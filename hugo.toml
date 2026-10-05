@@ -1,0 +1,11 @@
+baseURL = "https://pink-bourbon-estate.github.io/"
+languageCode = "en-us"
+title = "Pink Bourbon Estate"
+theme = "minimal"
+paginate = 10
+
+[params]
+  description = "Open source Blender tools for procedural environments"
+  author = "Pink Bourbon Estate"
+  github = "https://github.com/pink-bourbon-estate"
+  email = "pinkbourbonestate@gmail.com"
