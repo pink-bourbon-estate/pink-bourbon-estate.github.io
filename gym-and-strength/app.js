@@ -1,5 +1,6 @@
-/* Gym and Strength - a one-rep-max and working-weight calculator, strength standards, a lifts log,
-   exercises by movement pattern with progressions, programme templates and mobility.
+/* Gym and Strength - a sets-and-reps planner (estimate your max, get a starting weight, then a next-session suggestion and a rest timer),
+   a per-exercise progress graph, a lifts log, strength standards, programmes (templates, Conjugate, Golden and silver era), a week planner
+   and exercises by movement pattern with progressions. Shoulder prehab and mobility now live in the Mobility and Physio tool.
    Built on tracker.js. Not coaching and not medical advice: train within your limits, learn technique
    from a qualified coach where you can, and stop if something hurts in a sharp or unusual way. */
 
@@ -51,6 +52,53 @@ const PROGRAMMES = {
   'Push, pull, legs (repeat twice, 6 days)': { Push: [['Bench press', 'bench', 4, 6, 78], ['Overhead press', 'press', 3, 8, 70], ['Incline dumbbell press', null, 3, 10, 0], ['Lateral raise', null, 3, 15, 0], ['Triceps pushdown', null, 3, 12, 0]], Pull: [['Deadlift', 'deadlift', 3, 5, 80], ['Barbell row', 'row', 4, 8, 70], ['Pull-up or pulldown', null, 3, 8, 0], ['Face pull', null, 3, 15, 0], ['Biceps curl', null, 3, 12, 0]], Legs: [['Back squat', 'squat', 4, 6, 78], ['Romanian deadlift', 'deadlift', 3, 8, 60], ['Leg press or split squat', null, 3, 10, 0], ['Leg curl', null, 3, 12, 0], ['Calf raise', null, 4, 12, 0]], note: 'Push, Pull, Legs, then again. Rest one day a week. This is a lot of volume: start with fewer sets and build up.' },
 };
 
+
+/* ---- sets and reps helpers ---- */
+
+/** Work out what to do next time from what you did. Plain "double progression": fill the rep range, then add weight.
+    `reps` is the reps done in each set, `w` the weight, `rpe` the effort of the last set (0 if unknown). Returns {title, detail, why, nextWeight}. */
+function nextStep(o) {
+  const { reps, w, rpe, lo, hi, step, hist } = o, sets = reps.length, bump = step * Math.max(1, Math.round((w * 0.025) / step)), lower = (f) => Math.max(0, toStep(w * f, step));
+  const allTop = reps.every((r) => r >= hi), allIn = reps.every((r) => r >= lo), firstLow = reps[0] < lo, dropoff = !firstLow && reps.some((r) => r < lo);
+  // has the weight been stuck? Three sessions at this weight without the total reps going up
+  const same = (hist || []).slice(-3).filter((x) => x.weight === w), stuck = same.length >= 3 && same.every((x, i, a) => i === 0 || x.reps.reduce((s2, v) => s2 + v, 0) <= a[i - 1].reps.reduce((s2, v) => s2 + v, 0));
+  const stallNote = stuck ? ' You have been at this weight for three sessions without more reps: consider an easier week (about 10 % lighter), more sleep and food, or a slightly different rep range.' : '';
+  if (rpe >= 10 && !allIn) return { title: 'Lower the weight a little', detail: 'Next time try ' + lower(0.925) + ' kg for ' + sets + ' x ' + lo + ' to ' + hi + '.', why: 'The last set was all-out and some sets fell below ' + lo + ' reps. A slightly lighter weight lets you build the reps back up.' + stallNote, nextWeight: lower(0.925) };
+  if (firstLow) return { title: 'Lower the weight', detail: 'Next time try ' + lower(0.93) + ' kg for ' + sets + ' x ' + lo + ' to ' + hi + '.', why: 'Your first set was below the bottom of your rep range (' + lo + '), so the weight was a bit heavy for this range. (A bad day, poor sleep or a short rest can do this too: one session is not a trend.)' + stallNote, nextWeight: lower(0.93) };
+  if (dropoff) return { title: 'Same weight, rest longer', detail: 'Stay at ' + w + ' kg and rest 3 to 4 minutes between sets next time.', why: 'The first sets were in range but the later sets dropped below ' + lo + ': that usually means tiredness between sets rather than a weight that is too heavy.' + stallNote, nextWeight: w };
+  if (allTop && rpe >= 9.5) return { title: 'Stay at this weight once more', detail: 'Do ' + w + ' kg again and see if the top reps feel a little easier.', why: 'You hit the top of the range, but the last set was close to your limit. Repeating it makes the next jump smaller and safer.' + stallNote, nextWeight: w };
+  if (allTop) return { title: 'Add weight', detail: 'Next time try ' + (w + bump) + ' kg and start again at ' + lo + ' reps a set, working back up to ' + hi + '.', why: 'Every set reached the top of the range (' + hi + ' reps), which is the usual sign to go heavier.', nextWeight: w + bump };
+  const need = reps.map((r, i) => (r < hi ? 'set ' + (i + 1) + ' (' + r + ' to ' + (r + 1) + ')' : null)).filter(Boolean);
+  return { title: 'Same weight, add reps', detail: 'Stay at ' + w + ' kg and try for one more rep on: ' + need.join(', ') + '.', why: 'All sets were inside your rep range but not all at the top. Add reps first, then weight.' + stallNote, nextWeight: w };
+}
+const sessionHistory = (ex, get) => (get('srlog', []) || []).filter((x) => x.exercise === ex);
+/** Keep a session (for the advice next time) and add its best set to the Lifts log (for the graph). */
+function saveSession(ex, w, reps, rpe, s, a, get, set, today) {
+  const log = get('srlog', []) || []; log.push({ date: today(), exercise: ex, weight: w, reps, rpe: rpe || '', advice: a.title }); set('srlog', log);
+  const lifts = get('lifts', []) || []; lifts.push({ date: today(), exercise: ex, weight: w, reps: Math.max(...reps), sets: reps.length, rpe: rpe || '', notes: 'From Sets and reps' }); set('lifts', lifts);
+}
+/** A rest timer: choose a length and it counts down and chimes. */
+function restTimer(h) {
+  const node = h('div', {}), disp = h('p', { class: 'lede', id: 'rest_disp', 'aria-live': 'polite' }, 'Rest: not running'); let t = null, end = 0;
+  const stop = () => { if (t) clearInterval(t); t = null; };
+  const go = (secs) => { stop(); end = Date.now() + secs * 1000; if (window.PBEsound) { try { PBEsound.strike('wood'); } catch (e) { /* silent */ } } t = setInterval(() => { if (!document.body.contains(disp)) { stop(); return; } const left = Math.max(0, Math.ceil((end - Date.now()) / 1000)); disp.textContent = left ? 'Rest: ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') : 'Rest over: next set'; if (!left) { stop(); if (window.PBEsound) { PBEsound.strike('chime'); setTimeout(() => PBEsound.strike('chime'), 700); } } }, 250); };
+  node.append(h('p', { class: 'meta' }, 'Common guidance: about 1 to 2 minutes for lighter sets of 12 or more, 2 to 3 minutes for 6 to 12 reps, 3 to 5 minutes for heavy sets of 1 to 5. Press a length when you finish a set; it chimes when time is up.'), disp,
+    h('p', {}, [60, 90, 120, 180, 240, 300].map((s2) => h('span', {}, h('button', { type: 'button', onclick: () => go(s2) }, s2 >= 120 ? s2 / 60 + ' min' : s2 + ' s'), ' ')), h('button', { type: 'button', onclick: () => { stop(); disp.textContent = 'Rest: not running'; } }, 'Cancel')));
+  return { node };
+}
+/** Fold the Conjugate and Golden era tabs into one Programmes tab with three buttons, and put the tabs in a sensible order. */
+function mergeProgrammes(tabs) {
+  const by = (id) => tabs.find((t) => t.id === id), tpl = by('plan'), conj = by('conj'), gold = by('golden');
+  const merged = { id: 'plan', label: 'Programmes', type: 'custom', render: (ctx) => {
+    const box = ctx.h('div', {}), views = [['Templates', tpl], ['Conjugate (Westside)', conj], ['Golden and silver era', gold]], bar = ctx.h('div', { class: 'penbar' });
+    const show = (i) => { PBE.fill(box, views[i][1].render(ctx)); [...bar.children].forEach((b, j) => b.setAttribute('aria-pressed', j === i)); };
+    views.forEach(([name], i) => bar.append(ctx.h('button', { type: 'button', 'aria-pressed': i === 0, onclick: () => show(i) }, name)));
+    const first = ctx.h('div', {}); setTimeout(() => show(0), 0); return ctx.h('div', {}, bar, box, first);
+  } };
+  const order = ['orm', 'progress', 'lifts', 'plan', 'week', 'std', 'ex', 'prog', 'notes'];
+  return order.map((id) => (id === 'plan' ? merged : by(id))).filter(Boolean);
+}
+
 /* ---- the tabs ---- */
 PBE.tool({
   id: 'gym-and-strength',
@@ -58,7 +106,6 @@ PBE.tool({
   /* made-up example lifts: twelve weeks of slow progress on four lifts */
   example: ({ daysAgo, rnd }) => ({
     lifts: [['Back squat', 90, 5], ['Bench press', 62.5, 5], ['Deadlift', 110, 5], ['Standing barbell overhead press', 40, 6]].flatMap(([exercise, w0, reps], k) => Array.from({ length: 12 }, (_, i) => ({ date: daysAgo(84 - i * 7 - k), exercise, weight: Math.round((w0 + i * 2.5 + (rnd() > 0.7 ? 0 : 0)) / 2.5) * 2.5, reps: reps - (rnd() > 0.8 ? 1 : 0), sets: 3, rpe: 7 + Math.round(rnd() * 3 * 2) / 2 / 2, notes: '' }))),
-    shoulder: Array.from({ length: 14 }, (_, i) => ({ date: daysAgo(40 - i * 3), side: 'Right', activity: ['Bench press', 'Overhead press', 'Pull-up', 'Warm-up'][i % 4], pain: Math.max(0, Math.round(4 - i * 0.2 + (i % 4 === 1 ? 2 : 0))), where: 'front', notes: '' })),
     prog: [{ date: daysAgo(70), pattern: 'Horizontal push', exercise: 'Incline push-up', step: 2, result: '3 x 10', notes: '' }, { date: daysAgo(40), pattern: 'Horizontal push', exercise: 'Push-up', step: 4, result: '3 x 8', notes: '' }, { date: daysAgo(10), pattern: 'Horizontal push', exercise: 'Push-up', step: 4, result: '3 x 12', notes: '' }, { date: daysAgo(60), pattern: 'Vertical pull', exercise: 'Band-assisted pull-up', step: 3, result: '3 x 6', notes: '' }, { date: daysAgo(15), pattern: 'Vertical pull', exercise: 'Negative pull-up', step: 4, result: '3 x 5', notes: '' }],
   }),
   /* sliders: how much do you need to lift to reach each level at your bodyweight? */
@@ -77,29 +124,84 @@ PBE.tool({
       PBEcharts.slider('Bodyweight', 40, 130, 1, st.bw, (v) => { st.bw = v; draw(); }, 'kg'), PBEcharts.slider('Weight lifted', 20, 300, 2.5, st.w, (v) => { st.w = v; draw(); }, 'kg'), PBEcharts.slider('Reps', 1, 12, 1, st.r, (v) => { st.r = v; draw(); }), out);
   },
   notice: 'Not coaching or medical advice. Work in progress: expect bugs. Learn technique from a qualified coach if you can, and stop if anything hurts sharply. Your data stays in this browser.',
-  tabs: [
-    /* 1. one-rep-max calculator */
-    { id: 'orm', label: '1RM calculator', type: 'custom', render: ({ h, get, set, round }) => {
-      const s = get('orm', { w: 100, r: 5, step: 2.5 });
-      const out = h('div', {});
+  tabs: mergeProgrammes([
+    /* 1. SETS AND REPS: estimate your max, plan the sets, then check a session and see what to do next */
+    { id: 'orm', label: 'Sets and reps', type: 'custom', render: ({ h, get, set, round, today, rerender }) => {
+      /* what is stored: srx[exercise] = {w, r, sets, lo, hi, rir, step, weight, rest}; srlog = list of saved sessions */
+      const store = get('srx', {}), cur = get('srcur', EXERCISES.includes('Back squat') ? 'Back squat' : EXERCISES[0]);
+      let ex = cur; const S = () => Object.assign({ w: 80, r: 8, sets: 3, lo: 8, hi: 12, rir: 2, step: 2.5, orm: 0 }, store[ex] || {});
+      const root = h('div', {}), sec = h('div', {});
+      const save = (o) => { store[ex] = Object.assign(S(), o); set('srx', store); set('srcur', ex); };
       const field = (id, label, v, extra) => h('label', { class: 'fld' }, label, h('input', { id, type: 'number', value: v, step: 'any', min: 0, ...extra }));
+      const num = (id) => Number(document.getElementById(id).value) || 0;
+      const rest = restTimer(h);
+      /** the sessions from the lifts log for this exercise: used to make the estimate better */
+      const history = () => (get('lifts', []) || []).filter((x) => x.exercise === ex && x.weight && x.reps).sort((a, b) => (a.date < b.date ? -1 : 1));
+      const logOrm = () => { const hs = history().slice(-8); if (!hs.length) return 0; const top = hs.map((x) => est1RM(x.weight, x.reps)).sort((a, b) => b - a).slice(0, 3); return top.reduce((s2, v) => s2 + v, 0) / top.length; };
+
       const draw = () => {
-        const w = Number(document.getElementById('o_w').value), r = Number(document.getElementById('o_r').value), step = Number(document.getElementById('o_s').value) || 0;
-        set('orm', { w, r, step });
-        const orm = est1RM(w, r);
-        if (!orm) { PBE.fill(out, h('p', { class: 'meta' }, 'Enter a weight and a number of reps.')); return; }
-        const goals = [['Strength', '3 to 5 sets of 3 to 6 reps', 80, 90], ['Muscle growth', '3 to 4 sets of 6 to 12 reps', 65, 80], ['Endurance', '2 to 3 sets of 12 to 20 reps', 50, 65]];
-        PBE.fill(out, h('p', { class: 'lede' }, 'Estimated one-rep max: ' + round(orm) + ' kg'),
-          h('p', { class: 'meta' }, r > 10 ? 'Above about 10 reps this estimate is rough: a heavier set of fewer reps gives a better guess.' : 'An estimate: your real max depends on technique, fatigue and the day.'),
-          h('h3', {}, 'Weight at each percentage'),
-          h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['% of 1RM', 'Weight', 'About how many reps'].map((x) => h('th', {}, x)))), h('tbody', {}, PCT_REPS.map(([p, rp]) => h('tr', {}, h('td', {}, p + ' %'), h('td', { class: 'n' }, round(toStep(orm * p / 100, step), 1) + ' kg'), h('td', { class: 'n' }, rp)))))),
-          h('h3', {}, 'Working sets by goal'),
-          h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Goal', 'Typical sets and reps', 'Weight range'].map((x) => h('th', {}, x)))), h('tbody', {}, goals.map(([g, sr, lo, hi]) => h('tr', {}, h('td', {}, g), h('td', {}, sr), h('td', { class: 'n' }, round(toStep(orm * lo / 100, step), 1) + ' to ' + round(toStep(orm * hi / 100, step), 1) + ' kg')))))),
-          h('p', { class: 'meta' }, 'These are common starting ranges used in strength training, not rules. If a set feels easier or harder than expected, change the weight. The reps-at-percentage table is an approximation: people vary.'));
+        const s = S(), orm = s.orm || est1RM(s.w, s.r), hist = history(), lo = s.lo, hi = s.hi, sets = s.sets, step = s.step;
+        const confidence = hist.length >= 8 ? 'good: based on ' + hist.length + ' logged sets' : hist.length >= 3 ? 'fair: ' + hist.length + ' logged sets so far' : 'rough: one set (log more sessions and it improves)';
+        // starting weight: the weight you could lift for the TOP of the rep range with `rir` reps left in the tank
+        const effReps = hi + s.rir, pct = ((1 / (1 + effReps / 30)) + ((37 - effReps) / 36)) / 2, start = toStep(orm * pct, step);
+        PBE.fill(sec,
+          h('h3', {}, '1. Your estimated one-rep max'),
+          h('p', { class: 'lede' }, orm ? round(orm) + ' kg for ' + ex : 'Enter a weight and reps'),
+          h('p', { class: 'meta' }, 'Estimate confidence: ' + confidence + '. Above about 10 reps the formula is rough. It averages the Epley and Brzycki formulas.'),
+          hist.length ? h('p', {}, h('button', { type: 'button', onclick: () => { const v = logOrm(); if (v) { save({ orm: Math.round(v * 10) / 10 }); draw(); } } }, 'Use the estimate from my lifts log (' + round(logOrm()) + ' kg)'), ' ', s.orm ? h('button', { type: 'button', onclick: () => { save({ orm: 0 }); draw(); } }, 'Go back to my typed set') : null) : null,
+          h('h3', {}, '2. Your starting weight'),
+          h('p', { class: 'lede' }, sets + ' x ' + lo + ' to ' + hi + ' at ' + round(start, 1) + ' kg'),
+          h('p', { class: 'meta' }, 'That is about ' + Math.round((start / orm) * 100) + ' % of your one-rep max: the weight you could probably lift ' + hi + ' times with ' + s.rir + ' reps still in the tank, so you can work up from ' + lo + ' to ' + hi + ' reps. A set of ' + hi + ' reps should feel hard but not like a grind.'),
+          h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Reps', 'Weight (at ' + s.rir + ' reps left)', '% of 1RM'].map((x) => h('th', {}, x)))), h('tbody', {}, [3, 5, 6, 8, 10, 12, 15].map((rp) => { const e = rp + s.rir, p2 = ((1 / (1 + e / 30)) + ((37 - e) / 36)) / 2; return h('tr', {}, h('td', {}, rp), h('td', { class: 'n' }, round(toStep(orm * p2, step), 1) + ' kg'), h('td', { class: 'n' }, Math.round(p2 * 100) + ' %')); })))),
+          h('h3', {}, '3. After your session: what next?'),
+          sessionBox(s, start, orm));
       };
-      const form = h('div', { class: 'form' }, field('o_w', 'Weight lifted (kg)', s.w), field('o_r', 'Reps done', s.r, { step: 1, max: 30 }), field('o_s', 'Round to nearest (kg)', s.step, { step: 0.25 }));
-      form.addEventListener('input', draw); setTimeout(draw, 0);
-      return h('div', {}, h('p', { class: 'meta' }, 'Enter a hard set you have done and it estimates your one-rep max (the average of the Epley and Brzycki formulas), then works out the weights for other percentages and sets.'), form, out);
+      const sessionBox = (s, start, orm) => {
+        const box = h('div', {}), wUsed = h('input', { id: 'u_w', type: 'number', step: 'any', value: s.weight || start }), setBoxes = Array.from({ length: s.sets }, (_, i) => h('input', { class: 'u_r', type: 'number', min: 0, step: 1, 'aria-label': 'Reps in set ' + (i + 1), placeholder: 'set ' + (i + 1), style: 'width:5em' })), rpe = h('input', { id: 'u_rpe', type: 'number', min: 1, max: 10, step: 0.5, placeholder: '1-10 (optional)' }), out = h('div', {});
+        const advise = () => {
+          const reps = setBoxes.map((x) => Number(x.value)).filter((x) => x > 0), w = Number(wUsed.value) || 0, r = Number(rpe.value) || 0;
+          if (!reps.length || !w) { PBE.fill(out, h('p', { class: 'meta' }, 'Type the reps you did in each set to see a suggestion.')); return; }
+          const a = nextStep({ reps, w, rpe: r, lo: s.lo, hi: s.hi, step: s.step, hist: sessionHistory(ex, get) });
+          PBE.fill(out, h('p', { class: 'lede' }, a.title), h('p', {}, a.detail), h('p', { class: 'meta' }, a.why),
+            h('p', {}, h('button', { type: 'button', onclick: () => { saveSession(ex, w, reps, r, s, a, get, set, today); save({ weight: a.nextWeight }); draw(); } }, 'Save this session and set up the next one'), ' ', h('span', { class: 'meta' }, 'It also adds your best set to the Lifts log, so the Progress graph updates.')));
+        };
+        const form = h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Weight used (kg)', wUsed), h('label', { class: 'fld' }, 'Reps in each set', h('span', { style: 'display:flex;gap:6px;flex-wrap:wrap' }, ...setBoxes)), h('label', { class: 'fld' }, 'How hard was the last set? (RPE)', rpe));
+        form.addEventListener('input', advise); advise();
+        const log = get('srlog', []).filter((x) => x.exercise === ex).slice(-6).reverse();
+        box.append(h('p', { class: 'meta' }, 'Next time, the same advice uses what you did: all sets at the top of the range means more weight; sets in range means more reps; a drop-off in the last sets means the same weight with longer rests; and so on. The more sessions you save, the better it spots a stall.'),
+          form, out, h('h3', {}, 'Rest timer'), rest.node, log.length ? h('div', {}, h('h3', {}, 'Recent sessions'), h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Date', 'Weight', 'Reps', 'RPE', 'What it said'].map((x) => h('th', {}, x)))), h('tbody', {}, log.map((x) => h('tr', {}, h('td', {}, x.date), h('td', { class: 'n' }, x.weight + ' kg'), h('td', {}, x.reps.join(', ')), h('td', {}, x.rpe || ''), h('td', {}, x.advice))))))) : null);
+        return box;
+      };
+      /* the top form: exercise, a set you did, the plan */
+      const exInput = h('input', { id: 'sr_ex', list: 'sr_exlist', value: ex, 'aria-label': 'Exercise' }), dl = h('datalist', { id: 'sr_exlist' }, EXERCISES.map((e) => h('option', { value: e })));
+      const form = h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Exercise', exInput, dl), field('p_w', 'A hard set you have done: weight (kg)', S().w), field('p_r', '... reps', S().r, { step: 1 }),
+        field('p_sets', 'Sets you want to do', S().sets, { step: 1 }), field('p_lo', 'Rep range: from', S().lo, { step: 1 }), field('p_hi', '... to', S().hi, { step: 1 }), field('p_rir', 'Reps to leave in the tank', S().rir, { step: 1, max: 5 }), field('p_step', 'Smallest plate jump (kg)', S().step, { step: 0.25 }));
+      exInput.addEventListener('change', () => { ex = exInput.value.trim() || ex; set('srcur', ex); rerender(); });
+      form.addEventListener('input', (e) => { if (e.target === exInput) return; save({ w: num('p_w'), r: num('p_r'), sets: Math.max(1, num('p_sets')), lo: num('p_lo'), hi: Math.max(num('p_lo'), num('p_hi')), rir: num('p_rir'), step: num('p_step') || 2.5, orm: 0 }); draw(); });
+      root.append(h('p', { class: 'meta' }, 'Pick an exercise and enter a hard set you have done. It estimates your one-rep max, tells you what weight to start your sets and rep range with, and after each session tells you whether to add weight, add reps, stay, or rest longer. Everything is saved per exercise.'), form, sec);
+      draw(); return root;
+    } },
+    /* PROGRESS: one exercise over time */
+    { id: 'progress', label: 'Progress', type: 'custom', render: ({ h, get, round }) => {
+      const statBox = (pairs) => { const b = h('div', {}); PBEcharts.stat(b, pairs); return b; };
+      const rows = (get('lifts', []) || []).filter((x) => x.exercise && x.weight), names = [...new Set(rows.map((x) => x.exercise))].sort();
+      const out = h('div', {});
+      if (!names.length) return h('div', {}, h('p', { class: 'meta' }, 'Nothing to chart yet. Log some sets in the Lifts log or the Sets and reps tab, or load sample data in the Your data tab.'));
+      const ex = h('select', { id: 'pg_ex' }, names.map((n) => h('option', { value: n }, n))), metric = h('select', { id: 'pg_m' }, [['orm', 'Estimated one-rep max'], ['weight', 'Heaviest weight'], ['vol', 'Volume (weight x reps x sets)']].map(([v, l]) => h('option', { value: v }, l))), span = h('select', { id: 'pg_s' }, [['28', 'Last 4 weeks'], ['84', 'Last 12 weeks'], ['182', 'Last 6 months'], ['365', 'Last year'], ['0', 'All time']].map(([v, l]) => h('option', { value: v }, l)));
+      span.value = '0'; ex.value = names.includes('Back squat') ? 'Back squat' : names[0];
+      const draw = () => {
+        const cut = Number(span.value) ? new Date(Date.now() - Number(span.value) * 86400000).toISOString().slice(0, 10) : '', m = metric.value;
+        const mine = rows.filter((x) => x.exercise === ex.value && x.date >= cut).sort((a, b) => (a.date < b.date ? -1 : 1));
+        const val = (x) => (m === 'orm' ? est1RM(x.weight, x.reps || 1) : m === 'weight' ? x.weight : x.weight * (x.reps || 1) * (x.sets || 1));
+        const byDay = {}; mine.forEach((x) => { byDay[x.date] = Math.max(byDay[x.date] || 0, val(x)); });                                // best value per day
+        const pts = Object.keys(byDay).sort().map((d) => ({ x: d, y: Math.round(byDay[d] * 10) / 10 }));
+        const box = h('div', { class: 'chart' }); PBEcharts.line(box, pts, { unit: m === 'vol' ? 'kg' : 'kg', empty: 'Not enough sessions in this period: log at least two.', title: ex.value + ' over time' });
+        const first = pts[0], last = pts[pts.length - 1], best = pts.length ? Math.max(...pts.map((p) => p.y)) : 0, days = first && last ? Math.max(1, (new Date(last.x) - new Date(first.x)) / 86400000) : 0;
+        PBE.fill(out, box, pts.length > 1 ? statBox([['Sessions', pts.length], ['First', first.y + ' kg'], ['Latest', last.y + ' kg'], ['Change', (last.y - first.y >= 0 ? '+' : '') + round(last.y - first.y) + ' kg'], ['Per month', (last.y - first.y >= 0 ? '+' : '') + round(((last.y - first.y) / days) * 30.4, 1) + ' kg'], ['Best', best + ' kg']]) : null,
+          h('p', { class: 'meta' }, 'One point per day (the best set that day). Estimated one-rep max uses the average of the Epley and Brzycki formulas, so it can compare sessions with different reps.'));
+      };
+      [ex, metric, span].forEach((x) => x.addEventListener('change', draw)); draw();
+      return h('div', {}, h('p', { class: 'meta' }, 'Follow one exercise over any period.'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Exercise', ex), h('label', { class: 'fld' }, 'Measure', metric), h('label', { class: 'fld' }, 'Period', span)), out);
     } },
     /* 2. strength standards */
     { id: 'std', label: 'Strength standards', type: 'custom', render: ({ h, get, set, round }) => {
@@ -243,27 +345,6 @@ PBE.tool({
         h('h2', {}, 'Compare the eras'), tbl(['', 'Golden era (about 1940 to 1965)', 'Silver era (about 1965 to 1980)', 'Conjugate / Westside'], [['Frequency', 'Full body, 3 days a week', 'Splits, 4 to 6 days a week', 'Four to seven days a week, by quality'], ['Volume', 'Low to moderate per session', 'High', 'Varies by day'], ['Main aim', 'Size with strength basics', 'Size and shape', 'Strength, speed and size together'], ['Progression', 'Add weight when you complete all reps', 'More sets and intensity techniques', 'Rotate exercises, wave the percentages']]),
         h('h3', {}, 'Sources'), h('ul', {}, h('li', {}, h('a', { href: 'https://gymtalk.com/?p=19051', rel: 'noopener noreferrer' }, 'GymTalk, "The Reg Park Mr Universe Course"')), h('li', {}, h('a', { href: 'https://gymtalk.com/?p=17485', rel: 'noopener noreferrer' }, 'GymTalk, "The Steve Reeves \'Classic Physique\' Routine"'), ' (from Reeves\' May 1951 Your Physique article)'), h('li', {}, h('a', { href: 'https://gymtalk.com/?p=20795', rel: 'noopener noreferrer' }, 'GymTalk, "The Bill Pearl Bulk and Power Routine"')), h('li', {}, 'Reg Park, "Strength and Bulk Training for Weight Gain"; Bill Pearl, "Keys to the Inner Universe"; Steve Reeves, "Building the Classic Physique the Natural Way" (the original books, which I have not read).')));
     } },
-    /* 9. shoulder prehab */
-    { id: 'prehab', label: 'Shoulder prehab', type: 'static', blocks: [
-      { h: 'Shoulder and rotator cuff prehab', note: 'General information from published physiotherapy-style guidance, not a diagnosis or treatment plan. If you have shoulder pain that lasts, wakes you at night, comes with weakness, numbness or tingling, or follows an injury, see a physiotherapist or doctor.' },
-      { p: 'The rotator cuff is four small muscles (supraspinatus, infraspinatus, teres minor and subscapularis) that centre the ball of the upper arm in its shallow socket while the bigger muscles move it. Prehab means doing light, controlled work on them and on the shoulder blade muscles so heavy pressing, pulling and overhead lifting are easier on the joint.' },
-      { h3: 'Circuit A: push-pattern and trunk (about 10 minutes, 1 to 2 times a week)', list: ['Reverse push-up or inverted row-style press (10 reps)', 'Push-up plus: at the top, push the shoulder blades apart and round the upper back slightly (10 reps)', 'Scarecrow: elbows at 90 degrees, rotate the forearms up and down, 4 seconds up and 6 seconds down (10 reps)', 'Foam-roll the thoracic spine (upper back), about a minute', 'One-arm plank on a ball (advanced), 15 to 20 seconds'] },
-      { h3: 'Circuit B: pull-pattern and rotation (about 10 minutes, 1 to 2 times a week)', list: ['Face-down Y raise (10 reps, light)', 'Face-down T raise (10 reps, light)', 'Band external rotation with the arm about 30 degrees from the body: 4 seconds out, 6 seconds back (10 reps)', 'Scapular wall slides (10 reps)', 'Shoulder dislocates with a band or stick, pain-free range (10 reps)'] },
-      { p: 'Both circuits use light resistance: they are not max-strength workouts. Stabilising exercises are done for 10 to 20 reps or 30 to 60 seconds; timed holds in the circuits for 15 to 20 seconds. Emphasise the slow lowering on the rotation exercises.' },
-      { h3: 'How to do the key exercises', table: [['Exercise', 'How', 'Notes'], ['Band external rotation', 'Elbow bent to 90 degrees and tucked by your side (a rolled towel between arm and body helps), rotate the forearm outward against a light band, return slowly.', 'Stop when the shoulder blade starts to move, not the arm. Light resistance.'], ['Side-lying external rotation', 'Lie on your side with a light dumbbell; rotate the forearm up from your belly, return slowly.', 'The towel roll keeps the elbow in.'], ['Face pull', 'Cable or band at face height; pull toward the face with elbows high and rotate the hands outward.', 'The page recommended face pulls over upright rows.'], ['Y, T and W raises', 'Face down on a bench or bent over; lift arms in a Y, T or W shape with the thumbs up.', 'Very light: it is the shoulder blade muscles you want to feel.'], ['Scapular wall slides', 'Forearms on the wall, slide them up, keeping contact and pushing the blades apart.', 'Good for shoulder-blade control.'], ['Full-can raise', 'Arms raised in the plane of the shoulder blade (about 30 degrees forward of straight to the side) with the thumbs up.', 'Preferred over the "empty can" position with thumbs down.'], ['Thoracic extension', 'Over a foam roller or a chair back, extend the upper back while breathing out.', 'Opens up the posture so the shoulder can sit better.']] },
-      { h3: 'By problem area (as listed in the source)', table: [['If you find...', 'Consider'], ['Tight back of the shoulder (less internal rotation)', 'Cross-arm stretch, sleeper stretch, wall slides, dislocates, unilateral presses and pulls'], ['Internal rotators stronger than external', 'Face-down Y and T, band and cable external rotation, push-up plus, scarecrow'], ['Weak lower trapezius', 'Balance every press with a pull; retract the shoulder blades on pulls'], ['Poor body awareness at the shoulder', 'Ball push-ups, ball planks, rhythmic stabilisation on all fours']] },
-      { h3: 'Cautions', list: ['Never work through shoulder pain: stop and reassess.', 'Avoid the "high-five" position (arm out and rotated back under load): it stresses the front of the joint.', 'Use the full-can raise, not the empty can.', 'Gym changes that help many people: elbows closer to the body on bench, floor presses, front, Zercher or goblet squats if the back squat position bothers the shoulder, elbows slightly forward on pulldowns and overhead presses.', 'Be careful with explosive overhead lifts.'] },
-      { h3: 'Sources', list: ['Precision Nutrition, shoulder prehab article (circuits and problem areas): precisionnutrition.com/?p=14646', 'Please also see a qualified physiotherapist for your own shoulder: this is the only way to get advice that fits you.'] }] },
-    { id: 'prehabdo', label: 'Prehab routine', type: 'checks', word: 'Exercise', view: 'grid', intro: 'Tick the boxes as you do them. Light work: it should never hurt.',
-      items: [
-        { id: 'er', name: 'Band external rotation, 2 x 10 each side', every: 'daily', group: 'Shoulders' }, { id: 'slide', name: 'Scapular wall slides, 10', every: 'daily', group: 'Shoulders' }, { id: 'tx', name: 'Thoracic extension over a roller, 1 minute', every: 'daily', group: 'Shoulders' },
-        { id: 'ca', name: 'Circuit A (push pattern and trunk)', every: 'weekly', group: 'Circuits' }, { id: 'cb', name: 'Circuit B (pull pattern and rotation)', every: 'weekly', group: 'Circuits' },
-        { id: 'fp', name: 'Face pulls, 2 x 15', every: 'weekly', group: 'Shoulders' }, { id: 'ytw', name: 'Y, T, W raises, light', every: 'weekly', group: 'Shoulders' }, { id: 'hip', name: 'Hip and ankle mobility (squat holds, knee-to-wall)', every: 'daily', group: 'Lower body' }] },
-    { id: 'shoulder', label: 'Shoulder log', type: 'log', addLabel: 'Log how the shoulder feels', intro: 'Note pain from 0 (none) to 10 (worst) and what you were doing. Patterns (which lift, which angle) are worth taking to a physiotherapist.',
-      required: ['pain'],
-      fields: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'side', label: 'Side', type: 'select', options: ['Left', 'Right', 'Both'], keep: true }, { key: 'activity', label: 'Activity or lift' }, { key: 'pain', label: 'Pain (0-10)', type: 'number', min: 0, max: 10, step: 1 }, { key: 'where', label: 'Where (front, top, back, down the arm...)' }, { key: 'notes', label: 'Notes' }],
-      filterBy: 'side', summary: (r) => [['Entries', r.length], ['Average pain', PBE.round(r.reduce((s, x) => s + (x.pain || 0), 0) / r.length)], ['Highest', Math.max(...r.map((x) => x.pain || 0))]],
-      charts: [{ title: 'Pain over time', y: 'pain', zero: true }, { title: 'Pain average by activity', kind: 'bar', by: 'activity', avg: 'pain', unit: '/10' }] },
     /* week planner */
     { id: 'week', label: 'Week planner', type: 'custom', render: ({ weekPlanner }) => weekPlanner({
       id: 'weekplan', intro: 'Plan a typical training week. Dark boxes are hard sessions; the planner warns about back-to-back hard days and missing rest days. Start from a template, then change it to fit your life.',
@@ -279,13 +360,7 @@ PBE.tool({
         'Conjugate, 4 days': { Mon: ['Max effort lower'], Tue: ['Shoulder prehab circuit'], Wed: ['Dynamic effort upper'], Fri: ['Dynamic effort lower'], Sat: ['Max effort upper'], Sun: ['Low-intensity walk'] },
         'Conjugate with GPP, 7 days (per the template)': { Mon: ['Max effort lower'], Tue: ['Strongman endurance / GPP'], Wed: ['Dynamic effort upper'], Thu: ['Cardiac output (easy cardio)'], Fri: ['Dynamic effort lower'], Sat: ['Max effort upper'], Sun: ['Low-intensity walk'] },
       } }) },
-    /* mobility */
-    { id: 'mob', label: 'Mobility', type: 'checks', word: 'Exercise', intro: 'Short routines to keep joints moving. Pain-free ranges only: easing into a stretch is fine, forcing it is not.',
-      items: [
-        { id: 'hip', name: 'Hips: 90/90 switches or deep squat hold, 2 minutes', every: 'daily', group: 'Lower body' }, { id: 'ankle', name: 'Ankles: knee-to-wall drill, 10 each side', every: 'daily', group: 'Lower body' }, { id: 'ham', name: 'Hamstrings: gentle active leg raises or hinge stretch', every: 'daily', group: 'Lower body' },
-        { id: 'thor', name: 'Upper back: thoracic extensions over a roll, or thread-the-needle, 10 each', every: 'daily', group: 'Upper body' }, { id: 'shoulder', name: 'Shoulders: wall slides or band dislocates, 10', every: 'daily', group: 'Upper body' }, { id: 'neck', name: 'Neck and wrists: gentle circles and stretches', every: 'daily', group: 'Upper body' },
-        { id: 'foam', name: 'Foam roll or self-massage: quads, glutes, upper back', every: 'weekly', group: 'Recovery' }, { id: 'yoga', name: 'Longer stretching or yoga session, 20 to 30 minutes', every: 'weekly', group: 'Recovery' }, { id: 'deload', name: 'Easier week: reduce weights or volume by about half', every: 'quarterly', note: 'Many lifters take one every 4 to 8 weeks of hard training; adjust to how you feel.', group: 'Recovery' }] },
     { id: 'notes', label: 'Notes', type: 'notes', intro: 'Technique cues, injuries to avoid, plans, things your coach told you.' },
-  ],
+  ]),
 });
 function round1(x) { return Math.round(x * 10) / 10; }

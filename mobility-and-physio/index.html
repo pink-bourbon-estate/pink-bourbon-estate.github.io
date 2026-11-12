@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobility and Physio - Pink Bourbon Estate</title>
+<meta name="description" content="Shoulder and rotator-cuff prehab, a prehab routine to tick off, a shoulder log and mobility routines. General information, saved in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/mobility-and-physio/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Mobility and Physio - Pink Bourbon Estate">
+<meta property="og:description" content="Shoulder and rotator-cuff prehab, a prehab routine to tick off, a shoulder log and mobility routines. General information, saved in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/mobility-and-physio/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Mobility and Physio</h1>
+<p class="lede">Prehab circuits, mobility routines and a simple log of how a shoulder feels, to keep your training going. Free, in your browser, no account.</p>
+<div id="app"><p class="loading">Loading</p></div>
+<noscript><p class="note">This tool needs JavaScript to run.</p></noscript>
+<h2>About this tool</h2>
+<div class="prose"><p>A small tool in the same spirit as the rest of Pink Bourbon Estate: free, readable, and yours. Everything stays in this browser and nothing is sent anywhere; you can download your data as Markdown text or as CSV spreadsheet files. The code is plain JavaScript with comments, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/mobility-and-physio" rel="noopener">this folder</a>. This is a work in progress, not all tools are actively maintained, and nothing here is professional advice.</p></div>
+<script src="../charts.js"></script>
+<script src="../tracker.js"></script>
+<script src="app.js"></script>
+<script src="../databar.js"></script>
+<script>PBEdata.bar({ id: 'coffee', keys: ['mobility-and-physio-log-v1', 'mobility-and-physio-bags-v1'], sample: () => {
+  const d = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+  return {
+    'mobility-and-physio-log-v1': [
+      { date: d(12), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 3, grinder: 'Hand grinder', setting: '14', dose: 18, yield: 52, time: 24, tds: 0, taste: 'sour, thin', notes: 'Too fast: grind finer' },
+      { date: d(11), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 4, grinder: 'Hand grinder', setting: '12', dose: 18, yield: 40, time: 29, tds: 0, taste: 'sweet, lemon', notes: 'Better' },
+      { date: d(5), bean: 'Brazil natural', roaster: 'Example Roasters', method: 'V60', rating: 4, grinder: 'Hand grinder', setting: '22', dose: 15, yield: 250, time: 175, tds: 1.4, taste: 'chocolate, nutty', notes: '' }],
+    'mobility-and-physio-bags-v1': [
+      { date: d(14), name: 'Washed Ethiopian', roaster: 'Example Roasters', origin: 'Ethiopia', process: 'Washed', variety: 'Heirloom', grams: 250, price: 9.5, rating: 4, notes: 'Floral' },
+      { date: d(6), name: 'Brazil natural', roaster: 'Example Roasters', origin: 'Brazil', process: 'Natural', variety: 'Yellow Bourbon', grams: 1000, price: 22, rating: 3, notes: 'Everyday coffee' }] };
+} });</script>
+</main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
