@@ -1,4 +1,4 @@
-/* PianoCraft "PDF to MIDI" demo page.
+/* Sightline "PDF to MIDI" demo page.
    HONEST NOTE: a browser cannot reliably read a PDF's music symbols, so this page does not. It takes a public-domain
    piece (stored as MIDI), draws it as a page of sheet music, then ANIMATES the steps the desktop app performs on a real PDF
    (find the staves, find the barlines, find the music-font symbols, turn them into pitch and rhythm). The boxes are drawn

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PDF to MIDI demo - PianoCraft - Pink Bourbon Estate</title>
+<title>PDF to MIDI demo - Sightline - Pink Bourbon Estate</title>
 <meta name="description" content="A demonstration of how a page of sheet music is read into MIDI: staves, barlines, music-font symbols, pitch and rhythm, with a public-domain score.">
-<link rel="canonical" href="https://pink-bourbon-estate.github.io/pianocraft/convert/">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/sightline/convert/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pink Bourbon Estate">
-<meta property="og:title" content="PDF to MIDI demo - PianoCraft - Pink Bourbon Estate">
+<meta property="og:title" content="PDF to MIDI demo - Sightline - Pink Bourbon Estate">
 <meta property="og:description" content="A demonstration of how a page of sheet music is read into MIDI: staves, barlines, music-font symbols, pitch and rhythm, with a public-domain score.">
-<meta property="og:url" content="https://pink-bourbon-estate.github.io/pianocraft/convert/">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/sightline/convert/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <script src="../../theme.js"></script>
@@ -25,9 +25,9 @@
 </header>
 <main id="main">
 <h1>PDF to MIDI demo</h1>
-<p class="meta"><a href="../">PianoCraft</a> · <a href="../convert/">PDF to MIDI demo</a> · <a href="../player/">Player</a> · <a href="../score-lab/">Score lab</a></p>
+<p class="meta"><a href="../">Sightline</a> · <a href="../convert/">PDF to MIDI demo</a> · <a href="../player/">Player</a> · <a href="../score-lab/">Score lab</a></p>
 <p class="lede">Choose a piece, press "Read this page", and watch the steps. Then download the MIDI file or hear it.</p>
-<div class="note"><p><strong>This is a demonstration, not a converter.</strong> A browser cannot reliably read the symbols in a PDF. Here the score is a public-domain piece we already have as MIDI, drawn as a page; the boxes and labels show what the desktop app finds in a real PDF. For real PDF conversion, use the PianoCraft desktop app (in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>): it reads typeset PDFs by their music-font symbols, and uses Audiveris for scans.</p></div>
+<div class="note"><p><strong>This is a demonstration, not a converter.</strong> A browser cannot reliably read the symbols in a PDF. Here the score is a public-domain piece we already have as MIDI, drawn as a page; the boxes and labels show what the desktop app finds in a real PDF. For real PDF conversion, use the desktop app (in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>): it reads typeset PDFs by their music-font symbols, and uses Audiveris for scans.</p></div>
 <div class="ctl"><label class="row">Piece<select id="piece"></select></label><label class="row">Speed<input id="speed" type="range" min="1" max="10" value="7"></label></div>
 <div class="transport"><button id="read" type="button">Read this page</button><button id="dl" type="button" disabled>Download MIDI</button><button id="hear" type="button" disabled>Hear it</button><button id="openp" type="button">Open in the player</button></div>
 <div class="stage" id="stages"><span>1 Staves</span><span>2 Barlines</span><span>3 Music symbols</span><span>4 Pitch and rhythm</span><span>5 MIDI</span></div>
@@ -37,7 +37,7 @@
 <h2>How the real app does it</h2><div class="prose"><p>Typeset PDFs (from MuseScore, Sibelius, Dorico or Finale) draw each symbol with a music font, so the app can read the symbols directly rather than guess from pixels. That is quick and accurate. Scans are different: they are pictures, so they need optical music recognition (Audiveris), which is slower and needs checking. Colour key on this page: blue dashed = staves, amber = bars, pink = symbols.</p></div>
 <h2>Credits and licences</h2>
 <div class="prose">
-<p><strong>Music:</strong> every piece here is in the public domain. The MIDI files come from the Mutopia Project's typesetters, named on each page. <strong>Piano sound:</strong> the Salamander Grand Piano, recorded by Alexander Holm, used under the Creative Commons Attribution 3.0 licence (CC BY 3.0). The recordings are kept in this site's own folder; nothing is loaded from another site. <strong>Code:</strong> the tool's code is open and commented, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/pianocraft" rel="noopener">this folder</a>. The desktop app that does the real PDF reading is in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>.</p>
+<p><strong>Music:</strong> every piece here is in the public domain. The MIDI files come from the Mutopia Project's typesetters, named on each page. <strong>Piano sound:</strong> the Salamander Grand Piano, recorded by Alexander Holm, used under the Creative Commons Attribution 3.0 licence (CC BY 3.0). The recordings are kept in this site's own folder; nothing is loaded from another site. <strong>Code:</strong> the tool's code is open and commented, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/sightline" rel="noopener">this folder</a>. The desktop app that does the real PDF reading is in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>.</p>
 <p>Nothing you do here leaves your browser: markup is saved on your device only, and no files are uploaded anywhere.</p>
 </div>
 <script src="../pc.js"></script><script src="../convert.js"></script></main>

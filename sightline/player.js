@@ -1,9 +1,9 @@
-/* PianoCraft player page: pick a piece, hear it on a sampled piano, and practise with the controls.
+/* Sightline player page: pick a piece, hear it on a sampled piano, and practise with the controls.
    Uses pc.js for everything musical. Each control just changes a setting on the Player (see pc.js). */
 (() => {
   const $ = (id) => document.getElementById(id), BASE = '../scores/', SAMPLES = '../samples/';
   const LEVELS = ['', '1: the tune on the main beats', '2: the whole tune', '3: tune plus held bass notes', '4: tune plus the bass line', '5: tune with one harmony note', '6: full right hand', '7: everything'];
-  let score, player, drawn, level = 7, on = new Map(), nowBar = -1;
+  let fall, score, player, drawn, level = 7, on = new Map(), nowBar = -1;
 
   /** Draw (or redraw) the score for the current difficulty and wire up clicks. */
   function draw() {
@@ -26,6 +26,7 @@
   }
   const status = (t) => { $('status').textContent = t; };
   function onEvent(e) {
+    if (fall) fall.onEvent(e);
     if (e.type === 'step') {
       const delay = Math.max(0, (e.time - PC.Piano.ctx.currentTime) * 1000);
       setTimeout(() => {
@@ -69,6 +70,7 @@
     });
     $('stop').addEventListener('click', () => { player.stop(); on.forEach((e, id) => drawn.geo.note[id].el.classList.remove('on')); on.clear(); });
     $('dl').addEventListener('click', () => PC.download(score.meta.id + '-level' + level + '.mid', PC.writeMidi(score, PC.simplify(score, level), player.bpm, player.transpose)));
+    fall = PCfall.attach($('fall'), () => player);
     const q = new URLSearchParams(location.search).get('piece'); if (q && PC.PIECES.some((x) => x.id === q)) $('piece').value = q;
     await open($('piece').value); requestAnimationFrame(frame);
   });

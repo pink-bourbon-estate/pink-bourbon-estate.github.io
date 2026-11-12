@@ -1,0 +1,1 @@
+All pieces are public-domain compositions. The MIDI files come from the Mutopia Project (mutopiaproject.org) typesetters named on the Sightline pages and in the Toolkits repository's repertoire/LICENSES.md; each is marked Public Domain there.

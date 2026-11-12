@@ -1,4 +1,4 @@
-/* PianoCraft for the web: the shared engine used by the three pages.
+/* Sightline for the web: the shared engine used by the three pages.
    Plain JavaScript, no libraries, nothing loaded from other sites.
 
    What is in here, in the order you will meet it:

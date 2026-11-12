@@ -1,7 +1,7 @@
-/* PianoCraft score lab: mark up a score (pen, highlighter, text, fingering), simplify it, and tick off practice steps.
+/* Sightline score lab: mark up a score (pen, highlighter, text, fingering), simplify it, and tick off practice steps.
    Markup is saved in this browser only (localStorage), separately for each piece and difficulty level. */
 (() => {
-  const $ = (id) => document.getElementById(id), KEY = 'pbe-pianocraft-lab-v1';
+  const $ = (id) => document.getElementById(id), KEY = 'pbe-sightline-lab-v1';
   const STEPS = ['Listen to it, and sing or hum the tune', 'Count the beats and clap the rhythm', 'Right hand alone, slowly', 'Left hand alone, slowly', 'Hands together, slowly', 'Learn it by heart', 'Bring it up to tempo', 'Transpose it into another key'];
   let score, drawn, tool = 'pen', finger = '1', level = 5, store = {}, items = [], cur = null;
   const load = () => { try { store = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { store = {}; } };

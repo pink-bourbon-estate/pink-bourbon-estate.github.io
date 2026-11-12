@@ -1,4 +1,4 @@
-/* PianoCraft web pages: score drawing and player controls. Uses the site's colour variables so light and dark both work. */
+/* Sightline web pages: score drawing and player controls. Uses the site's colour variables so light and dark both work. */
 .scorebox { border: 1px solid var(--line); background: var(--bg); padding: 8px; margin: 12px 0; max-height: 70vh; overflow: auto; position: relative; }
 .score { width: 100%; height: auto; display: block; }
 .score .stl { stroke: var(--ink); stroke-width: 1; }
@@ -52,3 +52,5 @@
 .steps li { counter-increment: s; padding: 6px 0; border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; }
 .steps li::before { content: counter(s); color: var(--mute); width: 1.6em; }
 .steps label { display: flex; gap: 10px; align-items: baseline; cursor: pointer; }
+.ctl .row select, .ctl .row input[type=number] { width: 100%; }
+.ctl .row { align-content: start; }
