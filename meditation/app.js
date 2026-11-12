@@ -4,16 +4,8 @@
    If you have a medical or mental-health condition, meditation can sometimes bring up difficult feelings:
    go gently, and talk to a professional if it is distressing. This is not medical advice. */
 
-/** Play one soft bell: a sine tone that fades away. `freq` is the pitch in Hz. */
-function bell(freq = 528) {
-  try {
-    const ctx = bell.ctx || (bell.ctx = new (window.AudioContext || window.webkitAudioContext)());
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'sine'; o.frequency.value = freq;
-    g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 4);
-    o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 4.2);
-  } catch (e) { /* no audio available: the timer still works silently */ }
-}
+/** Play one bell-like sound. The sound comes from sounds.js (bell, bowl, chime, gong, wood); `freq` is the pitch in Hz. */
+function bell(freq) { PBEsound.strike(bell.sound || 'bell', bell.sound === 'bell' || !bell.sound ? freq : undefined); }
 const mmss = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 /** Breathing patterns: [name, [[phase, seconds], ...]] */
 const PACERS = { 'None': [], 'Box breathing (4-4-4-4)': [['In', 4], ['Hold', 4], ['Out', 4], ['Hold', 4]], 'Relaxing breath (4-7-8)': [['In', 4], ['Hold', 7], ['Out', 8]], 'Even breath (5-5)': [['In', 5], ['Out', 5]], 'Longer out-breath (4-6)': [['In', 4], ['Out', 6]] };
@@ -40,10 +32,11 @@ PBE.tool({
       const num = (id, label, v, ex) => h('label', { class: 'fld' }, label, h('input', { id, type: 'number', value: v, step: 'any', ...ex }));
       const kind = h('select', { id: 't_kind' }, ['Breath focus', 'Body scan', 'Loving-kindness', 'Open awareness', 'Walking', 'Guided', 'Other'].map((k) => h('option', { value: k }, k)));
       const pacer = h('select', { id: 't_pacer' }, Object.keys(PACERS).map((k) => h('option', { value: k }, k)));
-      kind.value = opts.kind; pacer.value = opts.pacer;
+      const snd = h('select', { id: 't_snd' }, PBEsound.names.map((k) => h('option', { value: k }, k))), amb = h('select', { id: 't_amb' }, [['none', 'None'], ['bath', 'Sound bath (bowls over a soft drone)'], ['drone', 'Soft drone'], ['ocean', 'Ocean'], ['rain', 'Rain']].map(([v, l]) => h('option', { value: v }, l)));
+      kind.value = opts.kind; pacer.value = opts.pacer; snd.value = opts.snd || 'bowl'; amb.value = opts.amb || 'none'; let stopAmb = null;
       let timer = null, endAt = 0, started = 0, nextBell = 0, total = 0;
       const stop = (finished) => {
-        if (timer) clearInterval(timer); timer = null;
+        if (timer) clearInterval(timer); timer = null; if (stopAmb) { stopAmb(); stopAmb = null; }
         const done = Math.round((Math.min(Date.now(), endAt) - started) / 60000);
         startBtn.textContent = 'Start'; phase.textContent = '';
         if (finished) { bell(396); PBE.fill(msg, 'Finished. ', h('button', { type: 'button', onclick: () => save(opts.mins) }, 'Save this sitting to the log')); }
@@ -60,12 +53,13 @@ PBE.tool({
       };
       const startBtn = h('button', { type: 'button', onclick: () => {
         if (timer) { stop(false); return; }
-        opts.mins = Number(document.getElementById('t_mins').value) || 10; opts.every = Number(document.getElementById('t_every').value) || 0; opts.kind = kind.value; opts.pacer = pacer.value; set('timeropts', opts);
+        opts.mins = Number(document.getElementById('t_mins').value) || 10; opts.every = Number(document.getElementById('t_every').value) || 0; opts.kind = kind.value; opts.pacer = pacer.value; opts.snd = snd.value; opts.amb = amb.value; bell.sound = snd.value; set('timeropts', opts); if (opts.amb !== 'none') stopAmb = PBEsound.ambient(opts.amb);
         started = Date.now(); total = opts.mins * 60000; endAt = started + total; nextBell = opts.every > 0 ? started + opts.every * 60000 : Infinity;
         bell(528); msg.textContent = ''; startBtn.textContent = 'Stop'; timer = setInterval(tick, 250); tick();
       } }, 'Start');
       wrap.append(h('p', { class: 'meta' }, 'Set a length, optional interval bells, and a breathing pacer if you want one. Keep this tab open while you sit. Bells are generated in your browser: make sure your sound is on.'),
-        h('div', { class: 'form' }, num('t_mins', 'Minutes', opts.mins, { min: 1 }), num('t_every', 'Bell every (minutes, 0 for none)', opts.every, { min: 0 }), h('label', { class: 'fld' }, 'Style', kind), h('label', { class: 'fld' }, 'Breathing pacer', pacer)),
+        h('div', { class: 'form' }, num('t_mins', 'Minutes', opts.mins, { min: 1 }), num('t_every', 'Bell every (minutes, 0 for none)', opts.every, { min: 0 }), h('label', { class: 'fld' }, 'Style', kind), h('label', { class: 'fld' }, 'Breathing pacer', pacer), h('label', { class: 'fld' }, 'Bell sound', snd), h('label', { class: 'fld' }, 'Background sound', amb)),
+        h('p', {}, h('button', { type: 'button', onclick: () => { bell.sound = snd.value; bell(528); } }, 'Hear the bell sound')),
         big, phase, h('p', {}, startBtn), msg);
       return wrap;
     } },

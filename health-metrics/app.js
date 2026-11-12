@@ -18,15 +18,15 @@ PBE.tool({
     const out = h('div', {}), out2 = h('div', {});
     const st = { rate: 0.3, weeks: 12, waist: 88, height: 175 };
     const draw = () => {
-      PBE.fill(out, h('p', { class: 'lede' }, 'If you change by ' + st.rate + ' kg a week for ' + st.weeks + ' weeks you would reach about ' + PBE.round(start - st.rate * st.weeks) + ' kg, starting from ' + start + ' kg.'), h('p', { class: 'meta' }, 'A slow, steady pace is generally easier to keep. For advice about your own weight, speak to a doctor or dietitian.'));
+      PBE.fill(out, h('p', { class: 'lede' }, 'If you change by ' + st.rate + ' kg a week for ' + st.weeks + ' weeks you would reach about ' + PBE.round(start - st.rate * st.weeks) + ' kg, starting from ' + start + ' kg.'), h('p', { class: 'meta' }, 'This is only a sum, not a target or advice. Weight goals are best set with a doctor or dietitian.'));
       const r = st.waist / st.height;
-      PBE.fill(out2, h('p', { class: 'lede' }, 'Waist-to-height ratio: ' + PBE.round(r, 2) + '.'), h('p', { class: 'meta' }, r < 0.5 ? 'Under 0.5, the figure often quoted as a rough guide.' : 'At or over 0.5, a figure often quoted as a rough sign to look at waist size. It is not a diagnosis.'));
+      PBE.fill(out2, h('p', { class: 'lede' }, 'Waist-to-height ratio: ' + PBE.round(r, 2) + '.'), h('p', { class: 'meta' }, 'Just the arithmetic (waist divided by height). What, if anything, it means for you is a question for your doctor or nurse.'));
     };
     draw();
     return h('div', {}, h('h3', {}, 'Weight projection'), PBEcharts.slider('Change per week', -1, 1, 0.1, st.rate, (v) => { st.rate = v; draw(); }, 'kg'), PBEcharts.slider('For how many weeks', 1, 52, 1, st.weeks, (v) => { st.weeks = v; draw(); }, 'weeks'), out,
       h('h3', {}, 'Waist to height'), PBEcharts.slider('Waist', 50, 140, 1, st.waist, (v) => { st.waist = v; draw(); }, 'cm'), PBEcharts.slider('Height', 140, 210, 1, st.height, (v) => { st.height = v; draw(); }, 'cm'), out2);
   },
-  notice: 'Not medical advice. This only records and charts what you enter. Work in progress: expect bugs. If you feel seriously unwell, or a reading worries you, contact a doctor or emergency services rather than a website. Your data stays in this browser.',
+  notice: 'Not medical advice. This only records and charts what you enter. Work in progress: expect bugs. It is a notebook to help you talk with a professional, not a source of advice. Your data stays in this browser.',
   tabs: [
     { id: 'bp', label: 'Blood pressure', type: 'log', addLabel: 'Add a reading',
       intro: 'Sit quietly for five minutes first, feet flat, arm supported at heart height, and take it at similar times each day. Many clinicians like two readings a minute apart.',
@@ -45,7 +45,7 @@ PBE.tool({
       summary: (r) => [['Readings', r.length], ['Highest', Math.max(...r.map((x) => x.temp || 0)) + ' °C'], ['Average', PBE.round(r.reduce((s, x) => s + (x.temp || 0), 0) / r.length) + ' °C']],
       charts: [{ title: 'Temperature over time', y: 'temp', unit: '°C' }] },
     { id: 'glucose', label: 'Blood glucose', type: 'log', addLabel: 'Add a glucose reading',
-      intro: 'Enter the number your meter shows, and pick the same unit it uses. Use the context box: a reading before a meal and one after are not comparable. Follow your own care team\'s targets.',
+      intro: 'Enter the number your meter shows, and pick the same unit it uses. Use the context box: a reading before a meal and one after are not comparable.',
       required: ['value'],
       fields: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'time', label: 'Time', type: 'time' }, { key: 'value', label: 'Reading', type: 'number', step: 0.1 },
         { key: 'unit', label: 'Unit', type: 'select', options: ['mmol/L', 'mg/dL'], keep: true },
@@ -54,7 +54,7 @@ PBE.tool({
       summary: (r) => { const v = r.map((x) => (x.unit === 'mg/dL' ? x.value / 18.016 : x.value)).filter(Boolean); return [['Readings', r.length], ['Average', v.length ? PBE.round(v.reduce((a, b) => a + b, 0) / v.length) + ' mmol/L' : '-']]; },
       charts: [{ title: 'Readings over time (mmol/L)', y: 'mmol', unit: 'mmol/L' }, { title: 'Readings by situation (count)', kind: 'bar', by: 'when', unit: 'readings' }] },
     { id: 'weight', label: 'Weight', type: 'log', addLabel: 'Add a weight',
-      intro: 'Weigh at the same time of day (many people choose the morning, after the toilet, before eating). Day-to-day swings of a kilo or so are normal, so look at the trend rather than one day.',
+      intro: 'Weigh at the same time of day (many people choose the morning, after the toilet, before eating). Day-to-day changes are common, so the trend over weeks is usually more useful than one day.',
       required: ['weight'],
       fields: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'weight', label: 'Weight', type: 'number', unit: 'kg', step: 0.1 }, { key: 'notes', label: 'Notes' }],
       summary: (r) => { const s = r.slice().sort((a, b) => a.date.localeCompare(b.date)); return [['Entries', r.length], ['Latest', s[s.length - 1].weight + ' kg'], ['Change since first', (s.length > 1 ? PBE.round(s[s.length - 1].weight - s[0].weight) : 0) + ' kg']]; },
@@ -66,12 +66,9 @@ PBE.tool({
       computed: [{ key: 'whr', label: 'Waist:hip', fn: (r) => (r.waist && r.hips ? PBE.round(r.waist / r.hips, 2) : '') }, { key: 'whtr', label: 'Waist:height', fn: (r) => (r.waist && r.height ? PBE.round(r.waist / r.height, 2) : '') }],
       charts: [{ title: 'Waist over time', y: 'waist', unit: 'cm' }, { title: 'Hips over time', y: 'hips', unit: 'cm' }, { title: 'Chest over time', y: 'chest', unit: 'cm' }, { title: 'Upper arm over time', y: 'arm', unit: 'cm' }, { title: 'Thigh over time', y: 'thigh', unit: 'cm' }] },
     { id: 'info', label: 'About the numbers', type: 'static', blocks: [
-      { h: 'What these numbers mean', note: 'General information only. Targets differ between people, and you should use the ones your own doctor or nurse gives you.' },
-      { h3: 'Blood pressure', p: 'In the UK the NHS describes a healthy range as roughly between 90/60 and under 120/80 mmHg, with high blood pressure usually meaning readings that stay at or above about 140/90 in a clinic or 135/85 at home. One high reading is not a diagnosis; a pattern is what matters. Very high readings with a severe headache, chest pain, confusion or breathlessness need urgent help.' },
-      { h3: 'Temperature', p: 'A typical body temperature is about 36 to 37 °C, varying by person, time of day and where it is measured. A temperature of 38 °C or higher is usually called a fever. Check current NHS guidance for babies and young children, where thresholds are different.' },
-      { h3: 'Blood glucose', p: 'Targets are set individually. People with diabetes are often given targets by their team; commonly quoted ranges for adults are about 4 to 7 mmol/L before meals, and under about 8.5 to 9 mmol/L two hours after a meal, but your own targets may differ. Low readings (under 4 mmol/L) with symptoms such as shakiness, sweating, confusion need quick treatment as advised by your team.' },
-      { h3: 'Weight and body measurements', p: 'Single numbers rarely tell the whole story. A waist measurement of more than about half your height is sometimes used as a rough sign of extra abdominal fat, which is what the waist-to-height ratio on the Body tab shows. It is not a diagnosis.' },
-      { h: 'Where these ranges come from', list: ['NHS: "High blood pressure (hypertension)", "Check your blood pressure", "High temperature (fever) in adults", "Blood sugar level targets" and related pages on nhs.uk: please read the current versions.', 'Diabetes UK: blood glucose targets information.'] },
-      { p: 'The figures above are summarised from memory of those pages and may be out of date: always check the current pages and ask your clinician.' }] },
+      { h: 'Using these records in a conversation', note: 'This tool only records what you enter. It does not tell you what a number means: that is for you and your doctor, nurse or pharmacist, who know your whole picture.' },
+      { h3: 'Things that make a record more useful to a professional', list: ['Note the date and time, and when relevant the situation (resting, after a walk, before or after a meal, which arm or device).', 'Use the same device and the same time of day where you can, so readings can be compared.', 'A pattern over weeks says more than a single reading, which is why the charts show a line.', 'Write down questions as you think of them in the Notes tab, and bring the summary to your appointment (the Your data tab can export a copy).'] },
+      { h3: 'Targets', p: 'Targets differ from person to person. If you have been given targets by your care team, they are the ones to follow; you can note them in the Notes tab.' },
+      { h3: 'Where to find general information', list: ['NHS (nhs.uk): pages on blood pressure, temperature, blood sugar and weight.', 'Diabetes UK, the British Heart Foundation and similar charities have clear, current guides.'] }] },
   ],
 });

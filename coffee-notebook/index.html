@@ -33,6 +33,18 @@
 </div>
 <script src="../charts.js"></script>
 <script src="app.js"></script>
+<script src="../databar.js"></script>
+<script>PBEdata.bar({ id: 'coffee', keys: ['coffee-notebook-log-v1', 'coffee-notebook-bags-v1'], sample: () => {
+  const d = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+  return {
+    'coffee-notebook-log-v1': [
+      { date: d(12), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 3, grinder: 'Hand grinder', setting: '14', dose: 18, yield: 52, time: 24, tds: 0, taste: 'sour, thin', notes: 'Too fast: grind finer' },
+      { date: d(11), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 4, grinder: 'Hand grinder', setting: '12', dose: 18, yield: 40, time: 29, tds: 0, taste: 'sweet, lemon', notes: 'Better' },
+      { date: d(5), bean: 'Brazil natural', roaster: 'Example Roasters', method: 'V60', rating: 4, grinder: 'Hand grinder', setting: '22', dose: 15, yield: 250, time: 175, tds: 1.4, taste: 'chocolate, nutty', notes: '' }],
+    'coffee-notebook-bags-v1': [
+      { date: d(14), name: 'Washed Ethiopian', roaster: 'Example Roasters', origin: 'Ethiopia', process: 'Washed', variety: 'Heirloom', grams: 250, price: 9.5, rating: 4, notes: 'Floral' },
+      { date: d(6), name: 'Brazil natural', roaster: 'Example Roasters', origin: 'Brazil', process: 'Natural', variety: 'Yellow Bourbon', grams: 1000, price: 22, rating: 3, notes: 'Everyday coffee' }] };
+} });</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

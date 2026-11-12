@@ -155,6 +155,7 @@
        Each job keeps a list of the dates you did it (hist). "Last done" is the newest of those.
        Two views: a list of what is due, and a grid like a habit tracker where you click a box to put an x in it. */
     function checksTab(t) {
+      const word = t.word || 'Habit';                         // what to call each row (set `word` on the tab: 'Routine', 'Check', 'Exercise'...)
       const wrap = h('div', {});
       let showFilter = 'due', ym = today().slice(0, 7);
       const state = () => {
@@ -174,7 +175,7 @@
         const s = state();
         const rowsData = items(s).map((i) => { const last = lastOf(s, i.id); const due = nextDue(last, i.every); return { ...i, last, due, left: daysUntil(due) }; });
         const view = h('p', {}, h('button', { type: 'button', 'aria-pressed': String(s.view !== 'grid'), onclick: () => { s.view = 'list'; set(t.id, s); draw(); } }, 'What is due'), ' ', h('button', { type: 'button', 'aria-pressed': String(s.view === 'grid'), onclick: () => { s.view = 'grid'; set(t.id, s); draw(); } }, 'Grid (tick boxes)'));
-        fill(wrap, h('p', { class: 'meta' }, t.intro || 'Tick a job when you have done it. It comes back when it is next due.'), view, s.view === 'grid' ? gridView(s, rowsData) : listView(s, rowsData), h('h3', {}, 'Add your own job'), addForm(s));
+        fill(wrap, h('p', { class: 'meta' }, t.intro || 'Tick an item when you have done it. It comes back when it is next due.'), view, s.view === 'grid' ? gridView(s, rowsData) : listView(s, rowsData), h('h3', {}, 'Add your own job'), addForm(s));
       };
       const listView = (s, rowsData) => {
         const groups = [...new Set(rowsData.map((r) => r.group).filter(Boolean))];
@@ -183,25 +184,25 @@
         const keep = rowsData.filter((r) => showFilter === 'all' || (showFilter === 'due' && r.left <= 0) || r.every === showFilter || showFilter === 'g:' + r.group).sort((a, b) => a.left - b.left);
         const status = (r) => (!r.last ? 'not done yet' : r.left < 0 ? 'overdue by ' + -r.left + ' day' + (r.left === -1 ? '' : 's') : r.left === 0 ? 'due today' : 'due in ' + r.left + ' day' + (r.left === 1 ? '' : 's'));
         return h('div', {}, h('label', { class: 'fld' }, 'Show', sel),
-          keep.length ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Job', 'How often', 'Last done', 'Status', ''].map((x) => h('th', {}, x)))),
+          keep.length ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, [word, 'How often', 'Last done', 'Status', ''].map((x) => h('th', {}, x)))),
             h('tbody', {}, keep.map((r) => h('tr', {}, h('td', {}, h('strong', {}, r.name), r.note ? h('span', { class: 'meta block' }, r.note) : null), h('td', {}, typeof r.every === 'number' ? 'every ' + r.every + ' days' : r.every), h('td', {}, r.last || '-'), h('td', { style: r.left < 0 || !r.last ? 'font-weight:600' : '' }, status(r)),
               h('td', {}, h('button', { type: 'button', onclick: () => { mark(s, r.id, today()); draw(); } }, 'Done today'), ' ', r.builtin ? null : h('button', { type: 'button', onclick: () => { s.custom = s.custom.filter((c) => c.id !== r.id); set(t.id, s); draw(); } }, 'Remove')))))))
-            : h('p', { class: 'meta' }, 'Nothing due. Choose "Everything" to see all jobs.'));
+            : h('p', { class: 'meta' }, 'Nothing due. Choose "Everything" to see all of them.'));
       };
       const gridView = (s, rowsData) => {
         const [y, m] = ym.split('-').map(Number), n = new Date(y, m, 0).getDate();
         const key = (d) => ym + '-' + String(d).padStart(2, '0');
         const sorted = rowsData.slice().sort((a, b) => FREQ_ORDER.indexOf(a.every) - FREQ_ORDER.indexOf(b.every));
         return h('div', {}, h('p', {}, h('button', { type: 'button', onclick: () => { ym = addMonths(ym + '-15', -1).slice(0, 7); draw(); } }, 'Previous'), ' ', h('strong', {}, ym), ' ', h('button', { type: 'button', onclick: () => { ym = addMonths(ym + '-15', 1).slice(0, 7); draw(); } }, 'Next')),
-          h('p', { class: 'meta' }, 'Click a box to put an x in it for the day you did the job; click again to take it out. The outlined box is today.'),
-          h('div', { class: 'tablewrap' }, h('table', { class: 'xgrid' }, h('thead', {}, h('tr', {}, h('th', {}, 'Job'), Array.from({ length: n }, (_, i) => h('th', {}, i + 1)))),
+          h('p', { class: 'meta' }, 'Click a box to put an x in it for the day you did it; click again to take it out. The outlined box is today.'),
+          h('div', { class: 'tablewrap' }, h('table', { class: 'xgrid' }, h('thead', {}, h('tr', {}, h('th', {}, word), Array.from({ length: n }, (_, i) => h('th', {}, i + 1)))),
             h('tbody', {}, sorted.map((r) => h('tr', {}, h('td', {}, r.name, h('span', { class: 'meta block' }, typeof r.every === 'number' ? 'every ' + r.every + ' days' : r.every)),
               Array.from({ length: n }, (_, i) => { const k = key(i + 1), on = (s.hist[r.id] || []).includes(k);
                 return h('td', {}, h('button', { type: 'button', class: 'xbox' + (k === today() ? ' today' : ''), 'aria-label': r.name + ' ' + k, 'aria-pressed': String(on), onclick: () => { mark(s, r.id, k); draw(); } }, on ? '×' : '')); }))))))); 
       };
       const addForm = (s) => {
         const name = h('input', { type: 'text' }), every = h('select', {}, FREQ_ORDER.map((f) => h('option', { value: f }, f))), group = h('input', { type: 'text', placeholder: 'optional' });
-        return h('div', {}, h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Job', name), h('label', { class: 'fld' }, 'How often', every), h('label', { class: 'fld' }, 'Group', group)),
+        return h('div', {}, h('div', { class: 'form' }, h('label', { class: 'fld' }, word, name), h('label', { class: 'fld' }, 'How often', every), h('label', { class: 'fld' }, 'Group', group)),
           h('p', {}, h('button', { type: 'button', onclick: () => { if (!name.value.trim()) return; s.custom.push({ id: 'c' + uid(), name: name.value.trim(), every: every.value, group: group.value.trim() || 'Mine' }); set(t.id, s); draw(); } }, 'Add the job')));
       };
       draw(); return wrap;
@@ -323,8 +324,8 @@
           stats.push([t.label + ' due or overdue', now.length]); over.sort((a, b) => a.left - b.left).slice(0, 6).forEach((r) => attention.push(r.name + ' (overdue by ' + -r.left + ' day' + (r.left === -1 ? '' : 's') + ')'));
           const perDay = {}; Object.values(s.hist).forEach((l) => l.forEach((x) => { perDay[x] = (perDay[x] || 0) + 1; }));
           const pts = Array.from({ length: 21 }, (_, i) => { const x = addDays(today(), i - 20); return { x, y: perDay[x] || 0 }; });
-          const c = h('div', { class: 'chart' }); PBEcharts.line(c, pts, { unit: 'jobs', empty: 'Nothing recorded yet.' });
-          blocks.push(h('div', {}, h('h2', {}, t.label + ': jobs done per day, last 3 weeks'), c));
+          const c = h('div', { class: 'chart' }); PBEcharts.line(c, pts, { unit: 'ticks', empty: 'Nothing recorded yet.' });
+          blocks.push(h('div', {}, h('h2', {}, t.label + ': ticks per day, last 3 weeks'), c));
         }
         if (t.type === 'dates' && d) {
           const upcoming = [...t.items, ...(d.custom || [])].map((i) => ({ i, date: (d.dates || {})[i.id] })).filter((x) => x.date).map((x) => ({ ...x, left: daysUntil(x.date) })).sort((a, b) => a.left - b.left);

@@ -33,6 +33,12 @@
 </div>
 <script src="../charts.js"></script>
 <script src="app.js"></script>
+<script src="../databar.js"></script>
+<script src="../sounds.js"></script>
+<script>PBEsound.timers();</script>
+<script>PBEdata.bar({ id: 'baking', keys: ['baking-timesheet-plan-v1'], sample: () => ({ 'baking-timesheet-plan-v1': [
+  { recipe_key: 'sourdough_country', label: 'Country sourdough x2', pieces: 2, piece_weight: 900, hydration: 74.5, yeast_type: 'instant', starter_cut: 20, waste_pct: 2, anchor: Date.now() + 86400000, mode: 'start', room_c: 20, overrides: {} },
+  { recipe_key: 'focaccia', label: 'Focaccia x1', pieces: 1, piece_weight: 900, hydration: 80, yeast_type: 'instant', starter_cut: 20, waste_pct: 2, anchor: Date.now() + 86400000 + 3600000 * 24, mode: 'start', room_c: 20, overrides: {} }] }) });</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

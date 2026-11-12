@@ -20,7 +20,7 @@ PBE.tool({
     return h('div', {}, h('h3', {}, 'What does laundry cost?'), PBEcharts.slider('Loads a week', 1, 14, 1, st.loads, (v) => { st.loads = v; draw(); }), PBEcharts.slider('Price of electricity per kWh', 5, 80, 1, st.price, (v) => { st.price = v; draw(); }, 'pence/cents'), out);
   },
   tabs: [
-    { id: 'routines', label: 'Routines', type: 'checks', intro: 'Press "Done today" when you finish a job and it comes back when it is next due. Pick "Everything" to see them all, or a group such as Kitchen. Add your own at the bottom.',
+    { id: 'routines', label: 'Routines', type: 'checks', word: 'Routine', intro: 'Press "Done today" when you finish a routine and it comes back when it is next due. Pick "Everything" to see them all, or a group such as Kitchen. Add your own at the bottom.',
       items: [
         { id: 'bed', name: 'Make beds, tidy surfaces', every: D, group: 'Daily tidy' }, { id: 'dishes', name: 'Wash up, wipe worktops and hob', every: D, group: 'Kitchen' }, { id: 'bins', name: 'Empty kitchen bin if needed, take out food waste', every: D, group: 'Kitchen' },
         { id: 'sweep', name: 'Sweep or quickly hoover high-traffic floors', every: D, group: 'Floors' },

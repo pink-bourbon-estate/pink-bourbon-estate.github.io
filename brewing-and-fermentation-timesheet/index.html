@@ -34,6 +34,12 @@
 </div>
 <script src="../charts.js"></script>
 <script src="app.js"></script>
+<script src="../databar.js"></script>
+<script src="../sounds.js"></script>
+<script>PBEsound.timers();</script>
+<script>PBEdata.bar({ id: 'brewing', keys: ['brewing-timesheet-plan-v1'], sample: () => ({ 'brewing-timesheet-plan-v1': [
+  { recipe_key: 'kombucha', label: 'Kombucha (3.8 L)', amount: 3.8, vars: [], anchor: Date.now() + 86400000, mode: 'start', room_c: 21 },
+  { recipe_key: 'mead', label: 'Mead (4.5 L)', amount: 4.5, vars: [0, 0, 0], anchor: Date.now() + 86400000 + 3600000 * 48, mode: 'start', room_c: 19 }] }) });</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

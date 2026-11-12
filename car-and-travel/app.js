@@ -7,7 +7,7 @@ PBE.tool({
   title: 'Car and Travel Checks',
   /* made-up example fill-ups */
   example: ({ daysAgo, rnd }) => ({
-    mileage: Array.from({ length: 14 }, (_, i) => { const litres = Math.round((38 + rnd() * 8) * 10) / 10; return { date: daysAgo(180 - i * 13), odo: Math.round(41200 + i * 330 + rnd() * 40), litres, cost: Math.round(litres * (1.42 + rnd() * 0.12) * 100) / 100, notes: '' }; }),
+    mileage: Array.from({ length: 14 }, (_, i) => { const litres = Math.round((38 + rnd() * 8) * 10) / 10; return { date: daysAgo(180 - i * 13), fuel: 'Petrol', odo: Math.round(41200 + i * 330 + rnd() * 40), litres, cost: Math.round(litres * (1.42 + rnd() * 0.12) * 100) / 100, notes: '' }; }),
   }),
   /* sliders: what does a year of motoring fuel cost? */
   whatif: ({ h }) => {
@@ -17,7 +17,7 @@ PBE.tool({
     return h('div', {}, h('h3', {}, 'What does a year of fuel cost?'), PBEcharts.slider('Miles a year', 1000, 25000, 500, st.miles, (v) => { st.miles = v; draw(); }, 'miles'), PBEcharts.slider('Miles per gallon (UK)', 15, 90, 1, st.mpg, (v) => { st.mpg = v; draw(); }, 'mpg'), PBEcharts.slider('Price per litre', 0.8, 2.5, 0.01, st.price, (v) => { st.price = v; draw(); }), out);
   },
   tabs: [
-    { id: 'checks', label: 'Vehicle checks', type: 'checks', intro: 'A common mnemonic for the quick check is POWDERS: Petrol, Oil, Water, Damage, Electrics, Rubber (tyres), Screenwash. The jobs below are general: your handbook has the exact intervals for your car.',
+    { id: 'checks', label: 'Vehicle checks', type: 'checks', word: 'Check', intro: 'A common mnemonic for the quick check is POWDERS: Petrol, Oil, Water, Damage, Electrics, Rubber (tyres), Screenwash. The jobs below are general: your handbook has the exact intervals for your car.',
       items: [
         { id: 'p', name: 'P - Petrol or charge: enough for the trip', every: 'daily', group: 'POWDERS' }, { id: 'lights', name: 'Lights, indicators, brake lights and wipers working', every: 'daily', group: 'POWDERS' }, { id: 'dmg', name: 'D - Damage: walk round for dents, leaks, objects, windscreen chips', every: 'daily', group: 'POWDERS' },
         { id: 'o', name: 'O - Oil level (engine cold, level ground)', every: 'weekly', group: 'POWDERS' }, { id: 'w', name: 'W - Water: coolant level (cold engine)', every: 'weekly', group: 'POWDERS' }, { id: 'e', name: 'E - Electrics: warning lights, horn, windscreen wash', every: 'weekly', group: 'POWDERS' },
@@ -27,10 +27,11 @@ PBE.tool({
     { id: 'dates', label: 'MOT, tax and insurance', type: 'dates', intro: 'Enter each date once. In the UK you can usually renew an MOT up to a month before it runs out and keep the same renewal date; check the current rules on gov.uk.',
       items: [{ id: 'mot', name: 'MOT (or your country\'s roadworthiness test) runs out' }, { id: 'tax', name: 'Vehicle tax renewal' }, { id: 'ins', name: 'Insurance renewal', note: 'Compare quotes a few weeks before.' }, { id: 'breakdown', name: 'Breakdown cover renewal' }, { id: 'service', name: 'Next service due' }, { id: 'licence', name: 'Driving licence photo renewal' }, { id: 'warranty', name: 'Warranty ends' }, { id: 'tyresdue', name: 'Tyres to be replaced by' }] },
     { id: 'mileage', label: 'Mileage and fuel', type: 'log', addLabel: 'Add a fill-up or odometer reading',
-      intro: 'Fill the tank each time and enter the odometer, the litres and the cost. Miles per gallon (UK) and cost per mile are worked out from the previous fill-up.',
+      intro: 'Fill the tank each time and enter the odometer, the litres and the cost. Pence per litre, miles per gallon (UK) and cost per mile are worked out for you. To compare with the going rate, GOV.UK publishes road fuel price data (gov.uk/guidance/access-fuel-price-data), and several apps now show nearby forecourt prices.',
       required: ['odo'],
-      fields: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'odo', label: 'Odometer', type: 'number', unit: 'miles', step: 1 }, { key: 'litres', label: 'Fuel', type: 'number', unit: 'litres' }, { key: 'cost', label: 'Cost', type: 'number' }, { key: 'notes', label: 'Notes (trip, tyre pressure, service...)' }],
+      fields: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'fuel', label: 'Fuel type', type: 'select', options: ['Petrol', 'Diesel', 'Hybrid', 'Other'], keep: true }, { key: 'odo', label: 'Odometer', type: 'number', unit: 'miles', step: 1 }, { key: 'litres', label: 'Fuel', type: 'number', unit: 'litres' }, { key: 'cost', label: 'Cost', type: 'number' }, { key: 'notes', label: 'Notes (trip, tyre pressure, service...)' }],
       computed: [
+        { key: 'ppl', label: 'Pence per litre', fn: (r) => (r.litres && r.cost ? PBE.round((r.cost / r.litres) * 100, 1) : '') },
         { key: 'miles', label: 'Miles since last', fn: (r, all) => { const p = all.filter((x) => x.date < r.date || (x.date === r.date && x.odo < r.odo)).sort((a, b) => b.odo - a.odo)[0]; return p ? r.odo - p.odo : ''; } },
         { key: 'mpg', label: 'mpg (UK)', fn: (r, all) => { const p = all.filter((x) => x.odo < r.odo).sort((a, b) => b.odo - a.odo)[0]; return p && r.litres ? PBE.round((r.odo - p.odo) / (r.litres / 4.54609), 1) : ''; } },
         { key: 'cpm', label: 'Cost per mile', fn: (r, all) => { const p = all.filter((x) => x.odo < r.odo).sort((a, b) => b.odo - a.odo)[0]; return p && r.cost ? PBE.round(r.cost / (r.odo - p.odo), 2) : ''; } }],
