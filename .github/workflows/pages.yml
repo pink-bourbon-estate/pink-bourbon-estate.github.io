@@ -7,6 +7,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '41 5 * * *'   # daily, so "Now reading" stays current
 
 permissions:
   contents: read
@@ -38,6 +40,40 @@ jobs:
           cargo build --release --lib --target wasm32-unknown-unknown
           cp target/wasm32-unknown-unknown/release/patternkit.wasm "$GITHUB_WORKSPACE/sewing-and-knitting-pattern-maker/patternkit.wasm"
           cp web/app.js "$GITHUB_WORKSPACE/sewing-and-knitting-pattern-maker/app.js"
+      - name: Look up the latest Standart magazine article (links only, polite)
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          # Reads Standart's public article feeds once a day, after checking robots.txt, and keeps
+          # only the title and link of the newest article. If anything fails the home page simply
+          # shows its plain link instead.
+          import json, re, urllib.request, urllib.robotparser
+          import xml.etree.ElementTree as ET
+          UA = "pink-bourbon-estate-site/1.0 (+https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io)"
+          rp = urllib.robotparser.RobotFileParser("https://standartmag.com/robots.txt")
+          rp.read()
+          ns = {"a": "http://www.w3.org/2005/Atom"}
+          best = None
+          for blog in ("library", "journal"):
+              url = f"https://standartmag.com/blogs/{blog}.atom"
+              if not rp.can_fetch(UA, url):
+                  print("robots.txt does not allow", url); continue
+              try:
+                  req = urllib.request.Request(url, headers={"User-Agent": UA})
+                  root = ET.fromstring(urllib.request.urlopen(req, timeout=30).read())
+              except Exception as e:
+                  print("could not read", url, e); continue
+              for e in root.findall("a:entry", ns):
+                  title = (e.findtext("a:title", "", ns) or "").strip()
+                  link = e.find("a:link[@rel='alternate']", ns)
+                  href = link.get("href") if link is not None else ""
+                  when = e.findtext("a:published", "", ns) or e.findtext("a:updated", "", ns) or ""
+                  if title and href.startswith("https://standartmag.com/") and (best is None or when > best[0]):
+                      best = (when, title, href)
+          if best:
+              json.dump({"title": best[1], "url": best[2]}, open("now-reading.json", "w"))
+              print("now reading:", best[1])
+          PY
       - name: Leave the build folders out of the site
         run: rm -rf _toolkits
       - uses: actions/configure-pages@v5
