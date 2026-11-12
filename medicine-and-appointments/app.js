@@ -18,6 +18,29 @@ function medSlots(meds) {
 PBE.tool({
   id: 'medicine-and-appointments',
   title: 'Medicine and Appointments',
+  /* the dashboard for medicines: how today is going */
+  dashboardExtra: ({ h, get, today }) => {
+    const meds = get('meds', []); if (!meds.length) return null;
+    const slots = medSlots(meds), taken = (get('taken', {})[today()]) || {}, got = slots.filter((s) => taken[s.key]).length;
+    const box = h('div', {});
+    PBEcharts.stat(box, [['Medicines in use', meds.filter((m) => m.active !== 'No').length], ['Doses due today', slots.length], ['Taken so far', got + '/' + slots.length]]);
+    return box;
+  },
+  /* made-up example entries: medicine names are invented and doses are placeholders, not advice */
+  example: ({ daysAgo, rnd, addDays, today }) => ({
+    meds: [{ date: daysAgo(40), name: 'Example tablet A', dose: '1 tablet', times: '08:00, 20:00', minHours: 12, what: 'example', prescriber: 'Example surgery', active: 'Yes', notes: '' }, { date: daysAgo(30), name: 'Example capsule B', dose: '1 capsule', times: '08:00', minHours: 24, what: 'example', prescriber: 'Example pharmacy', active: 'Yes', notes: 'with food' }, { date: daysAgo(10), name: 'Example painkiller C', dose: 'as on the label', times: '', minHours: 6, what: 'example', prescriber: '', active: 'Yes', notes: 'as needed' }],
+    rx: [{ date: daysAgo(12), name: 'Example tablet A', left: 40, perDay: 2, lead: 7, notes: '' }, { date: daysAgo(5), name: 'Example capsule B', left: 20, perDay: 1, lead: 7, notes: '' }],
+    appts: [{ date: addDays(today(), 6), time: '10:30', with: 'Example clinic', where: 'Example town', why: 'check-up', ask: 'ask about a repeat prescription', outcome: '' }, { date: addDays(today(), 31), time: '15:00', with: 'Example dentist', where: '', why: 'check-up', ask: '', outcome: '' }, { date: daysAgo(20), time: '09:00', with: 'Example nurse', where: '', why: 'blood test', ask: '', outcome: 'all fine (example)' }],
+    cond: Array.from({ length: 24 }, (_, i) => ({ date: daysAgo(46 - i * 2), condition: 'Example headache', severity: Math.max(0, Math.round(5 - i * 0.12 + rnd() * 3)), triggers: ['stress', 'poor sleep', 'screen time', 'dehydration'][Math.floor(rnd() * 4)], helped: 'rest', notes: '' })),
+    docs: [{ date: daysAgo(90), title: 'Example test result', kind: 'Test result', where: 'blue folder', expires: '', notes: '' }, { date: daysAgo(200), title: 'Example vaccination record', kind: 'Vaccination record', where: 'health app', expires: addDays(today(), 140), notes: '' }],
+  }),
+  /* sliders: when does a prescription run out? */
+  whatif: ({ h, today, addDays, daysUntil }) => {
+    const st = { left: 28, per: 1, lead: 7 }, out = h('div', {});
+    const draw = () => { const days = Math.floor(st.left / st.per), run = addDays(today(), days), order = addDays(run, -st.lead); PBE.fill(out, h('p', { class: 'lede' }, 'Runs out on ' + run + ' (in ' + days + ' days).'), h('p', { class: 'meta' }, 'Order by ' + order + (daysUntil(order) < 0 ? ' (that date has passed: order now).' : ' (in ' + daysUntil(order) + ' days).') + ' Use the amounts from your own label.')); };
+    draw();
+    return h('div', {}, h('h3', {}, 'When does a prescription run out?'), PBEcharts.slider('Left', 1, 200, 1, st.left, (v) => { st.left = v; draw(); }), PBEcharts.slider('Used per day', 0.5, 8, 0.5, st.per, (v) => { st.per = v; draw(); }), PBEcharts.slider('Order this many days ahead', 0, 21, 1, st.lead, (v) => { st.lead = v; draw(); }, 'days'), out);
+  },
   notice: 'Not medical advice. This only records what you type from your own labels and appointments, and never suggests doses. Follow your prescriber and pharmacist. Work in progress: expect bugs. Your data stays in this browser.',
   tabs: [
     /* the medicines list, which the Today tab reads */

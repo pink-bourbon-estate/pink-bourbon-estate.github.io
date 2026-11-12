@@ -99,6 +99,9 @@
           mk('p', { class: 'meta' }, 'Plain counts and averages of your own entries, not expert advice.'));
         box.append(mk('h3', {}, 'Entries'), mk('div', { class: 'tablewrap' }, mk('table', {}, mk('tbody', {}, list.map((e, i) => [e, i]).reverse().slice(0, 40).map(([e, i]) => mk('tr', {}, mk('td', {}, e.date), mk('td', {}, name(e.key), e.example ? mk('span', { class: 'meta block' }, '(example)') : null), mk('td', { class: 'n' }, e.rating ? e.rating + '/5' : ''), mk('td', { class: 'meta' }, e.notes || ''), mk('td', {}, mk('button', { type: 'button', onclick: () => { list.splice(i, 1); write(list); draw(); } }, 'Delete'))))))));
       }
+      // a what-if slider: how many a year at a steady pace
+      const proj = mk('p', { class: 'lede' }), upd = (v) => { proj.textContent = 'At ' + v + ' a month you would make about ' + v * 12 + ' a year.'; };
+      upd(4); box.append(mk('h2', {}, 'Play with it'), slider('' + (opt.plural || opt.noun + 's') + ' a month', 1, 30, 1, 4, upd), proj);
       box.append(mk('h2', {}, 'Example or clear'), mk('p', { class: 'meta' }, 'The example entries are made up to show what the charts look like. They are not from any real study or person, and they are labelled (example).'),
         mk('p', {}, mk('button', { type: 'button', onclick: () => {
           let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
@@ -111,5 +114,30 @@
     return box;
   }
 
-  window.PBEcharts = { bar, line, stat, history };
+  /* ---------- sliders ----------
+     Any number box written with data-slider="min,max,step" gets a slider beside it, kept in step with the box.
+     Moving the slider fires the same "input" event as typing, so the page recalculates live: this lets you
+     play with a calculator or a what-if and watch the numbers change. A slider you build yourself:
+        PBEcharts.slider('Miles a year', 1000, 20000, 500, 8000, (v) => {...}, 'miles')  returns a <label>. */
+  function enhance(inp) {
+    if (inp.dataset.enhanced) return; inp.dataset.enhanced = '1';
+    const [min, max, step] = inp.dataset.slider.split(',').map(Number);
+    const r = document.createElement('input'); r.type = 'range'; r.min = min; r.max = max; r.step = step || 1; r.value = inp.value || min; r.className = 'slider'; r.setAttribute('aria-label', (inp.getAttribute('aria-label') || 'slider'));
+    r.addEventListener('input', () => { inp.value = r.value; inp.dispatchEvent(new Event('input', { bubbles: true })); });
+    inp.addEventListener('input', () => { if (document.activeElement === inp) r.value = inp.value; });
+    inp.after(r);
+  }
+  const scan = (node) => (node.querySelectorAll ? node.querySelectorAll('input[data-slider]') : []).forEach(enhance);
+  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach(scan))).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', () => scan(document));
+
+  function slider(label, min, max, step, value, onInput, unit) {
+    const wrap = document.createElement('label'); wrap.className = 'fld';
+    const out = document.createElement('span'); out.className = 'meta'; out.textContent = value + (unit ? ' ' + unit : '');
+    const r = document.createElement('input'); r.type = 'range'; r.min = min; r.max = max; r.step = step; r.value = value; r.className = 'slider';
+    r.addEventListener('input', () => { out.textContent = r.value + (unit ? ' ' + unit : ''); onInput(Number(r.value)); });
+    wrap.append(label + ': ', out, r); return wrap;
+  }
+
+  window.PBEcharts = { bar, line, stat, history, slider };
 })();

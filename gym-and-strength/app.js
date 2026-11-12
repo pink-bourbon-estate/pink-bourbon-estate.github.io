@@ -55,6 +55,26 @@ const PROGRAMMES = {
 PBE.tool({
   id: 'gym-and-strength',
   title: 'Gym and Strength',
+  /* made-up example lifts: twelve weeks of slow progress on four lifts */
+  example: ({ daysAgo, rnd }) => ({
+    lifts: [['Back squat', 90, 5], ['Bench press', 62.5, 5], ['Deadlift', 110, 5], ['Standing barbell overhead press', 40, 6]].flatMap(([exercise, w0, reps], k) => Array.from({ length: 12 }, (_, i) => ({ date: daysAgo(84 - i * 7 - k), exercise, weight: Math.round((w0 + i * 2.5 + (rnd() > 0.7 ? 0 : 0)) / 2.5) * 2.5, reps: reps - (rnd() > 0.8 ? 1 : 0), sets: 3, rpe: 7 + Math.round(rnd() * 3 * 2) / 2 / 2, notes: '' }))),
+    prog: [{ date: daysAgo(70), pattern: 'Horizontal push', exercise: 'Incline push-up', step: 2, result: '3 x 10', notes: '' }, { date: daysAgo(40), pattern: 'Horizontal push', exercise: 'Push-up', step: 4, result: '3 x 8', notes: '' }, { date: daysAgo(10), pattern: 'Horizontal push', exercise: 'Push-up', step: 4, result: '3 x 12', notes: '' }, { date: daysAgo(60), pattern: 'Vertical pull', exercise: 'Band-assisted pull-up', step: 3, result: '3 x 6', notes: '' }, { date: daysAgo(15), pattern: 'Vertical pull', exercise: 'Negative pull-up', step: 4, result: '3 x 5', notes: '' }],
+  }),
+  /* sliders: how much do you need to lift to reach each level at your bodyweight? */
+  whatif: ({ h, round }) => {
+    const st = { bw: 80, sex: 'male', lift: 'squat', w: 100, r: 5 }, out = h('div', {});
+    const sel = h('select', {}, [['male', 'Male'], ['female', 'Female']].map(([v, l]) => h('option', { value: v }, l)));
+    const lift = h('select', {}, ['squat', 'bench', 'deadlift'].map((v) => h('option', { value: v }, v)));
+    const draw = () => {
+      const eff = Math.min(st.bw, 113.4), orm = est1RM(st.w, st.r), b = STANDARDS[st.sex][st.lift], x = orm / eff; let lv = 0; b.forEach((t, i) => { if (x >= t) lv = i + 1; });
+      PBE.fill(out, h('p', { class: 'lede' }, 'A set of ' + st.w + ' kg for ' + st.r + ' reps is about a ' + round(orm) + ' kg one-rep max: ' + round(x, 2) + ' x bodyweight, which is ' + LEVELS[lv].toLowerCase() + '.'),
+        h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Level', 'Needs a 1RM of'].map((x2) => h('th', {}, x2)))), h('tbody', {}, b.map((m, i) => h('tr', {}, h('td', {}, LEVELS[i + 1] + ' starts at ' + m + ' x'), h('td', { class: 'n' }, round(m * eff) + ' kg')))))),
+        h('p', { class: 'meta' }, 'From Jeff Nippard\'s published standards: see the Strength standards tab.'));
+    };
+    sel.addEventListener('change', () => { st.sex = sel.value; draw(); }); lift.addEventListener('change', () => { st.lift = lift.value; draw(); }); draw();
+    return h('div', {}, h('h3', {}, 'Where would a set put you?'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Sex', sel), h('label', { class: 'fld' }, 'Lift', lift)),
+      PBEcharts.slider('Bodyweight', 40, 130, 1, st.bw, (v) => { st.bw = v; draw(); }, 'kg'), PBEcharts.slider('Weight lifted', 20, 300, 2.5, st.w, (v) => { st.w = v; draw(); }, 'kg'), PBEcharts.slider('Reps', 1, 12, 1, st.r, (v) => { st.r = v; draw(); }), out);
+  },
   notice: 'Not coaching or medical advice. Work in progress: expect bugs. Learn technique from a qualified coach if you can, and stop if anything hurts sharply. Your data stays in this browser.',
   tabs: [
     /* 1. one-rep-max calculator */

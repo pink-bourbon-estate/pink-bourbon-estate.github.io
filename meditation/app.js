@@ -21,6 +21,17 @@ const PACERS = { 'None': [], 'Box breathing (4-4-4-4)': [['In', 4], ['Hold', 4],
 PBE.tool({
   id: 'meditation',
   title: 'Meditation',
+  /* made-up example sittings: most days over two months */
+  example: ({ daysAgo, rnd, pick }) => ({
+    sits: Array.from({ length: 62 }, (_, i) => i).filter((i) => rnd() < 0.75).map((i) => ({ date: daysAgo(61 - i), minutes: pick([5, 10, 10, 15, 20]), kind: pick(['Breath focus', 'Breath focus', 'Body scan', 'Loving-kindness', 'Open awareness']), before: 2 + Math.floor(rnd() * 2), after: 3 + Math.floor(rnd() * 3), notes: '' })),
+  }),
+  /* sliders: what does a habit add up to? */
+  whatif: ({ h }) => {
+    const st = { mins: 10, days: 5 }, out = h('div', {});
+    const draw = () => { const yr = (st.mins * st.days * 52) / 60; PBE.fill(out, h('p', { class: 'lede' }, st.mins + ' minutes, ' + st.days + ' days a week, adds up to about ' + PBE.round(yr, 0) + ' hours in a year (' + PBE.round(yr / 24, 1) + ' full days).'), h('p', { class: 'meta' }, 'Even a few minutes counts: regular beats long.')); };
+    draw();
+    return h('div', {}, h('h3', {}, 'What would a habit add up to?'), PBEcharts.slider('Minutes a sitting', 1, 60, 1, st.mins, (v) => { st.mins = v; draw(); }, 'min'), PBEcharts.slider('Days a week', 1, 7, 1, st.days, (v) => { st.days = v; draw(); }), out);
+  },
   notice: 'Not medical advice. If meditation brings up distress, go gently and speak to a professional. Work in progress: expect bugs. Your data stays in this browser.',
   tabs: [
     { id: 'timer', label: 'Timer', type: 'custom', render: ({ h, get, set, today }) => {

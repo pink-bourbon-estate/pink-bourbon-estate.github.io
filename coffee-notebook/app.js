@@ -98,14 +98,14 @@
       const t = root.querySelector('#taste').value;
       target.textContent = t ? TASTE_ADVICE[t] : '';
     };
-    const form = h('div', { class: 'form' }, num('dose', 'Coffee in (g)', 18, { min: 1, step: 0.1 }), num('yield', 'Liquid out (g)', 36, { min: 1, step: 0.1 }), num('time', 'Time (seconds)', 28, { min: 0 }),
-      num('tds', 'TDS % (optional, refractometer)', '', { min: 0, step: 0.01, placeholder: 'optional' }), h('label', { class: 'fld' }, 'Taste', taste));
+    const form = h('div', { class: 'form' }, num('dose', 'Coffee in (g)', 18, { min: 1, step: 0.1, 'data-slider': '5,30,0.5' }), num('yield', 'Liquid out (g)', 36, { min: 1, step: 0.1, 'data-slider': '10,90,1' }), num('time', 'Time (seconds)', 28, { min: 0, 'data-slider': '5,60,1' }),
+      num('tds', 'TDS % (optional, refractometer)', '', { min: 0, step: 0.01, placeholder: 'optional', 'data-slider': '0,12,0.05' }), h('label', { class: 'fld' }, 'Taste', taste));
     form.addEventListener('input', calc); setTimeout(calc, 0);
 
     /* second calculator: what to weigh for a ratio */
     const planOut = h('p', { class: 'lede', role: 'status' });
     const plan = () => { planOut.textContent = val('pdose') > 0 && val('pratio') > 0 ? 'Weigh ' + round1(val('pdose') * val('pratio')) + ' g of liquid for ' + val('pdose') + ' g of coffee (1:' + val('pratio') + ').' : ''; };
-    const form2 = h('div', { class: 'form' }, num('pdose', 'Coffee in (g)', 18, { min: 1, step: 0.1 }), num('pratio', 'Ratio (liquid per 1 of coffee)', 2, { min: 0.5, step: 0.1 }));
+    const form2 = h('div', { class: 'form' }, num('pdose', 'Coffee in (g)', 18, { min: 1, step: 0.1, 'data-slider': '5,30,0.5' }), num('pratio', 'Ratio (liquid per 1 of coffee)', 2, { min: 0.5, step: 0.1, 'data-slider': '0.5,20,0.1' }));
     form2.addEventListener('input', plan); setTimeout(plan, 0);
 
     return h('div', {}, h('p', { class: 'meta' }, 'Dial in one change at a time: keep the dose and the ratio fixed and move only the grind, then taste. Write what you find in the Grind log.'),
@@ -175,7 +175,7 @@
 
   function recipesTab() {
     const sel = h('select', { id: 'rec', 'aria-label': 'Recipe' }, [...new Set(RECIPES.map((r) => r.group))].map((g) => h('optgroup', { label: g }, RECIPES.filter((r) => r.group === g).map((r) => h('option', { value: r.key }, r.name)))));
-    const dose = num('rdose', 'Coffee dose (g)', RECIPES[0].dose, { min: 1, step: 0.1 });
+    const dose = num('rdose', 'Coffee dose (g)', RECIPES[0].dose, { min: 1, step: 0.1, 'data-slider': '5,100,1' });
     const out = h('div', {});
     const draw = () => {
       const r = RECIPES.find((x) => x.key === sel.value);

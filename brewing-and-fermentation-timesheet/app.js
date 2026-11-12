@@ -181,7 +181,7 @@
     // up to three adjustable boxes (for example honey per litre, or cocoa %, milk %, extra cocoa butter %)
     const varBoxes = [0, 1, 2].map((i) => num('varval' + i, 'Adjust', 0, { step: 'any' }));
     const varHints = [0, 1, 2].map(() => h('span', { class: 'meta' }));
-    const room = num('room', 'Room temperature (C)', 20, { min: 5, max: 35, step: 0.5 });
+    const room = num('room', 'Room temperature (C)', 20, { min: 5, max: 35, step: 0.5, 'data-slider': '5,35,0.5' });
     const mode = h('label', { class: 'fld' }, 'Plan by', h('select', { id: 'mode' }, h('option', { value: 'start' }, 'Start at'), h('option', { value: 'finish' }, 'Ready by (finish time)')));
     const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(10, 0, 0, 0);
     const when = h('label', { class: 'fld' }, 'When', h('input', { id: 'when', type: 'datetime-local', value: toLocalInput(t.getTime()) }));

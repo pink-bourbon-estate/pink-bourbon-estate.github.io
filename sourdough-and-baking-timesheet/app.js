@@ -233,18 +233,18 @@
     const first = DATA.recipes[0];
     const sel = h('select', { id: 'recipe', 'aria-label': 'Recipe' }, DATA.recipes.map((r) => h('option', { value: r.key }, r.name)));
     const desc = h('p', { class: 'meta', id: 'desc' });
-    const pieces = num('pieces', 'How many', first.default_pieces, { min: 1, step: 1 });
+    const pieces = num('pieces', 'How many', first.default_pieces, { min: 1, step: 1, 'data-slider': '1,24,1' });
     const pieceLabel = h('span', { class: 'meta', id: 'pl' });
-    const weight = num('weight', 'Grams of raw dough each', first.default_piece_weight, { min: 1 });
-    const hyd = num('hyd', first.liquid_label, first.hydration, { step: 0.5 });
+    const weight = num('weight', 'Grams of raw dough each', first.default_piece_weight, { min: 1, 'data-slider': '30,1500,10' });
+    const hyd = num('hyd', first.liquid_label, first.hydration, { step: 0.5, 'data-slider': '40,110,0.5' });
     const range = h('span', { class: 'meta', id: 'range' });
     // yeast choice only for recipes that use yeast (not sourdough, which uses a starter, and not pasta)
     const yeast = h('label', { class: 'fld' }, 'Yeast type', h('select', { id: 'yeast' }, Object.keys(YEAST).map((y) => h('option', { value: y }, y))));
     // sourdough only: dough cut away after the first mix, before salt, to become the next starter
-    const starter = num('starter', 'Starter to keep back (g)', 150, { min: 0, step: 10 });
+    const starter = num('starter', 'Starter to keep back (g)', 150, { min: 0, step: 10, 'data-slider': '0,400,10' });
     const starterNote = h('span', { class: 'meta', id: 'sn' }, 'Cut this much dough off after the first mix, before the salt goes in. 150 g is enough to start two more batches of loaves. It is added on top of the loaves, so your ratios stay the same. Set 0 if you keep your starter another way.');
-    const waste = num('waste', 'Bowl loss %', 1, { min: 0, max: 10, step: 0.5 });
-    const room = num('room', 'Kitchen temperature (C)', 21, { min: 5, max: 35, step: 0.5 });
+    const waste = num('waste', 'Bowl loss %', 1, { min: 0, max: 10, step: 0.5, 'data-slider': '0,10,0.5' });
+    const room = num('room', 'Kitchen temperature (C)', 21, { min: 5, max: 35, step: 0.5, 'data-slider': '5,35,0.5' });
     const mode = h('label', { class: 'fld' }, 'Plan by', h('select', { id: 'mode' }, h('option', { value: 'finish' }, 'Ready by (finish time)'), h('option', { value: 'start' }, 'Start at')));
     const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(10, 0, 0, 0);
     const when = h('label', { class: 'fld' }, 'When', h('input', { id: 'when', type: 'datetime-local', value: toLocalInput(t.getTime()) }));

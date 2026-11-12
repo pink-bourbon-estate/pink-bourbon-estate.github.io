@@ -5,6 +5,20 @@ const D = 'daily', W = 'weekly', M = 'monthly', Q = 'quarterly', Y = 'yearly';
 PBE.tool({
   id: 'home-routines',
   title: 'Home Routines',
+  view: 'grid',
+  /* made-up example meter and humidity readings; routines are filled in automatically */
+  example: ({ daysAgo, rnd }) => ({
+    meters: [...[0, 1, 2, 3, 4, 5].flatMap((i) => [{ date: daysAgo(150 - i * 30), meter: 'Electricity', reading: Math.round(41000 + i * 240 + rnd() * 40), unit: 'kWh', notes: '' }, { date: daysAgo(150 - i * 30), meter: 'Gas', reading: Math.round(8800 + i * 90 + rnd() * 20), unit: 'm³', notes: '' }, { date: daysAgo(150 - i * 30), meter: 'Water', reading: Math.round(310 + i * 7 + rnd() * 2), unit: 'm³', notes: '' }])],
+    humidity: Array.from({ length: 24 }, (_, i) => ({ date: daysAgo(46 - i * 2), room: ['Bedroom', 'Bathroom', 'Kitchen'][i % 3], rh: Math.round(48 + rnd() * 20 + (i % 3 === 1 ? 8 : 0)), temp: Math.round(17 + rnd() * 4), notes: '' })),
+  }),
+  /* sliders: what does a washing-machine load cost at different temperatures? (typical figures only) */
+  whatif: ({ h }) => {
+    const st = { loads: 4, price: 28 }, out = h('div', {});
+    const KWH = [[30, 0.4], [40, 0.6], [60, 1.0]];                 // rough kWh per cycle: check your machine's label
+    const draw = () => PBE.fill(out, h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Wash at', 'Per load', 'Per year'].map((x) => h('th', {}, x)))), h('tbody', {}, KWH.map(([t, k]) => h('tr', {}, h('td', {}, t + ' °C'), h('td', { class: 'n' }, PBE.round(k * st.price / 100, 2) + ' (currency units)'), h('td', { class: 'n' }, PBE.round(k * st.price / 100 * st.loads * 52, 0))))))), h('p', { class: 'meta' }, 'Typical energy per cycle (about 0.4, 0.6 and 1.0 kWh at 30, 40 and 60 °C) is a rough guide only: use your own machine\'s figures. Costs are in whatever currency you enter the price in.'));
+    draw();
+    return h('div', {}, h('h3', {}, 'What does laundry cost?'), PBEcharts.slider('Loads a week', 1, 14, 1, st.loads, (v) => { st.loads = v; draw(); }), PBEcharts.slider('Price of electricity per kWh', 5, 80, 1, st.price, (v) => { st.price = v; draw(); }, 'pence/cents'), out);
+  },
   tabs: [
     { id: 'routines', label: 'Routines', type: 'checks', intro: 'Press "Done today" when you finish a job and it comes back when it is next due. Pick "Everything" to see them all, or a group such as Kitchen. Add your own at the bottom.',
       items: [

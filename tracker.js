@@ -82,10 +82,10 @@
     const get = (id, fallback) => (store[id] === undefined ? fallback : store[id]);
     const set = (id, v) => { store[id] = v; save(); };
     const ctx = { h, get, set, today, addDays, addMonths, daysUntil, round, saveFile, uid, rerender: () => show(current) };
-    let current = cfg.tabs[0].id;
+    let current = '_dash';
 
     /* ---- log tab ---- */
-    function logTab(t) {
+    function logTab(t, opts = {}) {
       let rows = get(t.id, []);
       const fields = t.fields;
       const computed = t.computed || [];
@@ -123,7 +123,7 @@
         fill(charts, );
         const data = shown.map(([r]) => r);
         if (t.summary && data.length) PBEcharts.stat(charts, t.summary(data));
-        (t.charts || []).forEach((c) => {
+        (t.charts || []).slice(0, opts.limit || 99).forEach((c) => {
           const box = h('div', { class: 'chart' });
           charts.append(h('h3', {}, c.title), box);
           const sorted = data.slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
@@ -146,38 +146,63 @@
       };
       if (filter) filter.addEventListener('change', draw);
       draw();
+      if (opts.only === 'charts') return charts;                    // the dashboard wants just the stats and charts
       return h('div', {}, t.intro ? h('p', { class: 'meta' }, t.intro) : null, h('h2', {}, t.addLabel || 'Add an entry'), form, h('p', {}, h('button', { type: 'button', onclick: add }, 'Add')),
         filter ? h('label', { class: 'fld' }, 'Show', filter) : null, charts, h('h2', {}, 'Entries'), out);
     }
 
-    /* ---- checks tab: routine jobs with a frequency ---- */
+    /* ---- checks tab: routine jobs with a frequency ----
+       Each job keeps a list of the dates you did it (hist). "Last done" is the newest of those.
+       Two views: a list of what is due, and a grid like a habit tracker where you click a box to put an x in it. */
     function checksTab(t) {
-      const doneKey = t.id;
-      const state = () => get(doneKey, { done: {}, custom: [] });
       const wrap = h('div', {});
-      let showFilter = 'due';
+      let showFilter = 'due', ym = today().slice(0, 7);
+      const state = () => {
+        const s = get(t.id, { done: {}, hist: {}, custom: [], view: t.view || cfg.view || 'list' });
+        if (!s.hist) s.hist = {};
+        Object.keys(s.done || {}).forEach((id) => { if (!s.hist[id]) s.hist[id] = [s.done[id]]; });      // older saves only had the last date
+        return s;
+      };
+      const lastOf = (s, id) => (s.hist[id] || []).slice().sort().pop() || '';
+      const mark = (s, id, date) => {                                    // click: add the date, or remove it if already there
+        const l = s.hist[id] || (s.hist[id] = []), i = l.indexOf(date);
+        if (i >= 0) l.splice(i, 1); else l.push(date);
+        s.done[id] = lastOf(s, id); set(t.id, s);
+      };
+      const items = (s) => [...t.items.map((i) => ({ ...i, builtin: true })), ...s.custom];
       const draw = () => {
         const s = state();
-        const items = [...t.items.map((i) => ({ ...i, builtin: true })), ...s.custom];
-        const rowsData = items.map((i) => { const last = s.done[i.id] || ''; const due = nextDue(last, i.every); return { ...i, last, due, left: daysUntil(due) }; });
+        const rowsData = items(s).map((i) => { const last = lastOf(s, i.id); const due = nextDue(last, i.every); return { ...i, last, due, left: daysUntil(due) }; });
+        const view = h('p', {}, h('button', { type: 'button', 'aria-pressed': String(s.view !== 'grid'), onclick: () => { s.view = 'list'; set(t.id, s); draw(); } }, 'What is due'), ' ', h('button', { type: 'button', 'aria-pressed': String(s.view === 'grid'), onclick: () => { s.view = 'grid'; set(t.id, s); draw(); } }, 'Grid (tick boxes)'));
+        fill(wrap, h('p', { class: 'meta' }, t.intro || 'Tick a job when you have done it. It comes back when it is next due.'), view, s.view === 'grid' ? gridView(s, rowsData) : listView(s, rowsData), h('h3', {}, 'Add your own job'), addForm(s));
+      };
+      const listView = (s, rowsData) => {
         const groups = [...new Set(rowsData.map((r) => r.group).filter(Boolean))];
         const sel = h('select', { 'aria-label': 'Show' }, [['due', 'Due or overdue'], ['all', 'Everything'], ...FREQ_ORDER.map((f) => [f, 'Only ' + f]), ...groups.map((g) => ['g:' + g, g])].map(([v, l]) => h('option', { value: v }, l)));
         sel.value = showFilter; sel.addEventListener('change', () => { showFilter = sel.value; draw(); });
         const keep = rowsData.filter((r) => showFilter === 'all' || (showFilter === 'due' && r.left <= 0) || r.every === showFilter || showFilter === 'g:' + r.group).sort((a, b) => a.left - b.left);
         const status = (r) => (!r.last ? 'not done yet' : r.left < 0 ? 'overdue by ' + -r.left + ' day' + (r.left === -1 ? '' : 's') : r.left === 0 ? 'due today' : 'due in ' + r.left + ' day' + (r.left === 1 ? '' : 's'));
-        fill(wrap, 
-          h('p', { class: 'meta' }, t.intro || 'Tick a job when you have done it. It comes back when it is next due.'),
-          h('label', { class: 'fld' }, 'Show', sel),
+        return h('div', {}, h('label', { class: 'fld' }, 'Show', sel),
           keep.length ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Job', 'How often', 'Last done', 'Status', ''].map((x) => h('th', {}, x)))),
             h('tbody', {}, keep.map((r) => h('tr', {}, h('td', {}, h('strong', {}, r.name), r.note ? h('span', { class: 'meta block' }, r.note) : null), h('td', {}, typeof r.every === 'number' ? 'every ' + r.every + ' days' : r.every), h('td', {}, r.last || '-'), h('td', { style: r.left < 0 || !r.last ? 'font-weight:600' : '' }, status(r)),
-              h('td', {}, h('button', { type: 'button', onclick: () => { s.done[r.id] = today(); set(doneKey, s); draw(); } }, 'Done today'), ' ', r.builtin ? null : h('button', { type: 'button', onclick: () => { s.custom = s.custom.filter((c) => c.id !== r.id); set(doneKey, s); draw(); } }, 'Remove')))))))
-            : h('p', { class: 'meta' }, 'Nothing due. Choose "Everything" to see all jobs.'),
-          h('h3', {}, 'Add your own job'), addForm(s));
+              h('td', {}, h('button', { type: 'button', onclick: () => { mark(s, r.id, today()); draw(); } }, 'Done today'), ' ', r.builtin ? null : h('button', { type: 'button', onclick: () => { s.custom = s.custom.filter((c) => c.id !== r.id); set(t.id, s); draw(); } }, 'Remove')))))))
+            : h('p', { class: 'meta' }, 'Nothing due. Choose "Everything" to see all jobs.'));
+      };
+      const gridView = (s, rowsData) => {
+        const [y, m] = ym.split('-').map(Number), n = new Date(y, m, 0).getDate();
+        const key = (d) => ym + '-' + String(d).padStart(2, '0');
+        const sorted = rowsData.slice().sort((a, b) => FREQ_ORDER.indexOf(a.every) - FREQ_ORDER.indexOf(b.every));
+        return h('div', {}, h('p', {}, h('button', { type: 'button', onclick: () => { ym = addMonths(ym + '-15', -1).slice(0, 7); draw(); } }, 'Previous'), ' ', h('strong', {}, ym), ' ', h('button', { type: 'button', onclick: () => { ym = addMonths(ym + '-15', 1).slice(0, 7); draw(); } }, 'Next')),
+          h('p', { class: 'meta' }, 'Click a box to put an x in it for the day you did the job; click again to take it out. The outlined box is today.'),
+          h('div', { class: 'tablewrap' }, h('table', { class: 'xgrid' }, h('thead', {}, h('tr', {}, h('th', {}, 'Job'), Array.from({ length: n }, (_, i) => h('th', {}, i + 1)))),
+            h('tbody', {}, sorted.map((r) => h('tr', {}, h('td', {}, r.name, h('span', { class: 'meta block' }, typeof r.every === 'number' ? 'every ' + r.every + ' days' : r.every)),
+              Array.from({ length: n }, (_, i) => { const k = key(i + 1), on = (s.hist[r.id] || []).includes(k);
+                return h('td', {}, h('button', { type: 'button', class: 'xbox' + (k === today() ? ' today' : ''), 'aria-label': r.name + ' ' + k, 'aria-pressed': String(on), onclick: () => { mark(s, r.id, k); draw(); } }, on ? '×' : '')); }))))))); 
       };
       const addForm = (s) => {
         const name = h('input', { type: 'text' }), every = h('select', {}, FREQ_ORDER.map((f) => h('option', { value: f }, f))), group = h('input', { type: 'text', placeholder: 'optional' });
         return h('div', {}, h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Job', name), h('label', { class: 'fld' }, 'How often', every), h('label', { class: 'fld' }, 'Group', group)),
-          h('p', {}, h('button', { type: 'button', onclick: () => { if (!name.value.trim()) return; s.custom.push({ id: 'c' + uid(), name: name.value.trim(), every: every.value, group: group.value.trim() || 'Mine' }); set(doneKey, s); draw(); } }, 'Add the job')));
+          h('p', {}, h('button', { type: 'button', onclick: () => { if (!name.value.trim()) return; s.custom.push({ id: 'c' + uid(), name: name.value.trim(), every: every.value, group: group.value.trim() || 'Mine' }); set(t.id, s); draw(); } }, 'Add the job')));
       };
       draw(); return wrap;
     }
@@ -240,6 +265,87 @@
         b.table ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, b.table[0].map((x) => h('th', {}, x)))), h('tbody', {}, b.table.slice(1).map((r) => h('tr', {}, r.map((c) => h('td', {}, c))))))) : null]));
     }
 
+    /* ---- example data ----
+       "Load example data" fills the tool with made-up entries so you can see the dashboard working. They are NOT real.
+       Log rows are marked example:true so they can be removed later. Other tabs (routines, dates, tick lists) are
+       filled only if they are empty, and remembered in store._ex so "Remove example data" can undo them. */
+    const seeded = (seed) => () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const daysAgo = (n) => addDays(today(), -n);
+    function loadExample() {
+      const rnd = seeded(42), pick = (a) => a[Math.floor(rnd() * a.length)];
+      const ex = cfg.example ? cfg.example({ daysAgo, rnd, pick, today, addDays }) : {};
+      const made = new Set(store._ex || []);
+      cfg.tabs.forEach((t) => {
+        if (t.type === 'log' && ex[t.id]) store[t.id] = (store[t.id] || []).concat(ex[t.id].map((r) => ({ ...r, example: true })));
+        else if (t.type === 'checks' && !store[t.id]) {
+          const s = { done: {}, hist: {}, custom: [], view: t.view || cfg.view || 'list' };
+          t.items.forEach((i) => {
+            const [kind, n] = typeof i.every === 'number' ? ['d', i.every] : FREQ[i.every] || ['d', 7], step = kind === 'm' ? n * 30 : n, l = [];
+            for (let d = 60 + Math.floor(rnd() * step); d >= 0; d -= Math.max(1, Math.round(step * (0.8 + rnd() * 0.5)))) { if (rnd() < 0.85) l.push(daysAgo(d)); }
+            s.hist[i.id] = l; s.done[i.id] = l.slice().sort().pop() || '';
+          });
+          store[t.id] = s; made.add(t.id);
+        } else if (t.type === 'dates' && !store[t.id]) {
+          const s = { dates: {}, custom: [] }; t.items.forEach((i, k) => { s.dates[i.id] = addDays(today(), k === 0 ? 19 : 25 + Math.floor(rnd() * 300)); }); store[t.id] = s; made.add(t.id);
+        } else if (t.type === 'list' && !store[t.id]) {
+          const s = { ticked: {}, custom: [] }; t.items.forEach((i) => { if (rnd() < 0.6) s.ticked[i.name] = true; }); store[t.id] = s; made.add(t.id);
+        } else if (t.type === 'notes' && ex[t.id] && !store[t.id]) { store[t.id] = ex[t.id].map((n) => ({ ...n, example: true })); }
+      });
+      Object.entries(ex._raw || {}).forEach(([k, v]) => { if (store[k] === undefined) { store[k] = v; made.add(k); } });    // data kept by custom tabs
+      store._ex = [...made]; save();
+    }
+    function removeExample() {
+      cfg.tabs.forEach((t) => {
+        if (t.type === 'log' && Array.isArray(store[t.id])) store[t.id] = store[t.id].filter((r) => !r.example);
+        if (t.type === 'notes' && Array.isArray(store[t.id])) store[t.id] = store[t.id].filter((r) => !r.example);
+      });
+      (store._ex || []).forEach((k) => { delete store[k]; }); delete store._ex; save();
+    }
+    const exampleButtons = (here) => h('p', {},
+      h('button', { type: 'button', onclick: () => { loadExample(); show(here); } }, 'Load example data'), ' ',
+      h('button', { type: 'button', onclick: () => { removeExample(); show(here); } }, 'Remove example data'), ' ',
+      h('button', { type: 'button', onclick: () => { if (confirm('Delete all the data in this tool from this browser?')) { store = {}; save(); show(here); } } }, 'Clear all my data'));
+
+    /* ---- the Dashboard: an overview made automatically from every tab ---- */
+    function dashboardTab() {
+      const box = h('div', {});
+      const stats = [], attention = [], blocks = [];
+      cfg.tabs.forEach((t) => {
+        const d = store[t.id];
+        if (t.type === 'log' && Array.isArray(d) && d.length) {
+          stats.push([t.label + ' entries', d.length]);
+          blocks.push(h('div', {}, h('h2', {}, t.label), logTab(t, { only: 'charts', limit: 2 })));
+        }
+        if (t.type === 'checks' && d) {
+          const s = { done: d.done || {}, hist: d.hist || {}, custom: d.custom || [] };
+          const all = [...t.items, ...s.custom].map((i) => { const last = (s.hist[i.id] || [s.done[i.id]]).filter(Boolean).sort().pop() || ''; return { ...i, left: daysUntil(nextDue(last, i.every)), last }; });
+          const over = all.filter((r) => r.last && r.left < 0), now = all.filter((r) => r.left <= 0);
+          stats.push([t.label + ' due or overdue', now.length]); over.sort((a, b) => a.left - b.left).slice(0, 6).forEach((r) => attention.push(r.name + ' (overdue by ' + -r.left + ' day' + (r.left === -1 ? '' : 's') + ')'));
+          const perDay = {}; Object.values(s.hist).forEach((l) => l.forEach((x) => { perDay[x] = (perDay[x] || 0) + 1; }));
+          const pts = Array.from({ length: 21 }, (_, i) => { const x = addDays(today(), i - 20); return { x, y: perDay[x] || 0 }; });
+          const c = h('div', { class: 'chart' }); PBEcharts.line(c, pts, { unit: 'jobs', empty: 'Nothing recorded yet.' });
+          blocks.push(h('div', {}, h('h2', {}, t.label + ': jobs done per day, last 3 weeks'), c));
+        }
+        if (t.type === 'dates' && d) {
+          const upcoming = [...t.items, ...(d.custom || [])].map((i) => ({ i, date: (d.dates || {})[i.id] })).filter((x) => x.date).map((x) => ({ ...x, left: daysUntil(x.date) })).sort((a, b) => a.left - b.left);
+          upcoming.filter((x) => x.left <= 60).slice(0, 5).forEach((x) => attention.push(x.i.name + (x.left < 0 ? ' (passed ' + -x.left + ' days ago)' : ' (in ' + x.left + ' days)')));
+          if (upcoming.length) stats.push(['Next date in', Math.max(0, upcoming.filter((x) => x.left >= 0)[0] ? upcoming.filter((x) => x.left >= 0)[0].left : 0) + ' days']);
+        }
+        if (t.type === 'list' && d) { const items = [...t.items, ...(d.custom || [])], n = items.filter((i) => (d.ticked || {})[i.name]).length; stats.push([t.label + ' ticked', n + '/' + items.length]); }
+      });
+      const empty = !stats.length && !(cfg.dashboardExtra && cfg.dashboardExtra(ctx));
+      fill(box, h('p', { class: 'meta' }, 'An overview worked out on your device from what you have entered. Nothing is sent anywhere.'),
+        empty ? h('p', { class: 'lede' }, 'Nothing to show yet. Add some entries, or load example data to see how the dashboard looks.') : null,
+        exampleButtons('_dash'),
+        h('p', { class: 'meta' }, 'The example data is made up, to show what the charts look like: it is not from any real person or study. Remove it any time.'));
+      if (stats.length) PBEcharts.stat(box, stats.slice(0, 8));
+      if (attention.length) box.append(h('h2', {}, 'Needs attention'), h('ul', {}, attention.map((a) => h('li', {}, a))));
+      if (cfg.dashboardExtra) { const x = cfg.dashboardExtra(ctx); if (x) box.append(x); }       // a tool can add its own overview (for data kept by custom tabs)
+      if (cfg.whatif) box.append(h('h2', {}, 'Play with it'), cfg.whatif(ctx));
+      blocks.forEach((b) => box.append(b));
+      return box;
+    }
+
     /* ---- the Your data tab ---- */
     function dataTab() {
       const toMarkdown = () => {
@@ -270,22 +376,22 @@
           h('button', { type: 'button', onclick: () => saveFile(cfg.id + '-backup.json', JSON.stringify({ tool: cfg.id, saved: today(), data: store }), 'application/json') }, 'Download a backup')),
         logs.length ? h('div', {}, h('h3', {}, 'Spreadsheet files (CSV)'), h('p', {}, logs.map((t) => [h('button', { type: 'button', onclick: () => saveFile(cfg.id + '-' + t.id + '.csv', t.fields.map((f) => csvCell(f.label)).join(',') + '\n' + store[t.id].map((r) => t.fields.map((f) => csvCell(r[f.key])).join(',')).join('\n') + '\n', 'text/csv') }, t.label), ' ']))) : null,
         h('h3', {}, 'Restore a backup'), h('p', {}, file), msg,
-        h('h3', {}, 'Clear everything'), h('p', {}, h('button', { type: 'button', onclick: () => { if (confirm('Delete all the data in this tool from this browser?')) { store = {}; save(); show(cfg.tabs[0].id); } } }, 'Clear all my data')));
+        h('h3', {}, 'Example data and clearing'), exampleButtons('_data'));
     }
 
     /* ---- tabs and start-up ---- */
     const builders = { log: logTab, checks: checksTab, dates: datesTab, list: listTab, notes: notesTab, static: staticTab, custom: (t) => t.render(ctx) };
     function show(id) {
       current = id;
-      const all = [...cfg.tabs, { id: '_data', label: 'Your data', type: '_data' }];
+      const all = [{ id: '_dash', label: 'Dashboard', type: '_dash' }, ...cfg.tabs, { id: '_data', label: 'Your data', type: '_data' }];
       const t = all.find((x) => x.id === id) || all[0];
       fill(root, 
         h('p', { class: 'note' }, cfg.notice || 'Work in progress: expect bugs. Not all of these tools are actively maintained. Your data stays in this browser.'),
         h('nav', { class: 'tabs', 'aria-label': 'Sections' }, all.map((x) => h('a', { href: '#' + x.id, 'aria-current': x.id === t.id ? 'page' : false, onclick: (e) => { e.preventDefault(); show(x.id); } }, x.label))),
-        t.type === '_data' ? dataTab() : builders[t.type](t));
+        t.type === '_data' ? dataTab() : t.type === '_dash' ? dashboardTab() : builders[t.type](t));
     }
     show(current);
   }
 
-  window.PBE = { tool, h, fill, today, addDays, addMonths, daysUntil, round, saveFile, FREQ_ORDER };
+  window.PBE = { daysAgo: (n) => addDays(today(), -n), tool, h, fill, today, addDays, addMonths, daysUntil, round, saveFile, FREQ_ORDER };
 })();

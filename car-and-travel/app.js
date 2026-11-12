@@ -5,6 +5,17 @@
 PBE.tool({
   id: 'car-and-travel',
   title: 'Car and Travel Checks',
+  /* made-up example fill-ups */
+  example: ({ daysAgo, rnd }) => ({
+    mileage: Array.from({ length: 14 }, (_, i) => { const litres = Math.round((38 + rnd() * 8) * 10) / 10; return { date: daysAgo(180 - i * 13), odo: Math.round(41200 + i * 330 + rnd() * 40), litres, cost: Math.round(litres * (1.42 + rnd() * 0.12) * 100) / 100, notes: '' }; }),
+  }),
+  /* sliders: what does a year of motoring fuel cost? */
+  whatif: ({ h }) => {
+    const st = { miles: 8000, mpg: 45, price: 1.45 }, out = h('div', {});
+    const draw = () => { const litres = (st.miles / st.mpg) * 4.54609, cost = litres * st.price; PBE.fill(out, h('p', { class: 'lede' }, 'About ' + Math.round(litres) + ' litres a year, costing about ' + Math.round(cost) + ' (' + PBE.round(cost / 12, 0) + ' a month, ' + PBE.round(cost / st.miles, 2) + ' per mile).'), h('p', { class: 'meta' }, 'If your mpg improved by 10 % (steady driving, correct tyre pressures) you would save about ' + Math.round(cost - (litres / 1.1) * st.price) + ' a year.')); };
+    draw();
+    return h('div', {}, h('h3', {}, 'What does a year of fuel cost?'), PBEcharts.slider('Miles a year', 1000, 25000, 500, st.miles, (v) => { st.miles = v; draw(); }, 'miles'), PBEcharts.slider('Miles per gallon (UK)', 15, 90, 1, st.mpg, (v) => { st.mpg = v; draw(); }, 'mpg'), PBEcharts.slider('Price per litre', 0.8, 2.5, 0.01, st.price, (v) => { st.price = v; draw(); }), out);
+  },
   tabs: [
     { id: 'checks', label: 'Vehicle checks', type: 'checks', intro: 'A common mnemonic for the quick check is POWDERS: Petrol, Oil, Water, Damage, Electrics, Rubber (tyres), Screenwash. The jobs below are general: your handbook has the exact intervals for your car.',
       items: [

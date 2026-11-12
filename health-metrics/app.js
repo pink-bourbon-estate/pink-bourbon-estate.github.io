@@ -4,6 +4,28 @@
 PBE.tool({
   id: 'health-metrics',
   title: 'Health Metrics',
+  /* made-up example entries (labelled as examples): about two months of readings */
+  example: ({ daysAgo, rnd }) => ({
+    bp: Array.from({ length: 30 }, (_, i) => ({ date: daysAgo(58 - i * 2), time: '08:00', sys: Math.round(126 + rnd() * 12 - i * 0.15), dia: Math.round(80 + rnd() * 8), pulse: Math.round(60 + rnd() * 14), arm: 'Left', notes: '' })),
+    temp: Array.from({ length: 8 }, (_, i) => ({ date: daysAgo(55 - i * 7), time: '19:00', temp: Math.round((36.4 + rnd() * 0.7 + (i === 5 ? 1.2 : 0)) * 10) / 10, site: 'Ear', notes: i === 5 ? 'felt unwell' : '' })),
+    glucose: Array.from({ length: 24 }, (_, i) => ({ date: daysAgo(46 - i * 2), time: i % 2 ? '14:00' : '07:30', value: Math.round((i % 2 ? 6.2 + rnd() * 1.6 : 4.8 + rnd() * 1.2) * 10) / 10, unit: 'mmol/L', when: i % 2 ? '1-2 hours after a meal' : 'Fasting / waking', notes: '' })),
+    weight: Array.from({ length: 20 }, (_, i) => ({ date: daysAgo(57 - i * 3), weight: Math.round((82.4 - i * 0.12 + rnd() * 0.8) * 10) / 10, notes: '' })),
+    body: [0, 1, 2, 3].map((i) => ({ date: daysAgo(56 - i * 18), height: 175, waist: Math.round(88 - i * 0.8), hips: 99, chest: 100, arm: 33, thigh: 58, neck: 38, bodyfat: '' })),
+  }),
+  /* sliders on the dashboard: a weight projection and a waist-to-height check */
+  whatif: ({ h, get }) => {
+    const w = get('weight', []).slice().sort((a, b) => a.date.localeCompare(b.date)), start = w.length ? w[w.length - 1].weight : 80;
+    const out = h('div', {}), out2 = h('div', {});
+    const st = { rate: 0.3, weeks: 12, waist: 88, height: 175 };
+    const draw = () => {
+      PBE.fill(out, h('p', { class: 'lede' }, 'If you change by ' + st.rate + ' kg a week for ' + st.weeks + ' weeks you would reach about ' + PBE.round(start - st.rate * st.weeks) + ' kg, starting from ' + start + ' kg.'), h('p', { class: 'meta' }, 'A slow, steady pace is generally easier to keep. For advice about your own weight, speak to a doctor or dietitian.'));
+      const r = st.waist / st.height;
+      PBE.fill(out2, h('p', { class: 'lede' }, 'Waist-to-height ratio: ' + PBE.round(r, 2) + '.'), h('p', { class: 'meta' }, r < 0.5 ? 'Under 0.5, the figure often quoted as a rough guide.' : 'At or over 0.5, a figure often quoted as a rough sign to look at waist size. It is not a diagnosis.'));
+    };
+    draw();
+    return h('div', {}, h('h3', {}, 'Weight projection'), PBEcharts.slider('Change per week', -1, 1, 0.1, st.rate, (v) => { st.rate = v; draw(); }, 'kg'), PBEcharts.slider('For how many weeks', 1, 52, 1, st.weeks, (v) => { st.weeks = v; draw(); }, 'weeks'), out,
+      h('h3', {}, 'Waist to height'), PBEcharts.slider('Waist', 50, 140, 1, st.waist, (v) => { st.waist = v; draw(); }, 'cm'), PBEcharts.slider('Height', 140, 210, 1, st.height, (v) => { st.height = v; draw(); }, 'cm'), out2);
+  },
   notice: 'Not medical advice. This only records and charts what you enter. Work in progress: expect bugs. If you feel seriously unwell, or a reading worries you, contact a doctor or emergency services rather than a website. Your data stays in this browser.',
   tabs: [
     { id: 'bp', label: 'Blood pressure', type: 'log', addLabel: 'Add a reading',
