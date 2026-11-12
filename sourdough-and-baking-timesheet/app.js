@@ -91,15 +91,27 @@
     const hyd = inp.hydration;
     const totalPct = 100 + hyd + r.salt + r.yeast_instant + r.rollin_butter + r.extras.reduce((s, e) => s + e[1], 0);
     const totalDough = inp.pieces * inp.piece_weight * (1 + inp.waste_pct / 100);
-    const totalFlour = totalDough / (totalPct / 100);
+    const flourInLoaves = totalDough / (totalPct / 100);   // flour that ends up in the dough you bake
+    /*
+       Keeping back some dough as your next starter (sourdough only).
+       After the first mix, BEFORE the salt goes in, you cut off `cut` grams of that dough. It has the
+       same ratios as the loaves, so its flour must be added to the mix on top of the loaves' flour:
+         pre-salt percentage total P0 = total percentage - salt %
+         extra flour = cut x 100 / P0
+       Everything except the salt is weighed against that bigger flour total; the salt is worked out
+       from the flour that stays in the loaves, so the loaves keep exactly the recipe's ratios.
+    */
+    const cut = r.preferment === 'levain' ? Math.max(0, inp.starter_cut || 0) : 0;
+    const totalFlour = flourInLoaves + (cut * 100) / (totalPct - r.salt);
     const g = (pct) => (totalFlour * pct) / 100;
+    const gSalt = (pct) => (flourInLoaves * pct) / 100;
     const L = (name, grams, pct, note) => ({ name, grams, pct: pct ?? null, note: note || '', total: name.startsWith('=') });
-    const sheet = { overall: [], preferment: [], final: [], lamination: [], divide: [], totalFlour, totalDough };
+    const sheet = { overall: [], preferment: [], final: [], cutaway: [], lamination: [], divide: [], totalFlour, totalDough, cut };
 
     // overall formula (what the whole dough contains)
     r.flour_blend.forEach(([n, s]) => sheet.overall.push(L(n, roundG(g(s)), s)));
     r.liquids.forEach(([n, s]) => { const p = (hyd * s) / 100; sheet.overall.push(L(n, roundG(g(p)), round1(p), eggNote(n, g(p)))); });
-    if (r.salt > 0) sheet.overall.push(L('Salt', roundG(g(r.salt)), r.salt));
+    if (r.salt > 0) sheet.overall.push(L('Salt', roundG(gSalt(r.salt)), r.salt));
     if (r.yeast_instant > 0) sheet.overall.push(L('Yeast (' + inp.yeast_type + ')', roundG(g(r.yeast_instant * ycf)), Math.round(r.yeast_instant * ycf * 100) / 100));
     r.extras.forEach(([n, p]) => sheet.overall.push(L(n, roundG(g(p)), p)));
     if (r.rollin_butter > 0) sheet.overall.push(L('Roll-in butter (lamination)', roundG(g(r.rollin_butter)), r.rollin_butter));
@@ -134,7 +146,8 @@
       sheet.final.push(L(n, roundG(gr), null, /^water/i.test(n) ? 'temperature: see the Water tab' : eggNote(n, gr)));
     });
     if (r.preferment) sheet.final.push(L(r.preferment === 'levain' ? 'Levain (all of it)' : 'Poolish (all of it)', roundG(prefFlour + prefWater + prefYeast * ycf)));
-    if (r.salt > 0) sheet.final.push(L('Salt', roundG(g(r.salt))));
+    if (r.salt > 0) sheet.final.push(L('Salt', roundG(gSalt(r.salt)), null, cut > 0 ? 'add AFTER you have cut away the starter' : ''));
+    if (cut > 0) sheet.cutaway = [L('Cut away after the first mix, before the salt', cut, null, 'this dough is your next starter: keep it in a clean jar, and feed it before the next bake')];
     if (r.yeast_instant > 0) sheet.final.push(L('Yeast (' + inp.yeast_type + ')', roundG(Math.max(g(r.yeast_instant) - prefYeast, 0) * ycf)));
     r.extras.forEach(([n, p]) => sheet.final.push(L(n, roundG(g(p)))));
 
@@ -225,7 +238,11 @@
     const weight = num('weight', 'Grams of raw dough each', first.default_piece_weight, { min: 1 });
     const hyd = num('hyd', first.liquid_label, first.hydration, { step: 0.5 });
     const range = h('span', { class: 'meta', id: 'range' });
+    // yeast choice only for recipes that use yeast (not sourdough, which uses a starter, and not pasta)
     const yeast = h('label', { class: 'fld' }, 'Yeast type', h('select', { id: 'yeast' }, Object.keys(YEAST).map((y) => h('option', { value: y }, y))));
+    // sourdough only: dough cut away after the first mix, before salt, to become the next starter
+    const starter = num('starter', 'Starter to keep back (g)', 150, { min: 0, step: 10 });
+    const starterNote = h('span', { class: 'meta', id: 'sn' }, 'Cut this much dough off after the first mix, before the salt goes in. 150 g is enough to start two more batches of loaves. It is added on top of the loaves, so your ratios stay the same. Set 0 if you keep your starter another way.');
     const waste = num('waste', 'Bowl loss %', 1, { min: 0, max: 10, step: 0.5 });
     const room = num('room', 'Kitchen temperature (C)', 21, { min: 5, max: 35, step: 0.5 });
     const mode = h('label', { class: 'fld' }, 'Plan by', h('select', { id: 'mode' }, h('option', { value: 'finish' }, 'Ready by (finish time)'), h('option', { value: 'start' }, 'Start at')));
@@ -240,6 +257,9 @@
       hyd.firstChild.textContent = r.liquid_label;
       hyd.querySelector('input').value = r.hydration;
       pieceLabel.textContent = 'Per ' + r.piece_name + '.';
+      const sour = r.preferment === 'levain';
+      yeast.hidden = r.yeast_instant <= 0;
+      starter.hidden = !sour; starterNote.hidden = !sour;
       range.textContent = r.school_range ? 'The published formulas range from ' + r.school_range[0] + ' to ' + r.school_range[1] + ' %.' : '';
     };
     sel.addEventListener('change', refresh); refresh();
@@ -252,7 +272,7 @@
       const anchor = new Date(root.querySelector('#when').value).getTime();
       if (Number.isNaN(anchor)) { msg.textContent = 'Choose a date and time.'; return; }
       msg.textContent = '';
-      bakes.push({ recipe_key: r.key, label: r.name + ' x' + p, pieces: p, piece_weight: v('weight'), hydration: v('hyd'), yeast_type: root.querySelector('#yeast').value, waste_pct: v('waste'), anchor, mode: root.querySelector('#mode').value, room_c: v('room'), overrides: {} });
+      bakes.push({ recipe_key: r.key, label: r.name + ' x' + p, pieces: p, piece_weight: v('weight'), hydration: v('hyd'), yeast_type: root.querySelector('#yeast').value, starter_cut: v('starter'), waste_pct: v('waste'), anchor, mode: root.querySelector('#mode').value, room_c: v('room'), overrides: {} });
       save(); show('weigh');
     };
     const msg = h('p', { class: 'meta', role: 'status' });
@@ -264,7 +284,7 @@
         h('button', { type: 'button', onclick: () => { bakes = []; save(); show('plan'); } }, 'Clear the plan'))
       : h('p', { class: 'meta' }, 'No bakes yet. Add one above, then open Weigh-out and Timeline. Add several to see them on one timeline.');
 
-    return h('div', {}, h('h2', {}, 'Add a bake'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Recipe', sel), desc, pieces, pieceLabel, weight, hyd, range, yeast, waste, room, mode, when),
+    return h('div', {}, h('h2', {}, 'Add a bake'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Recipe', sel), desc, pieces, pieceLabel, weight, hyd, range, yeast, starter, starterNote, waste, room, mode, when),
       h('p', {}, h('button', { type: 'button', onclick: add }, 'Add to plan'), ' ', msg), list);
   }
 
@@ -283,7 +303,7 @@
       lines.forEach((l) => out.push('  ' + l.name.padEnd(46) + String(l.grams).padStart(8) + ' g  ' + (pct && l.pct != null ? String(l.pct).padStart(6) + ' %' : '        ') + (l.note ? '   (' + l.note + ')' : '')));
       out.push('');
     };
-    block("OVERALL FORMULA (baker's %)", s.overall, true); block('PREFERMENT - mix first', s.preferment); block('FINAL DOUGH - mix day', s.final); block('LAMINATION', s.lamination); block('DIVIDE', s.divide);
+    block("OVERALL FORMULA (baker's %)", s.overall, true); block('PREFERMENT - mix first', s.preferment); block('FINAL DOUGH - mix day', s.final); block('NEXT STARTER', s.cutaway); block('LAMINATION', s.lamination); block('DIVIDE', s.divide);
     out.push('BAKE: ' + r.bake); if (r.notes) out.push('NOTE: ' + r.notes);
     return out.join('\n') + '\n';
   }
@@ -293,8 +313,8 @@
       const r = recipeOf(b.recipe_key);
       const s = calculate(r, b);
       return h('article', { class: 'bake' }, h('h2', {}, b.label),
-        h('p', { class: 'lede' }, 'Total flour ' + Math.round(s.totalFlour) + ' g · total dough ' + Math.round(s.totalDough) + ' g · ' + r.liquid_label.split(' (')[0] + ' ' + b.hydration + ' %'),
-        sheetBlock('Preferment: mix first', s.preferment), sheetBlock('Final dough: mix day', s.final), sheetBlock('Lamination', s.lamination), sheetBlock('Divide', s.divide),
+        h('p', { class: 'lede' }, 'Total flour ' + Math.round(s.totalFlour) + ' g · ' + (s.cut ? 'mix ' + Math.round(s.totalDough + s.cut) + ' g, cut ' + s.cut + ' g, bake ' + Math.round(s.totalDough) + ' g · ' : 'total dough ' + Math.round(s.totalDough) + ' g · ') + r.liquid_label.split(' (')[0] + ' ' + b.hydration + ' %'),
+        sheetBlock('Preferment: mix first', s.preferment), sheetBlock('Final dough: mix day', s.final), sheetBlock('Your next starter', s.cutaway), sheetBlock('Lamination', s.lamination), sheetBlock('Divide', s.divide),
         h('p', {}, h('strong', {}, 'Bake: '), r.bake), r.notes ? h('p', { class: 'meta' }, r.notes) : null,
         sheetBlock("Overall formula (baker's percentages), for checking", s.overall, true),
         h('p', {}, h('button', { type: 'button', onclick: () => saveFile(r.key + '-weigh-out.txt', sheetText(b, s, r), 'text/plain') }, 'Download TXT'), ' ', h('button', { type: 'button', onclick: () => window.print() }, 'Print')));
@@ -367,11 +387,27 @@
       h('p', { class: 'meta' }, 'The same data, with its code comments, is in sources.rs and data.json in the source repository.'));
   }
 
+  /* ---- Starter tab: make one from nothing, or refresh one ---- */
+  /* Amounts in grams of flour and of water added each day (equal parts, so 100 % hydration). */
+  const STARTER_DAYS = [[1, 10, 10], [2, 10, 10], [3, 10, 10], [4, 10, 10], [5, 40, 40], [6, 40, 40], [7, 80, 80]];
+  function starterTab() {
+    let running = 0;
+    const rows = STARTER_DAYS.map(([d, f, w]) => { running += f + w; return h('tr', {}, h('td', {}, 'Day ' + d), h('td', { class: 'n' }, (d === 1 ? 'Mix ' : 'Add ') + f + ' g'), h('td', { class: 'n' }, w + ' g'), h('td', { class: 'n' }, running + ' g')); });
+    return h('div', {}, h('h2', {}, 'No starter yet? Make one in 7 days'),
+      h('p', { class: 'meta' }, 'Equal weights of flour and water, fed daily, in a clean jar with the lid resting on top (not sealed), somewhere warm (about 24-26 C). Wholemeal or rye flour wakes a starter faster than white.'),
+      h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Day', 'Flour', 'Water', 'Total if you discard nothing'].map((t, i) => h('th', { class: i ? 'n' : '' }, t)))), h('tbody', {}, rows))),
+      h('p', { class: 'meta' }, 'Written this way, nothing is thrown away, so by day 7 the jar would hold about 400 g. If you want about 200 g at the end of day 7, keep only 40 g of starter before that last feed and discard the rest (it makes good pancakes). Use it once it reliably doubles within 4 to 8 hours of a feed and smells pleasantly sour, not sharp or like nail varnish.'),
+      h('h2', {}, 'Already have a starter that needs waking up?'),
+      h('p', { class: 'meta' }, 'Keep a small amount (about 10-20 g), discard the rest, and feed it equal weights of flour and water (for example 20 g starter, 20 g flour, 20 g water). Repeat once or twice a day until it doubles within 4 to 8 hours, then it is ready to use. A starter kept in the fridge needs this two or three days before a bake. This is general guidance, not a tested recipe: judge by how the starter behaves.'),
+      h('h2', {}, 'Keeping it going'),
+      h('p', { class: 'meta' }, 'Each time you bake, the Plan tab can tell you how much dough to cut off after the first mix, before the salt, to be your next starter (150 g by default). That dough already has the levain in it, so it is a ready-made starter: put it in a clean jar and feed it before the next bake.'));
+  }
+
   /* ---- tabs and start-up ---- */
-  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['sources', 'Sources']];
+  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['starter', 'Starter'], ['sources', 'Sources']];
   function show(t) {
     tab = t;
-    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, sources: sourcesTab }[t]();
+    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, starter: starterTab, sources: sourcesTab }[t]();
     root.replaceChildren(
       bannerNote(),
       h('nav', { class: 'tabs', 'aria-label': 'Sections' }, TABS.map(([k, l]) => h('a', { href: '#' + k, 'aria-current': k === t ? 'page' : false, onclick: (e) => { e.preventDefault(); show(k); } }, l))),
