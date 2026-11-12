@@ -372,22 +372,30 @@
 
   /* ---- Sources tab: where every number comes from ---- */
   /*
-     Every published formula is stored as baker's percentages (flour = 100). To show GRAMS we need
-     a size, so each recipe family has its own "how many, and how many grams each" boxes, starting
-     at the same numbers the Plan tab uses. Because every formula has a different total percentage,
-     the same dough weight needs a different amount of flour in each one, so the flour is shown too.
+     Every published formula is stored as baker's percentages (flour = 100). To show GRAMS we need a size,
+     so each recipe family has "how many" and "grams each" boxes, starting at the Plan tab's numbers.
+     Each formula has a different total percentage, so the same dough weight needs a different amount of
+     flour in each one:
          total % = 100 + liquid + salt + yeast + eggs + milk + sugar + butter + oil + roll-in butter
          flour (g) = pieces x grams each / (total % / 100)
          ingredient (g) = flour x its % / 100
+     Only the ingredients you weigh are shown: flour (split by type where the source says so), water, salt,
+     starter, yeast, butter (dough and roll-in added together), oil, and so on. The starter is already
+     counted inside the flour and water, so its column is "of which".
   */
   const FAMILIES = { sourdough: 'Sourdough', baguette: 'Baguette', focaccia: 'Focaccia', brioche: 'Brioche', croissant: 'Croissant', pasta_egg: 'Fresh egg pasta', pasta_semola: 'Semola pasta' };
-  /* The ingredients that add weight to the dough, in the order they are shown. */
-  const WEIGHT_KEYS = ['hydration', 'salt', 'yeast_instant', 'eggs', 'milk', 'sugar', 'butter', 'oil', 'rollin_butter'];
-  /* 'hydration' is stored as one number whatever the liquid is, so the family says what it really is. */
-  const LIQUID_NAME = { pasta_egg: 'Eggs', pasta_semola: 'Water', brioche: 'Liquid', croissant: 'Liquid' };
-  const keyLabel = (fam, k) => ({ hydration: LIQUID_NAME[fam] || 'Water', salt: 'Salt', yeast_instant: 'Instant yeast', pff: fam === 'sourdough' ? 'Flour in the levain' : 'Flour in the poolish',
-    eggs: 'Eggs', milk: 'Milk', sugar: 'Sugar', butter: 'Butter in the dough', oil: 'Oil', rollin_butter: 'Roll-in butter' }[k]);
   const SRC = { unit: 'g', size: {} };   // remembered while you move between tabs: grams or percentages, and the sizes you typed
+
+  /** The flour types a source states in its notes, as percentages of its flour: [white, wholemeal, rye]. null if it does not say. */
+  function flourSplit(s) {
+    const n = (s.notes || '').toLowerCase();
+    let m;
+    if ((m = n.match(/(\d+) % white \/ (\d+) % wholemeal/))) return [Number(m[1]), Number(m[2]), 0];
+    if ((m = n.match(/(\d+) % (whole wheat|wholemeal)/))) return [100 - Number(m[1]), Number(m[1]), 0];
+    if ((m = n.match(/(\d+) % rye/))) return [100 - Number(m[1]), 0, Number(m[1])];
+    return null;
+  }
+  const FLOUR_TYPES = ['White flour', 'Wholemeal flour', 'Rye flour'];
 
   function sourcesTab() {
     const unitBtn = (u, label) => h('button', { type: 'button', class: 'seg', 'aria-pressed': SRC.unit === u ? 'true' : 'false', onclick: () => { SRC.unit = u; show('sources'); } }, label);
@@ -398,34 +406,51 @@
       const base = recipes[0];
       const plural = base.piece_name === 'loaf' ? 'loaves' : base.piece_name.replace(/ \(.*\)/, '') + 's';
       const size = SRC.size[fam] || (SRC.size[fam] = { n: base.default_pieces, w: base.default_piece_weight });
-      const cols = ['hydration', 'salt', 'yeast_instant', 'eggs', 'milk', 'sugar', 'butter', 'oil', 'rollin_butter', 'pff'].filter((k) => src.some((s) => s.values[k])); // hide columns that are empty or all zero
-      const avg = (k) => { const v = src.filter((s) => !s.reference_only && s.values[k] != null).map((s) => s.values[k]); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+      const splitFlours = fam === 'sourdough';                    // only sourdough mixes several flours in this data
+      const preferment = base.preferment === 'levain' ? 'Starter (levain)' : base.preferment === 'poolish' ? 'Poolish' : null;
+      // the columns: [label, function(values, flourG) -> grams, key used to decide whether to show it]
+      const defs = [
+        ['Water', (v) => v.hydration, fam === 'pasta_egg' ? 'Eggs' : 'Water'],
+        ['Salt', (v) => v.salt],
+        ['Starter', (v, f) => (v.pff ? (f * v.pff / 100) * (1 + (v.pref_hydration || 100) / 100) / f * 100 : null), preferment || ''],
+        ['Yeast', (v) => v.yeast_instant],
+        ['Eggs', (v) => v.eggs], ['Milk', (v) => v.milk], ['Sugar', (v) => v.sugar],
+        ['Butter', (v) => ((v.butter || 0) + (v.rollin_butter || 0)) || null],
+        ['Oil', (v) => v.oil],
+      ];
+      const label = (d) => d[2] || d[0];
+      const used = defs.filter((d) => src.some((s) => d[1](s.values, 100)));   // hide columns nobody uses
+      const avgValues = () => {
+        const real = src.filter((s) => !s.reference_only);
+        const keys = ['hydration', 'salt', 'pff', 'pref_hydration', 'yeast_instant', 'eggs', 'milk', 'sugar', 'butter', 'rollin_butter', 'oil'];
+        return Object.fromEntries(keys.map((k) => { const v = real.filter((s) => s.values[k] != null).map((s) => s.values[k]); return [k, v.length ? v.reduce((a, b) => a + b, 0) / v.length : null]; }));
+      };
       const out = h('div', {});
       const nIn = h('input', { type: 'number', min: 1, step: 1, value: size.n, 'aria-label': 'How many ' + plural });
       const wIn = h('input', { type: 'number', min: 1, step: 'any', value: size.w, 'aria-label': 'Grams per ' + base.piece_name });
 
       /* One table row. `values` holds percentages; in grams mode they are turned into grams. */
-      const row = (name, values, cls) => {
-        const total = 100 + WEIGHT_KEYS.reduce((s, k) => s + (values[k] || 0), 0);
+      const row = (name, values, split, cls) => {
+        const total = 100 + ['hydration', 'salt', 'yeast_instant', 'eggs', 'milk', 'sugar', 'butter', 'oil', 'rollin_butter'].reduce((s, k) => s + (values[k] || 0), 0);
         const flour = (size.n * size.w) / (total / 100);
-        const cell = (k) => {
-          const p = values[k];
-          if (p == null) return h('td', { class: 'n' }, '');
-          if (SRC.unit === '%') return h('td', { class: 'n' }, String(Math.round(p * 100) / 100) + ' %');
-          const g = (flour * p) / 100;
-          const eggs = k === 'eggs' || (k === 'hydration' && fam === 'pasta_egg') ? eggNote('egg', g) : '';
-          return h('td', { class: 'n' }, roundG(g) + ' g', eggs ? h('span', { class: 'meta block' }, eggs.replace('about ', '~')) : null);
-        };
+        const amt = (pct) => (pct == null || pct === 0 ? h('td', { class: 'n' }, '') : SRC.unit === '%' ? h('td', { class: 'n' }, String(Math.round(pct * 10) / 10) + ' %') : h('td', { class: 'n' }, roundG((flour * pct) / 100) + ' g'));
+        const eggCell = (pct) => { const c = amt(pct); if (pct && SRC.unit === 'g') c.append(h('span', { class: 'meta block' }, eggNote('egg', (flour * pct) / 100).replace('about ', '~'))); return c; };
+        const flourCells = splitFlours
+          ? FLOUR_TYPES.map((_, i) => (split ? amt(split[i]) : h('td', { class: 'n meta' }, i === 0 ? 'not stated' : '')))
+          : [];
         return h('tr', { class: cls || '' }, h('td', {}, name),
-          h('td', { class: 'n' }, SRC.unit === '%' ? '100 %' : roundG(flour) + ' g'), cols.map(cell));
+          h('td', { class: 'n' }, SRC.unit === '%' ? '100 %' : roundG(flour) + ' g'),
+          flourCells.map((c, i) => (SRC.unit === 'g' && split && split[i] ? h('td', { class: 'n' }, roundG((flour * split[i]) / 100) + ' g') : c)),
+          used.map((d) => (d[0] === 'Eggs' || (d[0] === 'Water' && fam === 'pasta_egg') ? eggCell(d[1](values, flour)) : amt(d[1](values, flour)))),
+          h('td', { class: 'n' }, SRC.unit === '%' ? Math.round(total) + ' %' : Math.round(size.n * size.w) + ' g'));
       };
       const draw = () => {
         size.n = Math.max(1, Number(nIn.value) || 1); size.w = Math.max(1, Number(wIn.value) || 1);
-        const avgValues = Object.fromEntries(cols.map((k) => [k, avg(k)]));
-        const head = h('tr', {}, h('th', {}, 'Source'), h('th', { class: 'n' }, 'Flour'), cols.map((k) => h('th', { class: 'n' }, keyLabel(fam, k))));
+        const head = h('tr', {}, h('th', {}, 'Source'), h('th', { class: 'n' }, 'Total flour'), splitFlours ? FLOUR_TYPES.map((t) => h('th', { class: 'n' }, t)) : null, used.map((d) => h('th', { class: 'n' }, label(d))), h('th', { class: 'n' }, SRC.unit === '%' ? 'Total %' : 'Total dough'));
         const body = src.map((s) => row(h('span', {}, s.reference_only ? h('em', {}, '(comparison only) ') : null, h('strong', {}, s.name), ' ',
-          h('span', { class: 'meta' }, s.origin + '. ' + s.citation + ' '), s.url ? h('a', { href: s.url, rel: 'noopener noreferrer' }, 'link') : null, s.notes ? h('span', { class: 'meta block' }, s.notes) : null), s.values));
-        body.push(row(h('strong', {}, 'Average (used by the recipe)'), avgValues, 'tot'));
+          h('span', { class: 'meta' }, s.origin + '. ' + s.citation + ' '), s.url ? h('a', { href: s.url, rel: 'noopener noreferrer' }, 'link') : null, s.notes ? h('span', { class: 'meta block' }, s.notes) : null), s.values, flourSplit(s)));
+        const classic = base.flour_blend.map(([, p]) => p);
+        body.push(row(h('strong', {}, 'Average (used by the recipe)'), avgValues(), [classic[0] || 100, classic[1] || 0, classic[2] || 0], 'tot'));
         const blends = recipes.map((r) => {
           const sh = calculate(r, { pieces: size.n, piece_weight: size.w, hydration: r.hydration, yeast_type: 'instant', waste_pct: 0, starter_cut: 0 });
           return h('p', { class: 'meta' }, h('strong', {}, r.name + ': '), roundG(sh.totalFlour) + ' g flour = ' + r.flour_blend.map(([n, s]) => roundG((sh.totalFlour * s) / 100) + ' g ' + n.replace(/ \(.*\)/, '').toLowerCase()).join(' + ') + '.');
@@ -438,7 +463,7 @@
     });
     return h('div', {}, h('p', { class: 'lede' }, "Every recipe is the average of published formulas from schools and bakeries. Sources a home-baking book supplies are shown for comparison only and are never averaged. Please buy the books: they are excellent."),
       h('div', { class: 'segs', role: 'group', 'aria-label': 'Show amounts as' }, h('span', { class: 'meta' }, 'Show: '), unitBtn('g', 'Grams'), unitBtn('%', "Percentages (flour = 100)")),
-      h('p', { class: 'meta' }, 'In grams, each formula is scaled to the same dough weight, so you can see how the sources differ: a richer or wetter formula needs less flour for the same weight. Change the numbers in each section to your own tins and loaves.'),
+      h('p', { class: 'meta' }, 'In grams, each formula is scaled to the same dough weight, so you can compare the sources. Flour is split into types only where the source says how. The starter is already counted inside the flour and water. Butter is the butter in the dough plus any roll-in butter.'),
       sections, h('p', { class: 'meta' }, 'The same data, with its code comments, is in sources.rs and data.json in the source repository.'));
   }
 

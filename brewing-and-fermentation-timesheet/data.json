@@ -22,7 +22,9 @@
      "var": true,
      "mult": 1,
      "sugar": 0.8,
-     "vol": 0.7
+     "vol": 0.7,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water (spring or dechlorinated)",
@@ -33,7 +35,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Wine or mead yeast",
@@ -44,7 +48,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Yeast nutrient",
@@ -55,7 +61,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Campden tablet or potassium metabisulfite (optional, at bottling)",
@@ -66,7 +74,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -160,15 +170,17 @@
    ],
    "status": "sourced",
    "ref_temp_c": 18.0,
-   "var": {
-    "label": "Honey (g per litre of water)",
-    "unit": "g",
-    "default": 500,
-    "min": 250,
-    "max": 700,
-    "step": 10,
-    "hint": "About 250 g gives roughly 7 %, 400 g about 11 %, 500 g about 13 %."
-   },
+   "vars": [
+    {
+     "label": "Honey (g per litre of water)",
+     "unit": "g",
+     "default": 500,
+     "min": 250,
+     "max": 700,
+     "step": 10,
+     "hint": "About 250 g gives roughly 7 %, 400 g about 11 %, 500 g about 13 %."
+    }
+   ],
    "og": {
     "fg": 1.0,
     "note": "The published batch is 1.4 kg honey in 2.8 L water, OG 1.108."
@@ -205,7 +217,9 @@
      "var": true,
      "mult": 1,
      "sugar": 0.8,
-     "vol": 0.7
+     "vol": 0.7,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water (spring or dechlorinated)",
@@ -216,7 +230,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Whole spices (cinnamon, cloves, ginger, citrus peel)",
@@ -227,7 +243,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Wine or mead yeast",
@@ -238,7 +256,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Yeast nutrient",
@@ -249,7 +269,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -343,15 +365,17 @@
    ],
    "status": "starting point",
    "ref_temp_c": 18.0,
-   "var": {
-    "label": "Honey (g per litre of water)",
-    "unit": "g",
-    "default": 400,
-    "min": 250,
-    "max": 600,
-    "step": 10,
-    "hint": "400 g gives roughly 11 %."
-   },
+   "vars": [
+    {
+     "label": "Honey (g per litre of water)",
+     "unit": "g",
+     "default": 400,
+     "min": 250,
+     "max": 600,
+     "step": 10,
+     "hint": "400 g gives roughly 11 %."
+    }
+   ],
    "og": {
     "fg": 1.0,
     "note": "Same method as the traditional mead above; the spice figures are a cautious first try, not yet checked against a published recipe."
@@ -387,7 +411,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.05,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "White sugar",
@@ -398,7 +424,9 @@
      "var": false,
      "mult": 1,
      "sugar": 1.0,
-     "vol": 0.63
+     "vol": 0.63,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water",
@@ -409,7 +437,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Acid blend",
@@ -420,7 +450,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Pectic enzyme",
@@ -431,7 +463,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Yeast nutrient",
@@ -442,7 +476,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Campden tablet",
@@ -453,7 +489,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Red wine yeast",
@@ -464,7 +502,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -551,7 +591,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": {
     "fg": 0.998,
     "note": "The published batch is 4 lb (1.8 kg) berries, 2.5 lb (1.1 kg) sugar and 1 gallon of water; this runs to about 13-14 % if it ferments dry. The yeast tolerates less than some people expect."
@@ -588,7 +628,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar",
@@ -599,7 +641,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Honey",
@@ -610,7 +654,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Malt (or more honey or sugar)",
@@ -621,7 +667,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Raisins",
@@ -632,7 +680,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Orange peel",
@@ -643,7 +693,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Mint",
@@ -654,7 +706,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sourdough starter (optional)",
@@ -665,7 +719,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -737,7 +793,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Low alcohol, but not none: it is a live ferment and it climbs the longer it sits warm. Not for children or anyone avoiding alcohol.",
@@ -771,7 +827,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Nuruk (starter)",
@@ -782,7 +840,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water for the first mix",
@@ -793,7 +853,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water for the second mix (after straining)",
@@ -804,7 +866,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -861,7 +925,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol.",
@@ -896,7 +960,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.8,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Bittering hops (60 min)",
@@ -907,7 +973,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hops at 15 minutes",
@@ -918,7 +986,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hops at 5 minutes",
@@ -929,7 +999,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hops at flame-out (0 minutes)",
@@ -940,7 +1012,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Dry hops (after the first week)",
@@ -951,7 +1025,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Ale yeast (dried)",
@@ -962,7 +1038,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Priming sugar (corn sugar) for bottling",
@@ -973,7 +1051,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1067,7 +1147,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": {
     "fg": 1.012,
     "note": "The published beer has OG 1.056 and FG 1.012, about 5.8 %."
@@ -1105,7 +1185,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Lemon (zest and juice)",
@@ -1116,7 +1198,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar",
@@ -1127,7 +1211,9 @@
      "var": false,
      "mult": 1,
      "sugar": 1.0,
-     "vol": 0.63
+     "vol": 0.63,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Cream of tartar",
@@ -1138,7 +1224,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Dried ale or bread yeast",
@@ -1149,7 +1237,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Boiling water",
@@ -1160,7 +1250,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1232,7 +1324,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 21.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Use PET plastic bottles only. Glass bottles must never be used for this one: the pressure can burst them.",
@@ -1266,7 +1358,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar",
@@ -1277,7 +1371,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hot water for steeping",
@@ -1288,7 +1384,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Cold water",
@@ -1299,7 +1397,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Starter liquid from a previous batch",
@@ -1310,7 +1410,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "SCOBY",
@@ -1321,7 +1423,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1383,7 +1487,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 23.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "The starter liquid must be pH 4.0 or lower before you use it. If it is higher, get fresh starter.",
@@ -1419,7 +1523,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Honey (raw)",
@@ -1430,7 +1536,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hot water for steeping",
@@ -1441,7 +1549,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Cold water",
@@ -1452,7 +1562,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Jun starter liquid",
@@ -1463,7 +1575,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Jun SCOBY",
@@ -1474,7 +1588,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1536,7 +1652,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 24.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Use the same starter-liquid rule as kombucha: pH 4.0 or lower.",
@@ -1568,7 +1684,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Hydrated water kefir grains",
@@ -1579,7 +1697,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Chlorine-free water",
@@ -1590,7 +1710,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1647,7 +1769,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 23.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation.",
@@ -1681,7 +1803,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Milk kefir grains",
@@ -1692,7 +1816,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1739,7 +1865,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 22.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "If it smells rotten, goes pink or shows mould, discard it. A clean tangy smell is normal."
@@ -1770,7 +1896,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Fine salt, no additives",
@@ -1781,7 +1909,9 @@
      "var": true,
      "mult": 10,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -1843,15 +1973,17 @@
    ],
    "status": "sourced",
    "ref_temp_c": 20.0,
-   "var": {
-    "label": "Salt (% of cabbage weight)",
-    "unit": "%",
-    "default": 2.0,
-    "min": 1.5,
-    "max": 2.5,
-    "step": 0.1,
-    "hint": "The published range is 1.5-2.5 %; too little salt allows bad bacteria and too much stops the fermentation."
-   },
+   "vars": [
+    {
+     "label": "Salt (% of cabbage weight)",
+     "unit": "%",
+     "default": 2.0,
+     "min": 1.5,
+     "max": 2.5,
+     "step": 0.1,
+     "hint": "The published range is 1.5-2.5 %; too little salt allows bad bacteria and too much stops the fermentation."
+    }
+   ],
    "og": null,
    "safety": [
     "Weigh the salt. Do not reduce it below the published range.",
@@ -1886,7 +2018,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Coarse sea salt for the brine",
@@ -1897,7 +2031,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Garlic, grated",
@@ -1908,7 +2044,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Ginger, grated",
@@ -1919,7 +2057,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar",
@@ -1930,7 +2070,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Fish sauce (or water for vegetarian)",
@@ -1941,7 +2083,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Gochugaru (Korean chilli flakes)",
@@ -1952,7 +2096,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Radish (daikon or Korean), matchsticks",
@@ -1963,7 +2109,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Scallions (spring onions), in 2.5 cm pieces",
@@ -1974,7 +2122,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2050,7 +2200,7 @@
    ],
    "status": "sourced",
    "ref_temp_c": 18.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Open jars slowly over a sink: gas builds. Keep the vegetables under the brine.",
@@ -2084,7 +2234,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Salt (no additives)",
@@ -2095,7 +2247,9 @@
      "var": true,
      "mult": 10,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water",
@@ -2106,7 +2260,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Fresh dill",
@@ -2117,7 +2273,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Garlic cloves",
@@ -2128,7 +2286,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Vinegar (5 % acidity)",
@@ -2139,7 +2299,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2205,15 +2367,17 @@
    ],
    "status": "starting point",
    "ref_temp_c": 22.0,
-   "var": {
-    "label": "Brine strength (% salt in the water)",
-    "unit": "%",
-    "default": 5,
-    "min": 3.5,
-    "max": 5.5,
-    "step": 0.5,
-    "hint": "5 % is a standard full-sour brine; 3.5 % is a milder half-sour that must be eaten sooner and kept cold."
-   },
+   "vars": [
+    {
+     "label": "Brine strength (% salt in the water)",
+     "unit": "%",
+     "default": 5,
+     "min": 3.5,
+     "max": 5.5,
+     "step": 0.5,
+     "hint": "5 % is a standard full-sour brine; 3.5 % is a milder half-sour that must be eaten sooner and kept cold."
+    }
+   ],
    "og": null,
    "safety": [
     "Do not reduce the salt in a full-sour pickle. Throw away pickles that are soft, slimy or smell bad.",
@@ -2247,7 +2411,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Live yoghurt or cultured buttermilk",
@@ -2258,7 +2424,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Fine salt (optional, to taste)",
@@ -2269,7 +2437,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2336,7 +2506,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 21.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Start with pasteurised cream and keep it cold apart from the culturing step.",
@@ -2368,7 +2538,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Milk kefir grains",
@@ -2379,7 +2551,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Fine salt (optional, for a cheese)",
@@ -2390,7 +2564,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2437,7 +2613,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 22.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Discard it if it smells rotten, goes pink or shows mould."
@@ -2468,7 +2644,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Raw honey",
@@ -2479,7 +2657,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2535,7 +2715,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Never give honey to babies under 12 months.",
@@ -2570,7 +2750,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Raw honey",
@@ -2581,7 +2763,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2637,7 +2821,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Never give honey to babies under 12 months.",
@@ -2672,7 +2856,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar",
@@ -2683,7 +2869,9 @@
      "var": true,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Lemon juice",
@@ -2694,7 +2882,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2751,15 +2941,17 @@
    ],
    "status": "sourced",
    "ref_temp_c": 20.0,
-   "var": {
-    "label": "Sugar (g per kilogram of fruit)",
-    "unit": "g",
-    "default": 830,
-    "min": 500,
-    "max": 1100,
-    "step": 10,
-    "hint": "Less sugar means a softer set and a shorter life; sugar is a preservative."
-   },
+   "vars": [
+    {
+     "label": "Sugar (g per kilogram of fruit)",
+     "unit": "g",
+     "default": 830,
+     "min": 500,
+     "max": 1100,
+     "step": 10,
+     "hint": "Less sugar means a softer set and a shorter life; sugar is a preservative."
+    }
+   ],
    "og": null,
    "safety": [
     "Process in a boiling-water canner as the tested recipe says if you want it shelf-stable; do not use unsealed jars you are unsure about.",
@@ -2793,7 +2985,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Coarse salt",
@@ -2804,7 +2998,9 @@
      "var": true,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Extra lemon juice to top up",
@@ -2815,7 +3011,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -2885,15 +3083,17 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": {
-    "label": "Salt (g per kilogram of lemons)",
-    "unit": "g",
-    "default": 150,
-    "min": 100,
-    "max": 250,
-    "step": 10,
-    "hint": "Do not use less than about 100 g per kg."
-   },
+   "vars": [
+    {
+     "label": "Salt (g per kilogram of lemons)",
+     "unit": "g",
+     "default": 150,
+     "min": 100,
+     "max": 250,
+     "step": 10,
+     "hint": "Do not use less than about 100 g per kg."
+    }
+   ],
    "og": null,
    "safety": [
     "Keep the lemons covered in juice. Discard the jar if it shows mould or smells off."
@@ -2924,7 +3124,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Onions, chopped",
@@ -2935,7 +3137,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Sugar (soft brown)",
@@ -2946,7 +3150,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Vinegar (5 % acidity or higher)",
@@ -2957,7 +3163,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Salt",
@@ -2968,7 +3176,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Spices (mustard seed, ginger, chilli, cinnamon)",
@@ -2979,7 +3189,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -3026,7 +3238,7 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": null,
+   "vars": [],
    "og": null,
    "safety": [
     "Use vinegar of at least 5 % acidity. Do not reduce the vinegar or sugar: they preserve it.",
@@ -3058,7 +3270,9 @@
      "var": true,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Water",
@@ -3069,7 +3283,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     },
     {
      "name": "Flavouring (ginger, peel, herbs), optional",
@@ -3080,7 +3296,9 @@
      "var": false,
      "mult": 1,
      "sugar": 0.0,
-     "vol": 0.0
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
     }
    ],
    "steps": [
@@ -3127,21 +3345,363 @@
    ],
    "status": "starting point",
    "ref_temp_c": 20.0,
-   "var": {
-    "label": "Sugar (g per litre of water)",
-    "unit": "g",
-    "default": 1000,
-    "min": 500,
-    "max": 2000,
-    "step": 100,
-    "hint": "1000 g per litre is a simple syrup, 2000 g per litre a rich one."
-   },
+   "vars": [
+    {
+     "label": "Sugar (g per litre of water)",
+     "unit": "g",
+     "default": 1000,
+     "min": 500,
+     "max": 2000,
+     "step": 100,
+     "hint": "1000 g per litre is a simple syrup, 2000 g per litre a rich one."
+    }
+   ],
    "og": null,
    "safety": [
     "Keep it chilled and use clean bottles. If it goes cloudy or grows mould, throw it away."
    ],
    "notes": "Plain sugar syrup, with no source needed. Ginger syrup is a good place to start.",
    "yield": "About 1.6 litres of syrup per litre of water.",
+   "sources": []
+  },
+  {
+   "key": "cacao_ferment",
+   "group": "food",
+   "family": "chocolate",
+   "name": "Cacao beans: ferment and dry (from the pod)",
+   "description": "The first half of chocolate. Fresh beans in their white pulp are fermented for several days, then dried. Most home chocolate makers buy beans that are already fermented and dried: if you do, skip this and go to the chocolate recipe.",
+   "base_label": "Kilograms of fresh wet beans (with pulp)",
+   "base_unit": "kg",
+   "default_amount": 5,
+   "amount_step": 1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Fresh cacao beans in their pulp",
+     "per": 1000,
+     "unit": "g",
+     "note": "straight from opened pods",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
+    },
+    {
+     "name": "Banana leaves or a clean breathable cloth (to cover)",
+     "per": 1,
+     "unit": "item",
+     "note": "keeps heat in and flies out",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 0,
+     "expr": null
+    }
+   ],
+   "steps": [
+    {
+     "name": "Open pods and collect the beans",
+     "minutes": 60,
+     "how": "Split the pods with a blunt tool, taking care not to cut the beans. Collect the beans with their pulp, discarding husk and the central core.",
+     "done_when": "Beans in a clean container.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment in a heap or box",
+     "minutes": 7200,
+     "how": "Cover and let the pulp ferment. The heap heats up (to about 45-50 C) and smells of vinegar. Turn it at about 48 hours and again at about 96 hours so the middle and edges swap.",
+     "done_when": "Pulp has drained away, the beans are brown inside when cut, and the smell is vinegary, not rotten.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       2880,
+       "Turn the heap"
+      ],
+      [
+       5760,
+       "Turn the heap"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Dry the beans",
+     "minutes": 14400,
+     "how": "Spread in a thin layer in a warm, airy place in the shade or in sun, turning daily. Remove any flat or mouldy beans.",
+     "done_when": "Beans rattle and snap rather than bend, about 7 % moisture.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       1440,
+       "Turn the beans"
+      ],
+      [
+       4320,
+       "Turn the beans"
+      ],
+      [
+       7200,
+       "Turn the beans"
+      ],
+      [
+       10080,
+       "Turn the beans"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Sort and store",
+     "minutes": 60,
+     "how": "Pick out any mouldy, flat or insect-damaged beans. Store dry in a breathable bag.",
+     "done_when": "Dry and clean.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 28.0,
+   "vars": [],
+   "og": null,
+   "safety": [
+    "Beans that smell rotten, are slimy or have white or green mould should be thrown away.",
+    "Dry beans fully before storing: damp stored beans grow mould.",
+    "Where cocoa is grown or bought, ask about cadmium: some soils give higher levels. Buying from traceable makers helps."
+   ],
+   "notes": "Typical practice from small-scale cacao fermentation; not yet checked against a published source. Dried beans weigh roughly 35-40 % of the wet weight. Times depend strongly on the bean, climate and heap size.",
+   "yield": "About 0.35-0.4 kg dried beans per kg of wet beans.",
+   "sources": []
+  },
+  {
+   "key": "chocolate",
+   "group": "food",
+   "family": "chocolate",
+   "name": "Chocolate (dried beans to bar)",
+   "description": "Roast, crack, winnow, grind, conche and temper. Choose your cocoa percentage and whether it has milk, and the sheet works out the nibs, extra cocoa butter, milk powder and sugar.",
+   "base_label": "Kilograms of finished chocolate",
+   "base_unit": "kg",
+   "default_amount": 0.5,
+   "amount_step": 0.1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Dried fermented cacao beans (before roasting)",
+     "per": 0,
+     "unit": "g",
+     "note": "about 80 % becomes nibs once roasted and winnowed; varies by bean",
+     "group": "Beans",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 0,
+     "expr": [
+      0,
+      [
+       [
+        0,
+        12.5
+       ],
+       [
+        2,
+        -12.5
+       ]
+      ]
+     ]
+    },
+    {
+     "name": "Roasted nibs",
+     "per": 0,
+     "unit": "g",
+     "note": "the bean without its shell",
+     "group": "Chocolate",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 0,
+     "expr": [
+      0,
+      [
+       [
+        0,
+        10
+       ],
+       [
+        2,
+        -10
+       ]
+      ]
+     ]
+    },
+    {
+     "name": "Extra cocoa butter",
+     "per": 0,
+     "unit": "g",
+     "note": "optional; makes it smoother and thinner",
+     "group": "Chocolate",
+     "var": true,
+     "mult": 10,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 2,
+     "expr": null
+    },
+    {
+     "name": "Sugar",
+     "per": 0,
+     "unit": "g",
+     "note": "what is left after the cocoa and milk",
+     "group": "Chocolate",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 0,
+     "expr": [
+      1000,
+      [
+       [
+        0,
+        -10
+       ],
+       [
+        1,
+        -10
+       ]
+      ]
+     ]
+    },
+    {
+     "name": "Whole milk powder",
+     "per": 0,
+     "unit": "g",
+     "note": "for milk chocolate; leave at 0 for dark",
+     "group": "Chocolate",
+     "var": true,
+     "mult": 10,
+     "sugar": 0.0,
+     "vol": 0.0,
+     "vi": 1,
+     "expr": null
+    }
+   ],
+   "steps": [
+    {
+     "name": "Sort and roast the beans",
+     "minutes": 40,
+     "how": "Pick out damaged beans. Roast in a single layer at about 120-135 C, stirring or turning, until they smell of chocolate and the shells crack away easily. Time depends on the bean and oven.",
+     "done_when": "Shells loosen, smell is chocolatey, not burnt.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cool, crack and winnow",
+     "minutes": 60,
+     "how": "Crack the cooled beans and separate the shell from the nibs with a hair dryer, a fan or a sieve. Shells are not food (they make a good tea).",
+     "done_when": "Mostly clean nibs.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Grind and refine",
+     "minutes": 1440,
+     "how": "Grind the nibs in a stone melanger or grinder, adding sugar a little at a time, and milk powder (dry, warm) if using. Keep it around 45-55 C. It goes from gritty to smooth over many hours.",
+     "done_when": "Smooth on the tongue, with no grit.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rest (optional)",
+     "minutes": 20160,
+     "how": "Pour into a tray and let it rest for a week or two for the flavour to settle. Re-melt before tempering.",
+     "done_when": "Flavour has mellowed.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Temper and mould",
+     "minutes": 90,
+     "how": "Melt to 45-50 C, cool to about 27-28 C, then gently rewarm to 31-32 C for dark (29-30 C for milk). Pour into moulds and tap out bubbles.",
+     "done_when": "A dab on a cool knife sets glossy within a few minutes.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Set and wrap",
+     "minutes": 720,
+     "how": "Set in a cool place at about 16-18 C, then turn out and wrap. Store cool and dry.",
+     "done_when": "Snaps cleanly and shines.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "vars": [
+    {
+     "label": "Total cocoa (% of the bar: nibs plus cocoa butter)",
+     "unit": "%",
+     "default": 70,
+     "min": 30,
+     "max": 100,
+     "step": 1,
+     "hint": "Dark bars are usually 60-85 %; milk bars 30-50 %. Sugar is whatever is left."
+    },
+    {
+     "label": "Milk powder (%)",
+     "unit": "%",
+     "default": 0,
+     "min": 0,
+     "max": 35,
+     "step": 1,
+     "hint": "0 for dark chocolate; around 20-25 for milk chocolate."
+    },
+    {
+     "label": "Extra cocoa butter (% of the bar)",
+     "unit": "%",
+     "default": 0,
+     "min": 0,
+     "max": 30,
+     "step": 1,
+     "hint": "Counts toward the total cocoa percentage; the nibs make up the rest. Roasted nibs are around half fat already."
+    }
+   ],
+   "og": null,
+   "safety": [
+    "Keep water out: a few drops make melted chocolate seize.",
+    "Milk powder is a major allergen: label and keep clean.",
+    "Nibs and beans can carry cadmium depending on origin: buy from traceable makers.",
+    "A stone grinder runs for a day: keep it on a stable, safe surface and never leave it near children."
+   ],
+   "notes": "Typical bean-to-bar practice, not yet checked against a published source. The cocoa % is the total of nibs plus cocoa butter, the way most bars are labelled. If sugar comes out below zero the cocoa and milk percentages together are over 100.",
+   "yield": "About 1 kg of chocolate from 1.25 kg of dried beans for a 70 % bar with no extra butter.",
    "sources": []
   }
  ],

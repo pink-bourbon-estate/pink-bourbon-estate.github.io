@@ -187,3 +187,14 @@ ul.planned li { margin: 4px 0; break-inside: avoid; }
 
 /* keep "250 g" on one line in narrow tables */
 td.n, th.n { white-space: nowrap; }
+
+/* forms: fields sit in a tidy grid; every note or hint spans the full row so nothing floats between fields */
+.form { align-items: start; }
+.form > :not(.fld) { grid-column: 1 / -1; margin: 0; }
+.fld { align-content: start; }
+
+/* Projects page: a category inside each status section */
+.cat { margin: 1.5rem 0; }
+.cat > h3 { margin-bottom: .5rem; }
+.cat .empty { opacity: .6; }
+#catfilter { margin-top: .5rem; flex-wrap: wrap; }

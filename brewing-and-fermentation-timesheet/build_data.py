@@ -28,16 +28,19 @@ D = 24 * 60      # ... and a day is 1440
 # --------------------------------------------------------------------------------------------
 # Small helpers that keep the recipes below short and readable.
 # --------------------------------------------------------------------------------------------
-def ing(name, per, unit="g", note="", group="", var=False, mult=1, sugar=0.0, vol=0.0):
+def ing(name, per, unit="g", note="", group="", var=False, mult=1, sugar=0.0, vol=0.0, vi=0, expr=None):
     """One ingredient.
     per    amount for ONE base unit (e.g. grams per litre)
     unit   'g', 'ml', 'tsp', 'tbsp', 'tablet' or 'item'
     var    True if the Plan tab's adjustable box sets this amount (amount = box value x mult)
     sugar  fraction of the weight that is fermentable sugar (honey 0.8, table sugar 1.0): used for the OG estimate
     vol    litres this ingredient adds to the liquid per kilogram (sugar 0.63, honey 0.70): used for the OG estimate
+    vi     which adjustable box (0, 1, 2...) sets this amount when var is True
+    expr   for amounts that depend on several boxes at once: [constant, [[box number, multiplier], ...]]
+           amount per base unit = constant + sum of (box value x multiplier)
     """
     return {"name": name, "per": per, "unit": unit, "note": note, "group": group,
-            "var": var, "mult": mult, "sugar": sugar, "vol": vol}
+            "var": var, "mult": mult, "sugar": sugar, "vol": vol, "vi": vi, "expr": expr}
 
 
 def step(name, minutes, how="", done="", temp=False, marks=None, hands=None):
@@ -51,14 +54,14 @@ def step(name, minutes, how="", done="", temp=False, marks=None, hands=None):
 
 
 def recipe(key, group, family, name, desc, base_label, base_unit, default_amount, ingredients, steps,
-           status, ref_temp=20.0, var=None, og=None, safety=None, notes="", yield_text="", sources=None,
+           status, ref_temp=20.0, var=None, vars=None, og=None, safety=None, notes="", yield_text="", sources=None,
            amount_step=1, amount_min=0.1, amount_max=500):
     """One recipe. group is 'drinks' or 'food'; family decides where it sits in the Sources tab."""
     return {"key": key, "group": group, "family": family, "name": name, "description": desc,
             "base_label": base_label, "base_unit": base_unit, "default_amount": default_amount,
             "amount_step": amount_step, "amount_min": amount_min, "amount_max": amount_max,
             "ingredients": ingredients, "steps": steps, "status": status, "ref_temp_c": ref_temp,
-            "var": var, "og": og, "safety": safety or [], "notes": notes, "yield": yield_text,
+            "vars": vars or ([var] if var else []), "og": og, "safety": safety or [], "notes": notes, "yield": yield_text,
             "sources": sources or []}
 
 
@@ -565,6 +568,56 @@ RECIPES.append(recipe(
     var={"label": "Sugar (g per litre of water)", "unit": "g", "default": 1000, "min": 500, "max": 2000, "step": 100, "hint": "1000 g per litre is a simple syrup, 2000 g per litre a rich one."},
     safety=["Keep it chilled and use clean bottles. If it goes cloudy or grows mould, throw it away."],
     notes="Plain sugar syrup, with no source needed. Ginger syrup is a good place to start.", yield_text="About 1.6 litres of syrup per litre of water.", sources=[], amount_step=0.1))
+
+
+# ---- Cacao beans: ferment and dry ------------------------------------------------------------
+RECIPES.append(recipe(
+    "cacao_ferment", "food", "chocolate", "Cacao beans: ferment and dry (from the pod)",
+    "The first half of chocolate. Fresh beans in their white pulp are fermented for several days, then dried. Most home chocolate makers buy beans that are already fermented and dried: if you do, skip this and go to the chocolate recipe.",
+    "Kilograms of fresh wet beans (with pulp)", "kg", 5,
+    [ing("Fresh cacao beans in their pulp", 1000, "g", "straight from opened pods"),
+     ing("Banana leaves or a clean breathable cloth (to cover)", 1, "item", "keeps heat in and flies out")],
+    [step("Open pods and collect the beans", 60, "Split the pods with a blunt tool, taking care not to cut the beans. Collect the beans with their pulp, discarding husk and the central core.", "Beans in a clean container.", hands=True),
+     step("Ferment in a heap or box", 5 * D, "Cover and let the pulp ferment. The heap heats up (to about 45-50 C) and smells of vinegar. Turn it at about 48 hours and again at about 96 hours so the middle and edges swap.", "Pulp has drained away, the beans are brown inside when cut, and the smell is vinegary, not rotten.", temp=True,
+          marks=[[2 * D, "Turn the heap"], [4 * D, "Turn the heap"]]),
+     step("Dry the beans", 10 * D, "Spread in a thin layer in a warm, airy place in the shade or in sun, turning daily. Remove any flat or mouldy beans.", "Beans rattle and snap rather than bend, about 7 % moisture.", temp=True,
+          marks=[[1 * D, "Turn the beans"], [3 * D, "Turn the beans"], [5 * D, "Turn the beans"], [7 * D, "Turn the beans"]]),
+     step("Sort and store", 60, "Pick out any mouldy, flat or insect-damaged beans. Store dry in a breathable bag.", "Dry and clean.", hands=True)],
+    "starting point", 28.0,
+    safety=["Beans that smell rotten, are slimy or have white or green mould should be thrown away.", "Dry beans fully before storing: damp stored beans grow mould.", "Where cocoa is grown or bought, ask about cadmium: some soils give higher levels. Buying from traceable makers helps."],
+    notes="Typical practice from small-scale cacao fermentation; not yet checked against a published source. Dried beans weigh roughly 35-40 % of the wet weight. Times depend strongly on the bean, climate and heap size.",
+    yield_text="About 0.35-0.4 kg dried beans per kg of wet beans.", sources=[], amount_step=1))
+
+# ---- Chocolate from beans ---------------------------------------------------------------------
+# Three adjustable boxes: total cocoa %, milk powder %, and how much of the cocoa is extra cocoa butter.
+# Per kilogram of finished chocolate (each % = 10 g):
+#   nibs        = 10 x (cocoa % - cocoa butter %)
+#   cocoa butter= 10 x cocoa butter %
+#   milk powder = 10 x milk %
+#   sugar       = 1000 - 10 x cocoa % - 10 x milk %
+#   dried beans = nibs / 0.80   (about 80 % of dried beans end up as nibs after the shell is removed)
+RECIPES.append(recipe(
+    "chocolate", "food", "chocolate", "Chocolate (dried beans to bar)",
+    "Roast, crack, winnow, grind, conche and temper. Choose your cocoa percentage and whether it has milk, and the sheet works out the nibs, extra cocoa butter, milk powder and sugar.",
+    "Kilograms of finished chocolate", "kg", 0.5,
+    [ing("Dried fermented cacao beans (before roasting)", 0, "g", "about 80 % becomes nibs once roasted and winnowed; varies by bean", group="Beans", expr=[0, [[0, 12.5], [2, -12.5]]]),
+     ing("Roasted nibs", 0, "g", "the bean without its shell", group="Chocolate", expr=[0, [[0, 10], [2, -10]]]),
+     ing("Extra cocoa butter", 0, "g", "optional; makes it smoother and thinner", group="Chocolate", var=True, vi=2, mult=10),
+     ing("Sugar", 0, "g", "what is left after the cocoa and milk", group="Chocolate", expr=[1000, [[0, -10], [1, -10]]]),
+     ing("Whole milk powder", 0, "g", "for milk chocolate; leave at 0 for dark", group="Chocolate", var=True, vi=1, mult=10)],
+    [step("Sort and roast the beans", 40, "Pick out damaged beans. Roast in a single layer at about 120-135 C, stirring or turning, until they smell of chocolate and the shells crack away easily. Time depends on the bean and oven.", "Shells loosen, smell is chocolatey, not burnt.", temp=False, hands=True),
+     step("Cool, crack and winnow", 60, "Crack the cooled beans and separate the shell from the nibs with a hair dryer, a fan or a sieve. Shells are not food (they make a good tea).", "Mostly clean nibs.", temp=False, hands=True),
+     step("Grind and refine", 24 * H, "Grind the nibs in a stone melanger or grinder, adding sugar a little at a time, and milk powder (dry, warm) if using. Keep it around 45-55 C. It goes from gritty to smooth over many hours.", "Smooth on the tongue, with no grit.", temp=False),
+     step("Rest (optional)", 14 * D, "Pour into a tray and let it rest for a week or two for the flavour to settle. Re-melt before tempering.", "Flavour has mellowed.", temp=False),
+     step("Temper and mould", 90, "Melt to 45-50 C, cool to about 27-28 C, then gently rewarm to 31-32 C for dark (29-30 C for milk). Pour into moulds and tap out bubbles.", "A dab on a cool knife sets glossy within a few minutes.", temp=False, hands=True),
+     step("Set and wrap", 12 * H, "Set in a cool place at about 16-18 C, then turn out and wrap. Store cool and dry.", "Snaps cleanly and shines.", temp=False)],
+    "starting point", 20.0,
+    vars=[{"label": "Total cocoa (% of the bar: nibs plus cocoa butter)", "unit": "%", "default": 70, "min": 30, "max": 100, "step": 1, "hint": "Dark bars are usually 60-85 %; milk bars 30-50 %. Sugar is whatever is left."},
+          {"label": "Milk powder (%)", "unit": "%", "default": 0, "min": 0, "max": 35, "step": 1, "hint": "0 for dark chocolate; around 20-25 for milk chocolate."},
+          {"label": "Extra cocoa butter (% of the bar)", "unit": "%", "default": 0, "min": 0, "max": 30, "step": 1, "hint": "Counts toward the total cocoa percentage; the nibs make up the rest. Roasted nibs are around half fat already."}],
+    safety=["Keep water out: a few drops make melted chocolate seize.", "Milk powder is a major allergen: label and keep clean.", "Nibs and beans can carry cadmium depending on origin: buy from traceable makers.", "A stone grinder runs for a day: keep it on a stable, safe surface and never leave it near children."],
+    notes="Typical bean-to-bar practice, not yet checked against a published source. The cocoa % is the total of nibs plus cocoa butter, the way most bars are labelled. If sugar comes out below zero the cocoa and milk percentages together are over 100.",
+    yield_text="About 1 kg of chocolate from 1.25 kg of dried beans for a 70 % bar with no extra butter.", sources=[], amount_step=0.1, amount_min=0.1))
 
 
 # --------------------------------------------------------------------------------------------

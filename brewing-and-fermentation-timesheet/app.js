@@ -89,12 +89,16 @@
     return (Math.max(0.25, Math.round(q * 4) / 4)) + (unit === 'item' ? '' : ' ' + unit);
   }
 
+  /** The adjustable boxes of a recipe, as a list (some recipes have none, some have several). */
+  const varsOf = (r) => r.vars || [];
   function calculate(r, inp) {
     const base = inp.amount;
-    const v = inp.varval != null ? inp.varval : (r.var ? r.var.default : 0);
+    // the values typed into the adjustable boxes; older saved plans stored a single number
+    const vs = inp.vars || (inp.varval != null ? [inp.varval] : varsOf(r).map((x) => x.default));
     const rows = r.ingredients.map((i) => {
-      const per = i.var ? v * i.mult : i.per;
-      return { name: i.name, q: per * base, unit: i.unit, note: i.note, group: i.group || '', sugar: i.sugar, vol: i.vol };
+      // three ways to get an amount: a fixed amount per base unit, one adjustable box, or a mix of boxes
+      const per = i.expr ? i.expr[0] + i.expr[1].reduce((s, [idx, k]) => s + (vs[idx] || 0) * k, 0) : (i.var ? (vs[i.vi || 0] || 0) * i.mult : i.per);
+      return { name: i.name, q: Math.max(0, per * base), unit: i.unit, note: i.note, group: i.group || '', sugar: i.sugar, vol: i.vol };
     });
     let est = null;
     if (r.og) {
@@ -174,8 +178,9 @@
     const desc = h('p', { class: 'meta', id: 'desc' });
     const status = h('p', { class: 'meta', id: 'status' });
     const amount = num('amount', first.base_label, first.default_amount, { min: 0.1, step: 'any' });
-    const varBox = num('varval', 'Adjust', 0, { step: 'any' });
-    const varHint = h('span', { class: 'meta', id: 'vh' });
+    // up to three adjustable boxes (for example honey per litre, or cocoa %, milk %, extra cocoa butter %)
+    const varBoxes = [0, 1, 2].map((i) => num('varval' + i, 'Adjust', 0, { step: 'any' }));
+    const varHints = [0, 1, 2].map(() => h('span', { class: 'meta' }));
     const room = num('room', 'Room temperature (C)', 20, { min: 5, max: 35, step: 0.5 });
     const mode = h('label', { class: 'fld' }, 'Plan by', h('select', { id: 'mode' }, h('option', { value: 'start' }, 'Start at'), h('option', { value: 'finish' }, 'Ready by (finish time)')));
     const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(10, 0, 0, 0);
@@ -188,8 +193,11 @@
       amount.firstChild.textContent = r.base_label;
       amount.querySelector('input').value = r.default_amount;
       amount.querySelector('input').step = r.amount_step;
-      varBox.hidden = !r.var; varHint.hidden = !r.var;
-      if (r.var) { varBox.firstChild.textContent = r.var.label; const i = varBox.querySelector('input'); i.value = r.var.default; i.min = r.var.min; i.max = r.var.max; i.step = r.var.step; varHint.textContent = r.var.hint; }
+      varBoxes.forEach((box, n) => {
+        const x = varsOf(r)[n];
+        box.hidden = !x; varHints[n].hidden = !x;
+        if (x) { box.firstChild.textContent = x.label; const i = box.querySelector('input'); i.value = x.default; i.min = x.min; i.max = x.max; i.step = x.step; varHints[n].textContent = x.hint; }
+      });
     };
     sel.addEventListener('change', refresh); refresh();
 
@@ -201,7 +209,7 @@
       const anchor = new Date(root.querySelector('#when').value).getTime();
       if (Number.isNaN(anchor)) { msg.textContent = 'Choose a date and time.'; return; }
       msg.textContent = '';
-      plan.push({ recipe_key: r.key, label: r.name + ' (' + v('amount') + ' ' + r.base_unit + ')', amount: v('amount'), varval: r.var ? v('varval') : null, anchor, mode: root.querySelector('#mode').value, room_c: v('room') });
+      plan.push({ recipe_key: r.key, label: r.name + ' (' + v('amount') + ' ' + r.base_unit + ')', amount: v('amount'), vars: varsOf(r).map((_, n) => v('varval' + n)), anchor, mode: root.querySelector('#mode').value, room_c: v('room') });
       save(); show('weigh');
     };
 
@@ -212,7 +220,7 @@
         h('button', { type: 'button', onclick: () => { plan = []; save(); show('plan'); } }, 'Clear the plan'))
       : h('p', { class: 'meta' }, 'Nothing planned yet. Add one above, then open Ingredients and Timeline. Add several to see them on one timeline.');
 
-    return h('div', {}, h('h2', {}, 'Add a batch'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Recipe', sel), desc, status, amount, varBox, varHint, room, mode, when),
+    return h('div', {}, h('h2', {}, 'Add a batch'), h('div', { class: 'form' }, h('label', { class: 'fld' }, 'Recipe', sel), desc, status, amount, varBoxes.flatMap((b, n) => [b, varHints[n]]), room, mode, when),
       h('p', {}, h('button', { type: 'button', onclick: add }, 'Add to plan'), ' ', msg), list);
   }
 
