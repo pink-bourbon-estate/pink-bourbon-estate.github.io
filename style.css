@@ -180,3 +180,10 @@ ul.planned li { margin: 4px 0; break-inside: avoid; }
 .more-line { margin: 18px 0 48px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
 #about { max-width: 46em; }
 @media (max-width: 640px) { .row { grid-template-columns: 1fr; gap: 4px; } }
+
+/* grams / percentages switch on the Sources tab */
+.segs { margin: 14px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.seg[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* keep "250 g" on one line in narrow tables */
+td.n, th.n { white-space: nowrap; }

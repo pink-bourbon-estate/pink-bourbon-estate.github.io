@@ -1,0 +1,3241 @@
+{
+ "recipes": [
+  {
+   "key": "mead",
+   "group": "drinks",
+   "family": "mead",
+   "name": "Mead (traditional, honey and water)",
+   "description": "Honey, water and yeast, nothing else. Dry to medium, roughly 12-15 % alcohol. Patience is the main ingredient.",
+   "base_label": "Litres of water",
+   "base_unit": "L",
+   "default_amount": 2.8,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Honey",
+     "per": 500,
+     "unit": "g",
+     "note": "any honey that tastes good raw",
+     "group": "",
+     "var": true,
+     "mult": 1,
+     "sugar": 0.8,
+     "vol": 0.7
+    },
+    {
+     "name": "Water (spring or dechlorinated)",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Wine or mead yeast",
+     "per": 1.8,
+     "unit": "g",
+     "note": "dried; rehydrate as the packet says",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Yeast nutrient",
+     "per": 1.3,
+     "unit": "g",
+     "note": "split into four doses at 24, 48, 72 and 96 hours",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Campden tablet or potassium metabisulfite (optional, at bottling)",
+     "per": 0.36,
+     "unit": "g",
+     "note": "1 g in 2.8 L, with sorbate, only if you back-sweeten",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean and sanitise everything",
+     "minutes": 30,
+     "how": "Wash, then sanitise the bucket, spoon, airlock and thermometer with a no-rinse sanitiser.",
+     "done_when": "Nothing that touches the mead is left unsanitised.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Mix the must",
+     "minutes": 30,
+     "how": "Dissolve the honey in about half the water, warm if needed, top up with cool water, and stir hard for a minute to add air. Take a gravity reading if you have a hydrometer.",
+     "done_when": "No honey left on the bottom; liquid is at 18-22 C.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Pitch the yeast",
+     "minutes": 15,
+     "how": "Rehydrate the yeast as its packet says, then stir it in. Fit the airlock.",
+     "done_when": "Airlock fitted.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Active fermentation",
+     "minutes": 20160,
+     "how": "Keep at 17-20 C, out of sunlight. Add the nutrient in four equal doses.",
+     "done_when": "Bubbling has slowed to one bubble every minute or so, and the gravity is steady for three days.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       1440,
+       "Nutrient dose 1 of 4"
+      ],
+      [
+       2880,
+       "Nutrient dose 2 of 4"
+      ],
+      [
+       4320,
+       "Nutrient dose 3 of 4"
+      ],
+      [
+       5760,
+       "Nutrient dose 4 of 4"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Rack off the sediment and clear",
+     "minutes": 86400,
+     "how": "Siphon the mead into a clean, sanitised vessel, leaving the sediment, and fill it close to the neck.",
+     "done_when": "Clear, with no new sediment and no bubbles for a month.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Bottle",
+     "minutes": 60,
+     "how": "Siphon into clean bottles. Back-sweeten only after stabilising.",
+     "done_when": "Bottled and capped.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Age",
+     "minutes": 129600,
+     "how": "Store cool and dark. Strong mead is harsh young and softens with months.",
+     "done_when": "Tastes smooth.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 18.0,
+   "var": {
+    "label": "Honey (g per litre of water)",
+    "unit": "g",
+    "default": 500,
+    "min": 250,
+    "max": 700,
+    "step": 10,
+    "hint": "About 250 g gives roughly 7 %, 400 g about 11 %, 500 g about 13 %."
+   },
+   "og": {
+    "fg": 1.0,
+    "note": "The published batch is 1.4 kg honey in 2.8 L water, OG 1.108."
+   },
+   "safety": [
+    "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol.",
+    "A fermenting vessel must be able to let gas out: always use an airlock, never a sealed lid, until it has fully stopped."
+   ],
+   "notes": "Honey amount drives the strength: the estimate is only a guide, so measure with a hydrometer if you can.",
+   "yield": "About 1.35 litres of mead for every litre of water.",
+   "sources": [
+    "aha_mead"
+   ]
+  },
+  {
+   "key": "metheglin",
+   "group": "drinks",
+   "family": "mead",
+   "name": "Metheglin (spiced mead)",
+   "description": "Mead with spices or herbs added: the old English name for it is metheglin. Lighter honey, so the spices show.",
+   "base_label": "Litres of water",
+   "base_unit": "L",
+   "default_amount": 2.8,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Honey",
+     "per": 400,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": true,
+     "mult": 1,
+     "sugar": 0.8,
+     "vol": 0.7
+    },
+    {
+     "name": "Water (spring or dechlorinated)",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Whole spices (cinnamon, cloves, ginger, citrus peel)",
+     "per": 1.0,
+     "unit": "g",
+     "note": "start light: about 1 g per litre in total, added after the first week, tasted every few days",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Wine or mead yeast",
+     "per": 1.8,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Yeast nutrient",
+     "per": 1.3,
+     "unit": "g",
+     "note": "four doses at 24, 48, 72 and 96 hours",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean and sanitise everything",
+     "minutes": 30,
+     "how": "Wash and sanitise everything that touches the mead.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Mix the must and pitch the yeast",
+     "minutes": 45,
+     "how": "Dissolve the honey in warm water, top up, stir hard to add air, then pitch the yeast and fit an airlock.",
+     "done_when": "At 18-22 C with the airlock fitted.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Active fermentation",
+     "minutes": 10080,
+     "how": "Keep at 17-20 C. Add nutrient in four doses.",
+     "done_when": "Fermentation is vigorous.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       1440,
+       "Nutrient dose 1 of 4"
+      ],
+      [
+       2880,
+       "Nutrient dose 2 of 4"
+      ],
+      [
+       4320,
+       "Nutrient dose 3 of 4"
+      ],
+      [
+       5760,
+       "Nutrient dose 4 of 4"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Add the spices",
+     "minutes": 15,
+     "how": "Add whole spices in a sanitised mesh bag so they can be removed.",
+     "done_when": "Spices in.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Infuse",
+     "minutes": 14400,
+     "how": "Taste every two or three days and take the spices out when it tastes right. Spices overpower quickly.",
+     "done_when": "Spice is clear but not harsh.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rack and clear",
+     "minutes": 64800,
+     "how": "Siphon off the sediment into a clean vessel and let it clear.",
+     "done_when": "Clear and still.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Bottle and age",
+     "minutes": 129600,
+     "how": "Bottle, then age cool and dark.",
+     "done_when": "Tastes balanced.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 18.0,
+   "var": {
+    "label": "Honey (g per litre of water)",
+    "unit": "g",
+    "default": 400,
+    "min": 250,
+    "max": 600,
+    "step": 10,
+    "hint": "400 g gives roughly 11 %."
+   },
+   "og": {
+    "fg": 1.0,
+    "note": "Same method as the traditional mead above; the spice figures are a cautious first try, not yet checked against a published recipe."
+   },
+   "safety": [
+    "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol."
+   ],
+   "notes": "Use whole, fresh spices and add little: you can add more, you cannot take it out.",
+   "yield": "About 1.3 litres per litre of water.",
+   "sources": [
+    "aha_mead"
+   ]
+  },
+  {
+   "key": "country_wine",
+   "group": "drinks",
+   "family": "wine",
+   "name": "Country wine (blackberry)",
+   "description": "Fruit wine in the old country tradition. The method works for most soft fruit: change the fruit, keep the process.",
+   "base_label": "Litres of water",
+   "base_unit": "L",
+   "default_amount": 3.8,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Blackberries (fresh or frozen)",
+     "per": 480,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.05,
+     "vol": 0.0
+    },
+    {
+     "name": "White sugar",
+     "per": 300,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 1.0,
+     "vol": 0.63
+    },
+    {
+     "name": "Water",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Acid blend",
+     "per": 0.25,
+     "unit": "tsp",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Pectic enzyme",
+     "per": 0.13,
+     "unit": "tsp",
+     "note": "clears the haze",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Yeast nutrient",
+     "per": 0.25,
+     "unit": "tsp",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Campden tablet",
+     "per": 0.27,
+     "unit": "tablet",
+     "note": "crushed, at the start (about 1 per 4 litres)",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Red wine yeast",
+     "per": 1.3,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean and sanitise everything",
+     "minutes": 30,
+     "how": "Wash and sanitise the pan, bucket, spoon, siphon and airlock.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Simmer the fruit, sugar and water",
+     "minutes": 40,
+     "how": "Simmer for 30 minutes, then add the acid, enzyme and nutrient and let it cool to room temperature. Take a gravity reading.",
+     "done_when": "Cool to 20-25 C.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Add the Campden tablet and wait",
+     "minutes": 720,
+     "how": "Stir in the crushed Campden tablet, cover, and wait at least 12 hours before the yeast so the sulphite can work.",
+     "done_when": "12 hours have passed.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Pitch the yeast and stir daily",
+     "minutes": 10080,
+     "how": "Add the yeast. Stir daily and push the fruit down until the gravity is 1.020 or lower.",
+     "done_when": "Gravity is 1.020 or below.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rack to a carboy",
+     "minutes": 43200,
+     "how": "Siphon off the fruit into a sanitised carboy with an airlock and leave it for about a month.",
+     "done_when": "Bubbling has slowed a lot.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rack again and clear",
+     "minutes": 108000,
+     "how": "Siphon off the sediment and leave it for 2-3 months.",
+     "done_when": "Clear.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rack, stabilise and bottle",
+     "minutes": 129600,
+     "how": "Rack once more. When it has been still for about a month, check the gravity is steady, then stabilise and bottle.",
+     "done_when": "Gravity steady for a month.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Bottle age",
+     "minutes": 259200,
+     "how": "At least six months in the bottle before the first taste.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": {
+    "fg": 0.998,
+    "note": "The published batch is 4 lb (1.8 kg) berries, 2.5 lb (1.1 kg) sugar and 1 gallon of water; this runs to about 13-14 % if it ferments dry. The yeast tolerates less than some people expect."
+   },
+   "safety": [
+    "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol.",
+    "Fermentation needs an airlock, not a sealed lid."
+   ],
+   "notes": "Sugar is the only thing you should change for strength; less sugar gives a lighter, drier wine.",
+   "yield": "About 1.2 litres of wine per litre of water.",
+   "sources": [
+    "midwest_blackberry"
+   ]
+  },
+  {
+   "key": "kvass",
+   "group": "drinks",
+   "family": "kvass",
+   "name": "Rye bread kvass",
+   "description": "A tart, lightly fizzy, low-alcohol drink from dried rye bread. Often the first fermented drink people try.",
+   "base_label": "Litres of water",
+   "base_unit": "L",
+   "default_amount": 4,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Dark rye bread, cubed, dried and roasted",
+     "per": 200,
+     "unit": "g",
+     "note": "180 C until dry like rusks",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar",
+     "per": 75,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Honey",
+     "per": 25,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Malt (or more honey or sugar)",
+     "per": 25,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Raisins",
+     "per": 4,
+     "unit": "g",
+     "note": "a small handful per 4 L",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Orange peel",
+     "per": 0.25,
+     "unit": "item",
+     "note": "one strip per 4 L",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Mint",
+     "per": 0.25,
+     "unit": "item",
+     "note": "one sprig per 4 L",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sourdough starter (optional)",
+     "per": 4,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Roast the bread",
+     "minutes": 45,
+     "how": "Cube the bread and roast at 180 C until dried like rusks and browned, not burnt.",
+     "done_when": "Dry and golden-brown.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Steep",
+     "minutes": 360,
+     "how": "Pour hot (not boiling) water over the bread, sugar, honey and malt. Cover and steep until cool.",
+     "done_when": "Cool to about room temperature.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain and add the culture",
+     "minutes": 20,
+     "how": "Strain into a clean jar. Add the raisins, peel, mint and starter. Cover with a cloth, not a lid.",
+     "done_when": "Covered with a cloth.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 8640,
+     "how": "Stir now and then. Taste from day 5: it is ready when sour, with depth and a slight fizz.",
+     "done_when": "Pleasantly sour.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       7200,
+       "Start tasting"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Bottle and fizz",
+     "minutes": 1440,
+     "how": "Strain into thick or swing-top bottles. A few raisins in each bottle add fizz.",
+     "done_when": "Bottled.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Chill",
+     "minutes": 720,
+     "how": "Move to the fridge to stop it. Drink within about a week.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Low alcohol, but not none: it is a live ferment and it climbs the longer it sits warm. Not for children or anyone avoiding alcohol.",
+    "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation."
+   ],
+   "notes": "The source gives no alcohol figure: treat it as low but not zero.",
+   "yield": "A little less than the water you started with.",
+   "sources": [
+    "fermentary_kvass"
+   ]
+  },
+  {
+   "key": "rice_wine",
+   "group": "drinks",
+   "family": "rice_wine",
+   "name": "Rice wine (makgeolli style)",
+   "description": "Milky, lightly sparkling Korean rice wine made with steamed rice and nuruk (a starter of grain, mould and yeast). About 7-8 %. This is the fermented drink; soju is distilled from a wine like this and is not covered.",
+   "base_label": "Kilograms of dry rice",
+   "base_unit": "kg",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Short-grain rice, washed and soaked",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Nuruk (starter)",
+     "per": 200,
+     "unit": "g",
+     "note": "check the packet: strengths vary",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Water for the first mix",
+     "per": 1000,
+     "unit": "ml",
+     "note": "the source uses 7 cups at the start for its batch",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Water for the second mix (after straining)",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Soak and steam the rice",
+     "minutes": 120,
+     "how": "Soak, then steam or cook the rice until soft but not mushy. Spread it to cool to body temperature.",
+     "done_when": "Cool to 30 C or below.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Mix",
+     "minutes": 30,
+     "how": "Combine the rice, crumbled nuruk and the first water in a very clean jar or crock. Mix with a sanitised hand or spoon.",
+     "done_when": "Mixed.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment, stirring",
+     "minutes": 10080,
+     "how": "Keep at about 20 C. Stir a few times a day with a sanitised spoon, and cover with a cloth.",
+     "done_when": "No more bubbles; the liquid settles to light gold.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain and dilute",
+     "minutes": 30,
+     "how": "Strain through muslin, pressing the rice. Add the second water to the strained liquid.",
+     "done_when": "Milky liquid.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Chill and drink",
+     "minutes": 720,
+     "how": "Chill. It keeps for only a few days in the fridge and goes on fermenting.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol.",
+    "Keep the fermenter clean. Gas is released during fermentation, so do not seal the jar until it has settled.",
+    "This tool does not cover distilling. Home distillation is illegal in many places, including the UK, and is dangerous."
+   ],
+   "notes": "The published page gives the water (7 cups, then 7 more), the time (about a week) and the strength (7-8 %) but not the rice or nuruk weights. The weights here are typical home ratios and have not been checked.",
+   "yield": "Several litres: about 2.5 litres per kilogram of rice.",
+   "sources": [
+    "masterclass_makgeolli"
+   ]
+  },
+  {
+   "key": "beer",
+   "group": "drinks",
+   "family": "beer",
+   "name": "Pale ale (malt extract)",
+   "description": "A first beer from malt extract. No mashing: boil, add the hops, cool, ferment.",
+   "base_label": "Litres of finished beer",
+   "base_unit": "L",
+   "default_amount": 18.9,
+   "amount_step": 1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Light liquid malt extract",
+     "per": 180,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.8,
+     "vol": 0.0
+    },
+    {
+     "name": "Bittering hops (60 min)",
+     "per": 0.74,
+     "unit": "g",
+     "note": "example: Columbus, 13.9 % alpha",
+     "group": "Hops",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hops at 15 minutes",
+     "per": 0.74,
+     "unit": "g",
+     "note": "",
+     "group": "Hops",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hops at 5 minutes",
+     "per": 0.74,
+     "unit": "g",
+     "note": "",
+     "group": "Hops",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hops at flame-out (0 minutes)",
+     "per": 1.48,
+     "unit": "g",
+     "note": "",
+     "group": "Hops",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Dry hops (after the first week)",
+     "per": 2.27,
+     "unit": "g",
+     "note": "example: Centennial",
+     "group": "Hops",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Ale yeast (dried)",
+     "per": 0.6,
+     "unit": "g",
+     "note": "about one 11.5 g packet per 19 litres",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Priming sugar (corn sugar) for bottling",
+     "per": 6.0,
+     "unit": "g",
+     "note": "see the pressure warning on the Safety tab",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean and sanitise everything",
+     "minutes": 45,
+     "how": "Everything that touches the beer after the boil needs sanitising.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Boil",
+     "minutes": 60,
+     "how": "Dissolve the malt extract in hot water, bring to the boil and add the hops on schedule.",
+     "done_when": "60 minutes done.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [
+      [
+       0,
+       "Bittering hops in"
+      ],
+      [
+       45,
+       "Hops at 15 minutes in"
+      ],
+      [
+       55,
+       "Hops at 5 minutes in"
+      ],
+      [
+       60,
+       "Flame-out hops in"
+      ]
+     ],
+     "hands": true
+    },
+    {
+     "name": "Cool and pitch",
+     "minutes": 45,
+     "how": "Cool to 20 C quickly (a sink of cold water works), transfer, aerate and pitch the yeast.",
+     "done_when": "At 20 C with the airlock fitted.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Primary fermentation",
+     "minutes": 12960,
+     "how": "Keep at about 20 C.",
+     "done_when": "Gravity steady for two days.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Dry hop",
+     "minutes": 12960,
+     "how": "Add the dry hops and rest at about 20 C.",
+     "done_when": "Hop flavour in.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Prime and bottle",
+     "minutes": 90,
+     "how": "Dissolve the priming sugar in boiled water, mix gently into the beer, bottle and cap.",
+     "done_when": "Capped.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Bottle condition",
+     "minutes": 20160,
+     "how": "Keep warm (about 20 C) for two weeks, then chill before opening.",
+     "done_when": "Fizzy and clear after chilling.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": {
+    "fg": 1.012,
+    "note": "The published beer has OG 1.056 and FG 1.012, about 5.8 %."
+   },
+   "safety": [
+    "Contains alcohol: not for children, pregnancy, driving or anyone who avoids alcohol.",
+    "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation.",
+    "Too much priming sugar or a bottled beer that was not finished fermenting can burst bottles."
+   ],
+   "notes": "Malt extract weights come from the published 5 gallon batch (3.4 kg liquid extract); a different extract may be thicker or thinner.",
+   "yield": "Roughly 40 pint bottles from 19 litres.",
+   "sources": [
+    "aha_columbus"
+   ]
+  },
+  {
+   "key": "ginger_beer",
+   "group": "drinks",
+   "family": "ginger_beer",
+   "name": "Ginger beer",
+   "description": "A spicy, fizzy drink, kept very low in alcohol by a short ferment and a cold finish. This is the plain-yeast version; the Cultures tab shows a ginger bug instead.",
+   "base_label": "Litres of ginger beer",
+   "base_unit": "L",
+   "default_amount": 2,
+   "amount_step": 1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Root ginger, sliced thin and bruised",
+     "per": 150,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Lemon (zest and juice)",
+     "per": 1,
+     "unit": "item",
+     "note": "unwaxed",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar",
+     "per": 140,
+     "unit": "g",
+     "note": "brown or white",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 1.0,
+     "vol": 0.63
+    },
+    {
+     "name": "Cream of tartar",
+     "per": 4,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Dried ale or bread yeast",
+     "per": 4,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Boiling water",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Make the base",
+     "minutes": 20,
+     "how": "Pour boiling water over the ginger, zest, juice, sugar and cream of tartar.",
+     "done_when": "Sugar dissolved.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cool",
+     "minutes": 90,
+     "how": "Cool to 25-30 C.",
+     "done_when": "Warm to the touch, not hot.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "First ferment",
+     "minutes": 1440,
+     "how": "Add the yeast, cover, and leave somewhere warm.",
+     "done_when": "A thick froth on top.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain and bottle",
+     "minutes": 20,
+     "how": "Skim, strain into clean PET plastic bottles, leaving a 3-5 cm gap at the top.",
+     "done_when": "Bottled.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Fizz",
+     "minutes": 2880,
+     "how": "Leave at about 21 C. Squeeze the bottle each day: when it is rock hard, move it to the fridge.",
+     "done_when": "Bottle is firm.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       1440,
+       "Check the bottles by squeezing"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Chill and drink",
+     "minutes": 720,
+     "how": "Refrigerate. Drink within six days.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 21.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Use PET plastic bottles only. Glass bottles must never be used for this one: the pressure can burst them.",
+    "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation."
+   ],
+   "notes": "The source recipe uses commercial yeast. A ginger bug (a wild starter) takes longer and varies from batch to batch.",
+   "yield": "Just under one litre per litre of water.",
+   "sources": [
+    "cern_gingerbeer"
+   ]
+  },
+  {
+   "key": "kombucha",
+   "group": "drinks",
+   "family": "kombucha",
+   "name": "Kombucha",
+   "description": "Sweet tea fermented by a SCOBY into a tart, lightly fizzy drink.",
+   "base_label": "Litres of kombucha",
+   "base_unit": "L",
+   "default_amount": 3.8,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Black tea",
+     "per": 2.4,
+     "unit": "g",
+     "note": "about 0.8 tablespoon, or 1.6 tea bags",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar",
+     "per": 53,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hot water for steeping",
+     "per": 270,
+     "unit": "ml",
+     "note": "heat to 70-75 C",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Cold water",
+     "per": 730,
+     "unit": "ml",
+     "note": "tea must be below 35 C before the SCOBY goes in",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Starter liquid from a previous batch",
+     "per": 100,
+     "unit": "ml",
+     "note": "must test pH 4.0 or lower",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "SCOBY",
+     "per": 0.26,
+     "unit": "item",
+     "note": "one per batch is plenty",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean everything",
+     "minutes": 20,
+     "how": "Wash hands and equipment. Sanitise with hot water over 77 C for 30 seconds.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Steep and sweeten",
+     "minutes": 20,
+     "how": "Steep the tea in hot water for 2 minutes, strain, stir in the sugar.",
+     "done_when": "Sugar dissolved.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cool and test",
+     "minutes": 120,
+     "how": "Add the cold water. Test the starter liquid with a pH strip (4.0 or lower), then add it and the SCOBY.",
+     "done_when": "Below 35 C; starter at pH 4.0 or lower.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "First ferment",
+     "minutes": 11520,
+     "how": "Cover with a cloth. Keep at 20-25 C out of direct sun. Taste from day 7.",
+     "done_when": "Tart, with the sweetness gone down.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       10080,
+       "Start tasting"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Bottle and chill",
+     "minutes": 30,
+     "how": "Keep some as starter for the next batch. Bottle the rest and refrigerate straight away.",
+     "done_when": "Chilled; use within 30 days.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 23.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "The starter liquid must be pH 4.0 or lower before you use it. If it is higher, get fresh starter.",
+    "Do not add the SCOBY until the tea is below 35 C.",
+    "Airtight containers can build pressure and burst; the finished drink should be chilled and used within 30 days.",
+    "Not for children, pregnant people or people with weak immune systems unless a professional has said it is fine."
+   ],
+   "notes": "Amounts are the National Center for Home Food Preservation's per gallon, scaled to litres.",
+   "yield": "About one litre per litre of water.",
+   "sources": [
+    "nchfp_kombucha"
+   ]
+  },
+  {
+   "key": "jun",
+   "group": "drinks",
+   "family": "jun",
+   "name": "Jun tea",
+   "description": "Like kombucha, but made with green tea and honey. Lighter and faster. It needs its own culture (a Jun SCOBY).",
+   "base_label": "Litres of jun",
+   "base_unit": "L",
+   "default_amount": 3.8,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Green tea",
+     "per": 3,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Honey (raw)",
+     "per": 90,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hot water for steeping",
+     "per": 300,
+     "unit": "ml",
+     "note": "about 70 C",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Cold water",
+     "per": 700,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Jun starter liquid",
+     "per": 100,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Jun SCOBY",
+     "per": 0.26,
+     "unit": "item",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean everything",
+     "minutes": 20,
+     "how": "Wash hands and sanitise equipment.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Steep and sweeten",
+     "minutes": 20,
+     "how": "Steep the tea for a few minutes, strain, stir in the honey.",
+     "done_when": "Honey dissolved.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cool and add the culture",
+     "minutes": 90,
+     "how": "Top up with cold water, cool below 35 C, then add the starter liquid and SCOBY.",
+     "done_when": "Below 35 C.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 7200,
+     "how": "Cover with a cloth. Keep at 22-26 C. Taste from day 3.",
+     "done_when": "Tart and lightly sweet.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       4320,
+       "Start tasting"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Bottle and chill",
+     "minutes": 30,
+     "how": "Keep some back as starter. Bottle the rest and refrigerate.",
+     "done_when": "Chilled.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 24.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Use the same starter-liquid rule as kombucha: pH 4.0 or lower.",
+    "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation."
+   ],
+   "notes": "Amounts are typical home practice and have not been checked against a published source. Jun is more sensitive to temperature than kombucha.",
+   "yield": "About one litre per litre of water.",
+   "sources": []
+  },
+  {
+   "key": "water_kefir",
+   "group": "drinks",
+   "family": "kefir",
+   "name": "Water kefir",
+   "description": "Sugar water cultured by water kefir grains into a light, fizzy drink.",
+   "base_label": "Litres of water kefir",
+   "base_unit": "L",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Sugar",
+     "per": 53,
+     "unit": "g",
+     "note": "plain white sugar is easiest for the grains; avoid raw honey",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Hydrated water kefir grains",
+     "per": 32,
+     "unit": "g",
+     "note": "about 2 tablespoons per quart",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Chlorine-free water",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Dissolve the sugar",
+     "minutes": 10,
+     "how": "Dissolve the sugar in the water, at room temperature.",
+     "done_when": "Dissolved and not hot.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "First ferment",
+     "minutes": 2160,
+     "how": "Add the grains, cover with a cloth, keep at 20-26 C. Never leave it longer than 72 hours or the grains starve.",
+     "done_when": "Slightly cloudy, less sweet.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain",
+     "minutes": 10,
+     "how": "Strain out the grains and start the next batch with them straight away.",
+     "done_when": "Grains out.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Optional second ferment",
+     "minutes": 2160,
+     "how": "Bottle the liquid with fruit or ginger for flavour and fizz.",
+     "done_when": "Fizzy; chill.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Chill",
+     "minutes": 360,
+     "how": "Refrigerate to stop it.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 23.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Fizzy drinks in sealed bottles build pressure. Use bottles made for it (swing-top or crown-cap glass, or PET plastic), never a thin jar, open one over a sink, and chill the bottles to stop the fermentation.",
+    "Alcohol builds if bottles stay warm and sweet: chill early. Low, but not guaranteed zero."
+   ],
+   "notes": "Make the next batch with the grains the moment you strain them.",
+   "yield": "About one litre per litre of water.",
+   "sources": [
+    "kk_waterkefir"
+   ]
+  },
+  {
+   "key": "milk_kefir",
+   "group": "drinks",
+   "family": "kefir",
+   "name": "Milk kefir",
+   "description": "Milk cultured by kefir grains into a tangy, drinkable yoghurt. Easier than it sounds.",
+   "base_label": "Litres of milk",
+   "base_unit": "L",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Whole milk",
+     "per": 1000,
+     "unit": "ml",
+     "note": "any dairy milk",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Milk kefir grains",
+     "per": 25,
+     "unit": "g",
+     "note": "about 1 tablespoon per 500 ml; adjust to taste",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Combine",
+     "minutes": 5,
+     "how": "Put the grains in a clean jar and add the milk. Cover with a cloth.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 1440,
+     "how": "Keep at about 20-24 C, out of direct sun.",
+     "done_when": "Thick, tangy and starting to separate.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain",
+     "minutes": 10,
+     "how": "Strain the grains out with a plastic or steel sieve and start the next batch.",
+     "done_when": "Grains out.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Chill",
+     "minutes": 360,
+     "how": "Refrigerate. Keeps a week or two.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 22.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "If it smells rotten, goes pink or shows mould, discard it. A clean tangy smell is normal."
+   ],
+   "notes": "Typical home practice: not yet checked against a published source.",
+   "yield": "Slightly less than the milk started with.",
+   "sources": []
+  },
+  {
+   "key": "sauerkraut",
+   "group": "food",
+   "family": "kraut",
+   "name": "Sauerkraut",
+   "description": "Cabbage and salt, nothing else. Weigh the salt: that is where the safety is.",
+   "base_label": "Kilograms of sliced cabbage",
+   "base_unit": "kg",
+   "default_amount": 0.8,
+   "amount_step": 0.1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Cabbage, finely sliced",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Fine salt, no additives",
+     "per": 20,
+     "unit": "g",
+     "note": "2 % of the cabbage by weight; the published range is 1.5-2.5 %",
+     "group": "",
+     "var": true,
+     "mult": 10,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean everything",
+     "minutes": 15,
+     "how": "Wash the jar, weight and your hands: clean tools prevent spoilage.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Slice and salt",
+     "minutes": 20,
+     "how": "Slice the cabbage thinly, sprinkle with the salt, mix, and leave 30 minutes.",
+     "done_when": "Wet and glossy.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Pack and weight",
+     "minutes": 20,
+     "how": "Pack tightly into a jar so brine covers the cabbage. Top with a whole leaf and a weight (not metal). Leave the lid loose.",
+     "done_when": "Brine above the cabbage.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 20160,
+     "how": "Keep at 18-22 C. Stand the jar in a bowl for overflow. Taste from the second week.",
+     "done_when": "Tart, crunchy, no mould.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       14400,
+       "Start tasting"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Refrigerate",
+     "minutes": 10,
+     "how": "Move to the fridge. It keeps for many months.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 20.0,
+   "var": {
+    "label": "Salt (% of cabbage weight)",
+    "unit": "%",
+    "default": 2.0,
+    "min": 1.5,
+    "max": 2.5,
+    "step": 0.1,
+    "hint": "The published range is 1.5-2.5 %; too little salt allows bad bacteria and too much stops the fermentation."
+   },
+   "og": null,
+   "safety": [
+    "Weigh the salt. Do not reduce it below the published range.",
+    "Keep everything under the brine. Throw away anything with mould, a rotten smell or slime.",
+    "The finished sauerkraut should have a pH of 4.6 or lower; a cheap strip will tell you."
+   ],
+   "notes": "Use salt without anti-caking agents or iodine.",
+   "yield": "Roughly the weight of the cabbage.",
+   "sources": [
+    "uvm_kraut"
+   ]
+  },
+  {
+   "key": "kimchi",
+   "group": "food",
+   "family": "kimchi",
+   "name": "Kimchi (napa cabbage)",
+   "description": "Salted napa cabbage with a garlic, ginger and chilli paste. Ready to eat in a few days, better in a few weeks.",
+   "base_label": "Kilograms of napa cabbage",
+   "base_unit": "kg",
+   "default_amount": 0.9,
+   "amount_step": 0.1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Napa cabbage, cut in pieces",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "Cabbage",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Coarse sea salt for the brine",
+     "per": 55,
+     "unit": "g",
+     "note": "the source says 1/4 cup per 2 lb; weigh your own, brands differ",
+     "group": "Cabbage",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Garlic, grated",
+     "per": 17,
+     "unit": "g",
+     "note": "",
+     "group": "Paste",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Ginger, grated",
+     "per": 2,
+     "unit": "g",
+     "note": "",
+     "group": "Paste",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar",
+     "per": 4.4,
+     "unit": "g",
+     "note": "",
+     "group": "Paste",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Fish sauce (or water for vegetarian)",
+     "per": 33,
+     "unit": "ml",
+     "note": "",
+     "group": "Paste",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Gochugaru (Korean chilli flakes)",
+     "per": 22,
+     "unit": "g",
+     "note": "the source gives 1-5 tablespoons to taste",
+     "group": "Paste",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Radish (daikon or Korean), matchsticks",
+     "per": 250,
+     "unit": "g",
+     "note": "",
+     "group": "Vegetables",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Scallions (spring onions), in 2.5 cm pieces",
+     "per": 45,
+     "unit": "g",
+     "note": "",
+     "group": "Vegetables",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Salt the cabbage",
+     "minutes": 90,
+     "how": "Dissolve the salt in water and soak the cabbage, weighted, for 1-2 hours.",
+     "done_when": "Cabbage bends without snapping.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Rinse and drain",
+     "minutes": 30,
+     "how": "Rinse three times in cold water, then drain for 15-20 minutes.",
+     "done_when": "Not too salty to taste.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Make the paste and mix",
+     "minutes": 30,
+     "how": "Mix the paste ingredients, then work them through the cabbage, radish and scallions (gloves help).",
+     "done_when": "Evenly red.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Pack",
+     "minutes": 15,
+     "how": "Pack tightly into a jar, leaving a gap at the top. Press down so brine rises.",
+     "done_when": "Brine over the vegetables.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 4320,
+     "how": "Leave at a cool room temperature, out of sun, 1-5 days. Press down daily to release gas and taste.",
+     "done_when": "Pleasantly sour and fizzy.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       1440,
+       "Press down and taste"
+      ],
+      [
+       2880,
+       "Press down and taste"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Refrigerate",
+     "minutes": 10,
+     "how": "Move to the fridge. Best after another week or two; keeps a few months.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 18.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Open jars slowly over a sink: gas builds. Keep the vegetables under the brine.",
+    "Discard it if it has mould or smells rotten, rather than just sour or funky."
+   ],
+   "notes": "The paste figures are per 900 g (2 lb) in the source, scaled. Fish sauce can be left out.",
+   "yield": "Roughly one litre per kilogram.",
+   "sources": [
+    "kitchn_kimchi"
+   ]
+  },
+  {
+   "key": "pickles",
+   "group": "food",
+   "family": "pickles",
+   "name": "Fermented dill pickles",
+   "description": "Cucumbers fermented in a salt brine with dill and garlic, the old way. No vinegar-bath shortcut.",
+   "base_label": "Litres of brine",
+   "base_unit": "L",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Small pickling cucumbers",
+     "per": 700,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Salt (no additives)",
+     "per": 50,
+     "unit": "g",
+     "note": "a 5 % brine; use 35 g for a milder, shorter 'half-sour'",
+     "group": "",
+     "var": true,
+     "mult": 10,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Water",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Fresh dill",
+     "per": 15,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Garlic cloves",
+     "per": 4,
+     "unit": "item",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Vinegar (5 % acidity)",
+     "per": 15,
+     "unit": "ml",
+     "note": "the Penn State page says not to leave the vinegar out of the tested recipe",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Clean everything",
+     "minutes": 15,
+     "how": "Wash the jar, cucumbers and your hands. Cut off the blossom end (it holds an enzyme that softens pickles).",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Make the brine and pack",
+     "minutes": 25,
+     "how": "Dissolve the salt in the water. Pack the cucumbers, dill and garlic into the jar and cover with brine.",
+     "done_when": "All submerged.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Weight",
+     "minutes": 10,
+     "how": "Hold them under with a plastic bag filled with brine (never plain water) or a weight.",
+     "done_when": "Nothing floating.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 30240,
+     "how": "Keep at 21-24 C (70-75 F). Skim off any scum. The Penn State page gives 3-4 weeks.",
+     "done_when": "Even olive colour, tart.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       10080,
+       "Skim and check"
+      ],
+      [
+       20160,
+       "Skim and check"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Refrigerate",
+     "minutes": 10,
+     "how": "Move to the fridge. Keep up to six months.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 22.0,
+   "var": {
+    "label": "Brine strength (% salt in the water)",
+    "unit": "%",
+    "default": 5,
+    "min": 3.5,
+    "max": 5.5,
+    "step": 0.5,
+    "hint": "5 % is a standard full-sour brine; 3.5 % is a milder half-sour that must be eaten sooner and kept cold."
+   },
+   "og": null,
+   "safety": [
+    "Do not reduce the salt in a full-sour pickle. Throw away pickles that are soft, slimy or smell bad.",
+    "Use food-grade containers: glass, glazed crock or food-grade plastic, never galvanised metal."
+   ],
+   "notes": "The Penn State page does not give the brine amounts and refers readers to the National Center for Home Food Preservation. The amounts here are common brine strengths, not yet checked against that recipe.",
+   "yield": "One litre of brine covers about 700 g of cucumbers.",
+   "sources": [
+    "psu_pickles"
+   ]
+  },
+  {
+   "key": "cultured_butter",
+   "group": "food",
+   "family": "butter",
+   "name": "Fermented (cultured) butter",
+   "description": "Cream is cultured first, then churned. Deeper, tangier, richer than sweet-cream butter. You get buttermilk as a by-product.",
+   "base_label": "Litres of cream",
+   "base_unit": "L",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Pasteurised double cream (35-40 % fat)",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Live yoghurt or cultured buttermilk",
+     "per": 60,
+     "unit": "ml",
+     "note": "with live cultures on the label",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Fine salt (optional, to taste)",
+     "per": 6,
+     "unit": "g",
+     "note": "about 1.5 % of the butter",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Warm the cream",
+     "minutes": 20,
+     "how": "Bring the cream to about 22 C. Stir in the yoghurt or buttermilk.",
+     "done_when": "Mixed.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Culture",
+     "minutes": 1080,
+     "how": "Cover and keep at 20-24 C until slightly thickened, tangy and fragrant.",
+     "done_when": "Thicker than cream, pleasantly sour.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Chill",
+     "minutes": 720,
+     "how": "Chill the cultured cream in the fridge overnight.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Churn",
+     "minutes": 20,
+     "how": "Whip in a mixer or jar until it splits into butter and buttermilk. Strain.",
+     "done_when": "Grainy lumps in thin liquid.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Wash and salt",
+     "minutes": 20,
+     "how": "Rinse the butter in cold water, pressing until the water runs clear. Salt if you like.",
+     "done_when": "Rinse water clear.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Store",
+     "minutes": 10,
+     "how": "Wrap and refrigerate. Use within two to three weeks, or freeze.",
+     "done_when": "Wrapped.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 21.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Start with pasteurised cream and keep it cold apart from the culturing step.",
+    "Washing the butter thoroughly, until the water runs clear, makes it keep longer."
+   ],
+   "notes": "Typical home practice, not yet checked against a published source. One litre of cream gives about 400 g of butter.",
+   "yield": "About 400 g of butter and 600 ml of buttermilk per litre of cream.",
+   "sources": []
+  },
+  {
+   "key": "kefir_yoghurt",
+   "group": "food",
+   "family": "kefir_food",
+   "name": "Kefir 'yoghurt' (strained milk kefir)",
+   "description": "Milk kefir strained until thick, like a tangy Greek-style yoghurt. Salt it and you have a soft cheese.",
+   "base_label": "Litres of milk",
+   "base_unit": "L",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Whole milk",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Milk kefir grains",
+     "per": 25,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Fine salt (optional, for a cheese)",
+     "per": 5,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Combine",
+     "minutes": 5,
+     "how": "Put the grains in a clean jar and add the milk.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Ferment",
+     "minutes": 1440,
+     "how": "Keep at about 20-24 C.",
+     "done_when": "Thick, tangy, starting to separate.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain the grains",
+     "minutes": 10,
+     "how": "Remove the grains and start the next batch.",
+     "done_when": "Grains out.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Strain the kefir",
+     "minutes": 480,
+     "how": "Hang the kefir in muslin over a bowl in the fridge until thick. The whey can be used in baking.",
+     "done_when": "As thick as you like.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 22.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Discard it if it smells rotten, goes pink or shows mould."
+   ],
+   "notes": "Typical home practice. It loses about half its weight as whey.",
+   "yield": "About 500 g per litre of milk.",
+   "sources": []
+  },
+  {
+   "key": "honey_garlic",
+   "group": "food",
+   "family": "honey_ferment",
+   "name": "Fermented honey garlic",
+   "description": "Peeled garlic covered in raw honey. The garlic's water thins the honey and it slowly ferments. Sweet, mellow, savoury.",
+   "base_label": "Grams of peeled garlic",
+   "base_unit": "g",
+   "default_amount": 150,
+   "amount_step": 10,
+   "amount_min": 10,
+   "amount_max": 2000,
+   "ingredients": [
+    {
+     "name": "Garlic cloves, peeled",
+     "per": 1,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Raw honey",
+     "per": 2.1,
+     "unit": "g",
+     "note": "by volume the source says 1:1 (1 cup of each)",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Peel and dry",
+     "minutes": 30,
+     "how": "Peel the garlic and make sure it is dry. Use a clean, dry jar.",
+     "done_when": "No moisture.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Fill and cover",
+     "minutes": 15,
+     "how": "Fill the jar no more than two-thirds, cover the garlic with honey, and push it under with a clean spoon.",
+     "done_when": "Garlic submerged.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Burp daily",
+     "minutes": 30240,
+     "how": "Open the lid daily for the first two to three weeks to release gas, push the garlic down, and close again. Stir if you can do so cleanly.",
+     "done_when": "Bubbling has stopped and the honey is runny.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       10080,
+       "Burp the jar"
+      ],
+      [
+       20160,
+       "Burp the jar and test with pH strips"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Mature",
+     "minutes": 43200,
+     "how": "Keep cool and dark. The garlic may turn blue or green, which is normal. It is at its best after several weeks.",
+     "done_when": "Mellow and sweet.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Never give honey to babies under 12 months.",
+    "Check the pH after the first two weeks: under 4.6 is considered safe. If it is higher, do not eat it.",
+    "Use dry garlic and a dry, clean jar. If it smells rotten or shows mould, discard it."
+   ],
+   "notes": "Ratio taken from a food blog, not from a laboratory-tested recipe. The ratio here is by weight (about 2.1 g honey per gram of garlic).",
+   "yield": "About a 2.5-fold weight of the garlic.",
+   "sources": [
+    "alpha_garlichoney"
+   ]
+  },
+  {
+   "key": "honey_chilli",
+   "group": "food",
+   "family": "honey_ferment",
+   "name": "Fermented honey chilli",
+   "description": "Chillies in raw honey, fermented gently for a hot-sweet condiment.",
+   "base_label": "Grams of chillies",
+   "base_unit": "g",
+   "default_amount": 100,
+   "amount_step": 10,
+   "amount_min": 10,
+   "amount_max": 2000,
+   "ingredients": [
+    {
+     "name": "Fresh chillies (stems on, pricked or sliced)",
+     "per": 1,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Raw honey",
+     "per": 3,
+     "unit": "g",
+     "note": "enough to cover completely",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Prepare",
+     "minutes": 20,
+     "how": "Wash and dry the chillies, then prick them or cut into rings. Use a clean, dry jar.",
+     "done_when": "Dry.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Fill and cover",
+     "minutes": 15,
+     "how": "Pack into the jar, cover with honey, and push under. Leave a gap at the top.",
+     "done_when": "All submerged.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Burp daily",
+     "minutes": 30240,
+     "how": "Open the lid daily for the first weeks to release gas, push the chillies down, and close again.",
+     "done_when": "Bubbling has stopped.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       10080,
+       "Burp the jar"
+      ],
+      [
+       20160,
+       "Burp the jar"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Mature",
+     "minutes": 30240,
+     "how": "Keep in a cool, dark place. Taste after three weeks.",
+     "done_when": "Hot and sweet.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Never give honey to babies under 12 months.",
+    "Check the pH after two weeks: under 4.6 is considered safe. If it is higher, do not eat it.",
+    "Wear gloves when handling chillies."
+   ],
+   "notes": "Typical home practice, following the same method as the honey garlic. It has not been checked against a published source.",
+   "yield": "About 3 times the chilli weight.",
+   "sources": [
+    "alpha_garlichoney"
+   ]
+  },
+  {
+   "key": "jam",
+   "group": "food",
+   "family": "jam",
+   "name": "Jam (berries, no added pectin)",
+   "description": "Fruit, sugar and a little lemon, boiled to the setting point. Sugar does the preserving as well as the setting.",
+   "base_label": "Kilograms of fruit",
+   "base_unit": "kg",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Fruit (crushed berries)",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar",
+     "per": 830,
+     "unit": "g",
+     "note": "the published berry jam is about 4 cups of sugar to 4 cups of crushed fruit",
+     "group": "",
+     "var": true,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Lemon juice",
+     "per": 15,
+     "unit": "ml",
+     "note": "helps the set and keeps colour",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Prepare jars",
+     "minutes": 30,
+     "how": "Wash the jars and keep them hot in the oven or canner.",
+     "done_when": "Jars hot.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cook",
+     "minutes": 25,
+     "how": "Crush the fruit, add the sugar and lemon, stir over a gentle heat until the sugar has dissolved, then boil hard.",
+     "done_when": "Reaches 105 C (220 F) at sea level, or a drop wrinkles on a cold plate.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Fill the jars",
+     "minutes": 20,
+     "how": "Ladle into hot jars, leaving 5 mm at the top. Wipe the rims and cap.",
+     "done_when": "Capped.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Process or refrigerate",
+     "minutes": 15,
+     "how": "For shelf storage, process in a boiling-water canner for 5 minutes (0-300 m) or 10 minutes (300-1800 m); otherwise keep in the fridge.",
+     "done_when": "Sealed lids.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cool and set",
+     "minutes": 1440,
+     "how": "Leave undisturbed for 12-24 hours. Check the seals.",
+     "done_when": "Lids do not flex.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "sourced",
+   "ref_temp_c": 20.0,
+   "var": {
+    "label": "Sugar (g per kilogram of fruit)",
+    "unit": "g",
+    "default": 830,
+    "min": 500,
+    "max": 1100,
+    "step": 10,
+    "hint": "Less sugar means a softer set and a shorter life; sugar is a preservative."
+   },
+   "og": null,
+   "safety": [
+    "Process in a boiling-water canner as the tested recipe says if you want it shelf-stable; do not use unsealed jars you are unsure about.",
+    "Discard anything with mould, even a little."
+   ],
+   "notes": "Setting temperature drops about 1 C for every 150 m above sea level; check the National Center for Home Food Preservation chart for your altitude.",
+   "yield": "About 1.5 kg of jam per kg of fruit.",
+   "sources": [
+    "nchfp_jam"
+   ]
+  },
+  {
+   "key": "preserved_lemons",
+   "group": "food",
+   "family": "preserves",
+   "name": "Preserved lemons",
+   "description": "Lemons packed in salt until the rind turns soft and mellow. A classic salt preserve.",
+   "base_label": "Kilograms of lemons",
+   "base_unit": "kg",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Unwaxed lemons",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Coarse salt",
+     "per": 150,
+     "unit": "g",
+     "note": "about 15 % of the lemon weight, a typical home ratio",
+     "group": "",
+     "var": true,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Extra lemon juice to top up",
+     "per": 200,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Prepare jars",
+     "minutes": 20,
+     "how": "Wash a jar and rinse with boiling water.",
+     "done_when": "",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cut and salt",
+     "minutes": 30,
+     "how": "Cut the lemons almost into quarters, stuff with salt and pack tightly.",
+     "done_when": "Packed.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Add juice",
+     "minutes": 10,
+     "how": "Press down and add juice until the lemons are covered. Leave a gap at the top.",
+     "done_when": "Covered.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cure",
+     "minutes": 43200,
+     "how": "Keep at room temperature, turning the jar every few days.",
+     "done_when": "The rind is soft and translucent.",
+     "temp_sensitive": true,
+     "start_offset": 0,
+     "marks": [
+      [
+       10080,
+       "Turn the jar"
+      ],
+      [
+       20160,
+       "Turn the jar"
+      ],
+      [
+       30240,
+       "Turn the jar"
+      ]
+     ],
+     "hands": null
+    },
+    {
+     "name": "Refrigerate",
+     "minutes": 10,
+     "how": "Move to the fridge. Rinse before use. Keeps for several months.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": {
+    "label": "Salt (g per kilogram of lemons)",
+    "unit": "g",
+    "default": 150,
+    "min": 100,
+    "max": 250,
+    "step": 10,
+    "hint": "Do not use less than about 100 g per kg."
+   },
+   "og": null,
+   "safety": [
+    "Keep the lemons covered in juice. Discard the jar if it shows mould or smells off."
+   ],
+   "notes": "Typical home practice, not yet checked against a published source.",
+   "yield": "Fills a litre jar.",
+   "sources": []
+  },
+  {
+   "key": "chutney",
+   "group": "food",
+   "family": "chutney",
+   "name": "Chutney (apple and onion)",
+   "description": "A slow-cooked fruit, onion, sugar and vinegar preserve. The vinegar acid and sugar keep it.",
+   "base_label": "Kilograms of fruit",
+   "base_unit": "kg",
+   "default_amount": 1,
+   "amount_step": 0.5,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Apples (peeled, cored, chopped)",
+     "per": 1000,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Onions, chopped",
+     "per": 300,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Sugar (soft brown)",
+     "per": 450,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Vinegar (5 % acidity or higher)",
+     "per": 500,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Salt",
+     "per": 10,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Spices (mustard seed, ginger, chilli, cinnamon)",
+     "per": 8,
+     "unit": "g",
+     "note": "to taste",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Prepare jars",
+     "minutes": 30,
+     "how": "Wash the jars and sterilise them in a hot oven or boiling water.",
+     "done_when": "Jars hot.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Cook",
+     "minutes": 90,
+     "how": "Simmer everything, stirring often, until thick and no thin liquid pools when you drag a spoon across the pan.",
+     "done_when": "A spoon leaves a clear trail.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Pot",
+     "minutes": 20,
+     "how": "Spoon into the hot jars, cap, and wipe.",
+     "done_when": "Capped.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Mature",
+     "minutes": 40320,
+     "how": "Store cool and dark for four weeks to mellow.",
+     "done_when": "Mellow, not sharp.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": null,
+   "og": null,
+   "safety": [
+    "Use vinegar of at least 5 % acidity. Do not reduce the vinegar or sugar: they preserve it.",
+    "For long storage on the shelf, follow a tested canning recipe's processing times; otherwise keep it in the fridge after opening."
+   ],
+   "notes": "Typical home ratios, not yet checked against a published tested recipe.",
+   "yield": "About 1.3 kg of chutney per kg of fruit.",
+   "sources": []
+  },
+  {
+   "key": "syrup",
+   "group": "food",
+   "family": "syrup",
+   "name": "Sugar syrup (simple to rich)",
+   "description": "Sugar dissolved in water. One-to-one is simple syrup; two-to-one is richer and keeps longer. Add ginger, citrus or herbs to infuse.",
+   "base_label": "Litres of water",
+   "base_unit": "L",
+   "default_amount": 0.5,
+   "amount_step": 0.1,
+   "amount_min": 0.1,
+   "amount_max": 500,
+   "ingredients": [
+    {
+     "name": "Sugar",
+     "per": 1000,
+     "unit": "g",
+     "note": "1 part sugar to 1 part water by weight is simple syrup, 2 to 1 is rich",
+     "group": "",
+     "var": true,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Water",
+     "per": 1000,
+     "unit": "ml",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    },
+    {
+     "name": "Flavouring (ginger, peel, herbs), optional",
+     "per": 100,
+     "unit": "g",
+     "note": "",
+     "group": "",
+     "var": false,
+     "mult": 1,
+     "sugar": 0.0,
+     "vol": 0.0
+    }
+   ],
+   "steps": [
+    {
+     "name": "Dissolve",
+     "minutes": 10,
+     "how": "Heat the water gently, add the sugar and stir until clear. Do not boil hard.",
+     "done_when": "Clear.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Infuse (optional)",
+     "minutes": 30,
+     "how": "Add flavouring and leave to steep as it cools.",
+     "done_when": "Tastes right.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    },
+    {
+     "name": "Strain and bottle",
+     "minutes": 10,
+     "how": "Strain into a clean bottle.",
+     "done_when": "Bottled.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": true
+    },
+    {
+     "name": "Chill",
+     "minutes": 360,
+     "how": "Store in the fridge: simple syrup about a month, rich syrup longer.",
+     "done_when": "Cold.",
+     "temp_sensitive": false,
+     "start_offset": 0,
+     "marks": [],
+     "hands": null
+    }
+   ],
+   "status": "starting point",
+   "ref_temp_c": 20.0,
+   "var": {
+    "label": "Sugar (g per litre of water)",
+    "unit": "g",
+    "default": 1000,
+    "min": 500,
+    "max": 2000,
+    "step": 100,
+    "hint": "1000 g per litre is a simple syrup, 2000 g per litre a rich one."
+   },
+   "og": null,
+   "safety": [
+    "Keep it chilled and use clean bottles. If it goes cloudy or grows mould, throw it away."
+   ],
+   "notes": "Plain sugar syrup, with no source needed. Ginger syrup is a good place to start.",
+   "yield": "About 1.6 litres of syrup per litre of water.",
+   "sources": []
+  }
+ ],
+ "sources": [
+  {
+   "id": "nchfp_kombucha",
+   "name": "Kombucha tea",
+   "origin": "National Center for Home Food Preservation (University of Georgia)",
+   "url": "https://nchfp.uga.edu/how/ferment/recipes/kombucha-tea/",
+   "used": "1 gallon water, 3 tablespoons black tea (or 6 bags), 1 cup sugar, 1 SCOBY with starter liquid; 7-10 days at 20-25 C (68-77 F); starter liquid must be pH 4.0 or lower; tea below 35 C (95 F) before the SCOBY goes in; keep up to 30 days chilled."
+  },
+  {
+   "id": "uvm_kraut",
+   "name": "Sauerkraut: DIY fabulous fermented food",
+   "origin": "University of Vermont Extension",
+   "url": "https://www.uvm.edu/extension/news/sauerkraut-diy-fabulous-fermented-food",
+   "used": "800 g sliced cabbage with 2 % salt by weight (range 1.5-2.5 %), 18-22 C (65-72 F) for up to four weeks, keep it submerged, finished pH 4.6 or lower."
+  },
+  {
+   "id": "aha_mead",
+   "name": "Mead Day 2020 Traditional Mead",
+   "origin": "American Homebrewers Association",
+   "url": "https://homebrewersassociation.org/homebrew-recipe/mead-day-2020-traditional-mead/",
+   "used": "1 gallon batch: 3 lb (1.4 kg) honey in 0.75 gallon (2.8 L) water, 5 g wine yeast, nutrient in four doses at 24, 48, 72 and 96 hours, ferment at 17 C (62 F), original gravity 1.108."
+  },
+  {
+   "id": "cern_gingerbeer",
+   "name": "Ginger beer: a traditional fermented low-alcohol drink",
+   "origin": "Science in School (published by CERN and partners)",
+   "url": "https://scienceinschool.web.cern.ch/article/2008/gingerbeer",
+   "used": "Per litre: 150 g ginger, 1 lemon, 140 g sugar, 4 g cream of tartar, 4 g dried yeast; 24 hours, then bottle in PET plastic bottles for no more than 48 hours at about 21 C, then refrigerate and drink within six days."
+  },
+  {
+   "id": "kitchn_kimchi",
+   "name": "How to make easy kimchi at home",
+   "origin": "The Kitchn",
+   "url": "https://www.thekitchn.com/how-to-make-easy-kimchi-at-home-189390",
+   "used": "About 2 lb (900 g) napa cabbage, 1/4 cup salt for a 1-2 hour brine, garlic, ginger, sugar, fish sauce, 1-5 tablespoons gochugaru, 8 oz radish, 4 scallions; 1-5 days at cool room temperature then the fridge."
+  },
+  {
+   "id": "nchfp_jam",
+   "name": "Making jams and jellies: jam without added pectin",
+   "origin": "National Center for Home Food Preservation (archived copy)",
+   "url": "https://webarchive.library.unt.edu/eot2008/20090116024238/http:/www.uga.edu/nchfp/how/can_07/jam_without_pectin.html",
+   "used": "Berries: 4 cups crushed fruit to 4 cups sugar; setting temperature 105 C (220 F) at sea level, lower at altitude; freezer-plate test; boiling-water canner 5 minutes (up to 300 m), 10 minutes (300-1800 m)."
+  },
+  {
+   "id": "psu_pickles",
+   "name": "Fermenting dill pickles",
+   "origin": "Penn State Extension",
+   "url": "https://extension.psu.edu/fermenting-dill-pickles",
+   "used": "Ferment at 21-24 C (70-75 F) for about 3-4 weeks; keep the cucumbers under the brine; do not omit or reduce the salt or vinegar; discard soft, slimy or bad-smelling pickles. It sends you to the National Center for Home Food Preservation recipe for exact amounts, which this tool has not yet checked."
+  },
+  {
+   "id": "fermentary_kvass",
+   "name": "Rye kvass (Zhivoi kvass)",
+   "origin": "The Fermentary",
+   "url": "https://www.thefermentary.com.au/blogs/wild-drinks-and-kvass/rye-kvass",
+   "used": "800 g dark rye bread (dried and roasted), 4 litres water, 300 g sugar, 100 g honey, 100 g malt, raisins, orange peel, mint; about a week covered, a day sealed for fizz; thick or swing-top bottles."
+  },
+  {
+   "id": "midwest_blackberry",
+   "name": "How to make blackberry wine",
+   "origin": "Midwest Supplies",
+   "url": "https://midwestsupplies.com/blogs/bottled-knowledge/blackberry-wine-recipe",
+   "used": "1 gallon: 4 lb blackberries, 2.5 lb sugar, 1 gallon water, 1 tsp acid blend, 1/2 tsp pectic enzyme, 1 tsp yeast nutrient, 1-2 Campden tablets, wine yeast; rack at about 1 week, 1 month and 3-4 months, then bottle age 6 months."
+  },
+  {
+   "id": "aha_columbus",
+   "name": "Columbus Pale Ale (extract)",
+   "origin": "American Homebrewers Association",
+   "url": "https://www.homebrewersassociation.org/wp-content/uploads/2015/04/Columbus-Pale-Ale-Extract.pdf",
+   "used": "5 gallons (18.9 L): 7.5 lb (3.4 kg) light liquid malt extract, hops at 60, 15, 5 and 0 minutes plus dry hops, 20 C for 9 + 9 days, 113 g priming sugar, OG 1.056, FG 1.012, 5.8 % ABV."
+  },
+  {
+   "id": "kk_waterkefir",
+   "name": "How to make water kefir (tibicos)",
+   "origin": "Kombucha Kamp",
+   "url": "https://kombuchakamp.com/water-kefir-recipe",
+   "used": "Per quart (about 1 litre): 1/4 cup sugar, 2 tablespoons hydrated grains; 24-48 hours at 20-26 C; never longer than 72 hours; optional 1-3 day second ferment."
+  },
+  {
+   "id": "alpha_garlichoney",
+   "name": "Fermented garlic honey",
+   "origin": "Alphafoodie (a food blog, not a laboratory)",
+   "url": "https://www.alphafoodie.com/fermented-garlic-honey/comment-page-2/",
+   "used": "1 cup garlic cloves to 1 cup raw honey; open and re-close the lid daily for about 14-21 days; a pH under 4.6 is considered safe; never for babies under 12 months."
+  },
+  {
+   "id": "masterclass_makgeolli",
+   "name": "Makgeolli recipe",
+   "origin": "MasterClass",
+   "url": "https://www.masterclass.com/articles/makgeolli-recipe",
+   "used": "Cooked rice, nuruk and 7 cups water, then 7 more cups after straining; about a week at cool room temperature (20 C is ideal); finished makgeolli is typically 7-8 % alcohol. The page does not give the rice or nuruk weights."
+  }
+ ]
+}

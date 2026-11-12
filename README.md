@@ -13,6 +13,7 @@ This repository is the home page, the articles, the about page and the privacy a
 
 - Home, projects, articles, about, privacy and licence: hand-written HTML (written with a small helper script).
 - `sourdough-and-baking-timesheet/`: the bake planner, plain JavaScript with comments.
+- `brewing-and-fermentation-timesheet/`: the brewing and fermented-food planner, plain JavaScript with comments, with its recipe data in `build_data.py`.
 - `sewing-and-knitting-pattern-maker/`: the sewing and knitting pattern tool. Its engine is built from the Toolkits repository on every deploy.
 
 All tools are works in progress: expect bugs, and not every one is actively maintained.
