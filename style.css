@@ -161,3 +161,10 @@ tr.tot td { border-top: 1px solid var(--ink); }
 /* light / dark switch (see theme.js) */
 .themebtn { margin-left: auto; padding: 4px 10px; font-size: 11px; }
 @media print { .themebtn { display: none; } }
+
+/* projects page: filter buttons and the planned list */
+#filter { gap: 8px; }
+#filter button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+ul.planned { columns: 2 22em; column-gap: 40px; padding-left: 1.1em; margin: 6px 0 22px; }
+ul.planned li { margin: 4px 0; break-inside: avoid; }
+[hidden] { display: none !important; }
