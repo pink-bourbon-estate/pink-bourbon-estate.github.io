@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proving Ground: a bake planner for the home kitchen - Pink Bourbon Estate</title>
+<meta name="description" content="From a bakery bench to a browser tab: planning several bakes at once with baker&#x27;s percentages, a clock-time timeline and no account.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/articles/proving-ground-a-bake-planner-for-the-home-kitchen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Proving Ground: a bake planner for the home kitchen - Pink Bourbon Estate">
+<meta property="og:description" content="From a bakery bench to a browser tab: planning several bakes at once with baker&#x27;s percentages, a clock-time timeline and no account.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/articles/proving-ground-a-bake-planner-for-the-home-kitchen/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">pink bourbon<span>estate</span></a>
+  <nav aria-label="Main"><a href="../../projects/">Projects</a><a href="../../articles/" aria-current="page">Articles</a><a href="../../about/">About</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<p class="tag"><a href="../">Articles</a> / Project · 12 November 2026 · 8 min read</p>
+<h1>Proving Ground: a bake planner for the home kitchen</h1>
+<div class="prose">
+<p class="lede">A tool for planning bakes the way a bakery plans its production sheet, built for the home kitchen, and now small enough to try in a browser tab.</p>
+<p><a class="btn" href="../../proving-ground/">Try it in your browser</a> <a class="btn" href="https://github.com/pink-bourbon-estate/Toolkits/tree/main/bakecraft" rel="noopener">Read the desktop code</a></p>
+<p class="note">Work in progress: expect bugs, and this tool is not actively maintained. The times are estimates. When the dough and the timer disagree, go with the dough.</p>
+
+<h2>Where it came from</h2>
+<p>It began at a bakery bench. After a job in a bakery, I wanted my own resource to manage home bakes, ferments and brews, especially when several things are going at once: a levain to feed, a dough in the fridge, something proving, and the oven needed in an hour. A bakery runs on a production sheet that says what to do and when. A home kitchen runs on memory and a phone full of timers, and it is easy to lose the thread.</p>
+<p>A big part of why baking stuck is a book. Flora Shedden's <em>Aran</em> showed that a good recipe can take you from giving up to falling in love with it. That book, and a stretch of baking for a living, are the reason this exists. The career ended when an intolerance and severe baker's eczema made professional baking impossible, and these days it is home baking only. That turns out to be easier, more fun and more satisfying, and it is where a tool like this is most useful.</p>
+
+<h2>What it does</h2>
+<ul>
+<li><strong>Weigh-out sheets.</strong> Choose a recipe, how many, how big and how wet, and get every gram, with the levain or poolish split out and the final dough grouped the way you work.</li>
+<li><strong>A clock-time timeline.</strong> Say when you want it ready, or when you start, and get the time of every step, adjusted for your kitchen temperature, with a reminder of what the dough should look like when each step is done.</li>
+<li><strong>Several bakes on one timeline.</strong> Hands-on moments from different bakes that fall within ten minutes of each other are marked, so you can see a clash before it happens.</li>
+<li><strong>A water-temperature calculator.</strong> To make the dough come off the mix at the temperature the timings assume, with a one-off calibration for your own mixer.</li>
+<li><strong>Every source on show.</strong> Which published formulas each recipe averages, with links.</li>
+</ul>
+<p>Recipes: classic and country sourdough, poolish baguette, focaccia, brioche, croissant and pain au chocolat, fresh egg pasta and semola pasta. Fermenting and brewing are part of the original idea, but they are not built yet: today it plans bakes and pasta.</p>
+
+<h2>How the numbers are worked out</h2>
+<p>Recipes are calculated with baker's percentages: flour is 100, and every other ingredient is a percentage of the flour. That makes a recipe scale to any size, and makes two recipes comparable. The sum is short:</p>
+<ol>
+<li>Add up every percentage: flour 100 + water 72 + salt 2 and so on.</li>
+<li>Work out the total dough wanted, for example 2 loaves of 900 g.</li>
+<li>Total flour is the dough weight divided by the percentage total.</li>
+<li>Each ingredient is the total flour times its percentage.</li>
+</ol>
+<p>A levain or poolish holds some of the flour and water, so the tool works out the whole dough first (which makes the hydration slider the true hydration) and then subtracts what is already in the preferment. Times follow a simple rule of thumb: fermentation roughly doubles in speed for every 9 degrees warmer, within sensible limits, and fridge steps are not adjusted.</p>
+<p>The recipes are not copied from any one place. Each is the average of several formulas from schools and bakeries, such as the San Francisco Baking Institute, the Culinary Institute of America, King Arthur Baking (including Jeffrey Hamelman), Tartine, Ken's Artisan Bakery, Bouchon Bakery, Le Cordon Bleu and Bread Ahead. A home-baking book, <em>Aran</em>, is shown for comparison only and is never averaged. The sourdough schools average about 71.5 % hydration against about 65.5 % in that book, which is exactly the kind of difference the Sources tab lets you see. Each source and its citation is credited in the code, in <code>sources.rs</code> in the desktop version and in the Sources tab here.</p>
+
+<h2>Standing on other people's shoulders</h2>
+<p>The approach is inspired by bakeries and by a lot of generous teachers: King Arthur Baking, Aran Bakery, Proof Bread, and numerous YouTube channels, among them Life by Mike, Alex (French Guy Cooking), Gluten Morgen, Brian Lagerstrom and Johnny Kyunghwo, and the Noma Guide to Fermentation series of books. They shaped how the tool thinks about timing, technique and fermentation. Where a published formula supplies a number, it is credited directly in the code. The others are inspiration, and are not endorsed by, or connected to, this project. If you enjoy the tool, please buy the books and watch the videos. They are excellent.</p>
+
+<h2>Why a web version</h2>
+<p>The first version is a desktop program written in Rust, which you download and keep. That is a fine way to own a tool, but a lot of people want to know if it is for them before downloading anything. The web version is that: a way to try it, in a tab, in seconds. It is the same maths and the same recipes, in plain commented JavaScript, and it runs entirely in your browser. Your plan is kept on your own device, so it is still there tomorrow, and it is never sent anywhere. The desktop version stays free too, and adds alarms for each step and fold. Neither costs anything.</p>
+<p>The web page was made by taking the recipes and sources out of the desktop program as data, then writing the calculator, the clock and the water maths again in JavaScript. That keeps the two in step, and means that adding a recipe or a source in one place can flow to the other.</p>
+
+<h2>Limits</h2>
+<ul>
+<li>It is a work in progress and not all of it is actively maintained. Bugs are to be expected.</li>
+<li>Times are estimates. The "done when" cue on each step is the real test.</li>
+<li>Averages smooth out differences in flour, climate and technique. A recipe that works for a school may need small changes in your kitchen.</li>
+<li>The web version has no alarms; the desktop program does.</li>
+</ul>
+<p class="meta">Licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a>. See <a href="../../privacy/">privacy and licence</a>.</p>
+</div>
+</main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="../../about/">About</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

@@ -127,3 +127,29 @@ details ol { font-size: 14px; margin: 8px 0 8px 1.4em; padding: 0; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 @media print { .top nav, .find, .tools button, .foot { display: none; } }
 
+
+/* ---------- forms, tools and notes used by the project pages ---------- */
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px 24px; margin: 12px 0; max-width: 60em; }
+.fld { display: grid; gap: 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+.fld input, .fld select, select, input[type=number], input[type=datetime-local] { font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--ink); padding: 6px 0; border-radius: 0; width: 100%; }
+select option { color: #111; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 20px 0 8px; }
+.tabs a { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+.tabs a:hover, .tabs a[aria-current="page"] { border-bottom-color: var(--ink); color: var(--ink); }
+button, .btn { font: inherit; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: transparent; color: var(--ink); border: 1px solid var(--ink); padding: 6px 12px; cursor: pointer; text-decoration: none; display: inline-block; border-radius: 0; }
+button:hover, .btn:hover { background: var(--ink); color: var(--bg); }
+.note { background: var(--soft); padding: 12px 16px; font-size: 14px; margin: 16px 0; max-width: 46em; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); border-bottom: 1px solid var(--ink); }
+td.n, th.n { text-align: right; padding-right: 18px; }
+tr.tot td { border-top: 1px solid var(--ink); }
+.block { display: block; }
+.plan li { margin: 6px 0; }
+.ev { display: grid; grid-template-columns: 9em 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.ev .time { font-variant-numeric: tabular-nums; }
+.ev.fold { padding-left: 1.5em; font-size: 14px; }
+.ev.clash { border-left: 3px solid var(--accent); padding-left: 10px; }
+@media print { .top, .foot, .tabs, button, .note { display: none; } }
+@media (max-width: 640px) { .ev { grid-template-columns: 1fr; gap: 2px; } }

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern Kit: sewing patterns from your measurements - Pink Bourbon Estate</title>
+<meta name="description" content="Free sewing pattern generator: choose a garment, a fit and your measurements and get a print-ready tiled pattern. Runs in your browser, nothing is sent anywhere.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/pattern-kit/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Pattern Kit: sewing patterns from your measurements - Pink Bourbon Estate">
+<meta property="og:description" content="Free sewing pattern generator: choose a garment, a fit and your measurements and get a print-ready tiled pattern. Runs in your browser, nothing is sent anywhere.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/pattern-kit/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../pattern-kit.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">pink bourbon<span>estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../about/">About</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Pattern Kit</h1>
+<p class="lede">Pick a garment, a fit and your measurements, and get a print-ready sewing pattern, tiled to print at home. The pattern is generated from your numbers, on your own device. Nothing you type leaves your browser.</p>
+<p class="note">Work in progress: the patterns pass their own geometry checks but have not been sewn up yet, so make a test garment first. Expect bugs; this tool is not actively maintained. <a href="../articles/pattern-kit-clothing-patterns-from-your-own-measurements/">Read how it was made</a>.</p>
+<div class="pk">
+<aside>
+  <fieldset><legend>1 · Garment and fit</legend>
+    <label>Garment <select id="garment"><option value="tshirt">T-shirt</option><option value="shirt">Shirt (collar, button front)</option><option value="hoodie">Hoodie</option><option value="trousers">Trousers</option><option value="knit">Knitted pullover (basic)</option></select></label>
+    <label>Fit <select id="fit"><option value="fitted">Fitted (tailored block)</option><option value="regular">Regular</option><option value="baggy" selected>Baggy</option></select></label>
+    <label id="row-sleeve">Sleeve <select id="sleeve"><option value="short">Short</option><option value="long">Long</option></select></label>
+    <label id="row-rise">Waist height <select id="rise_style"><option value="high" selected>High-waisted (+1 1/2 in rise)</option><option value="standard">Standard</option></select></label>
+    <label id="row-length">Length <select id="length"><option value="standard">Standard</option><option value="long" selected>Long line (+4 in)</option></select></label>
+  </fieldset>
+  <fieldset><legend>2 · Your measurements <span class="note" id="unitnote">(inches)</span></legend>
+    <div class="row noprint" style="margin-bottom:6px"><button id="p-demo">Example body A</button><button id="p-corn">Tutorial example (37.5 in chest)</button></div>
+    <label>Units <select id="units"><option value="in">inches</option><option value="cm">centimetres</option></select></label>
+    <div id="meas"></div>
+    <label>Paper <select id="page"><option value="a4">A4</option><option value="letter">US Letter</option></select></label>
+  </fieldset>
+  <fieldset id="fs-gauge" style="display:none"><legend>Knitting gauge (from your swatch)</legend>
+    <label>Stitches per 4 in (10 cm) <input type="number" id="gauge_sts" step="0.5" min="8" value="20"></label>
+    <label>Rows per 4 in (10 cm) <input type="number" id="gauge_rows" step="0.5" min="8" value="28"></label>
+    <div class="note">Knit a swatch, wash and dry it, then count. Type the numbers here (always per 4 in, not per cm).</div>
+  </fieldset>
+  <fieldset><legend>3 · Fix common fit complaints</legend>
+    <div class="note">All zero = the block as designed. Move a slider only if your test garment shows the problem. Change one thing at a time, as in the videos.</div>
+    <div id="alts"></div>
+    <div class="row noprint" style="margin-top:8px"><button id="reset-alts">Reset adjustments</button></div>
+  </fieldset>
+  <fieldset><legend>4 · Show on the pattern</legend>
+    <label>Construction lines &amp; numbered points <input type="checkbox" id="show_construction" checked></label>
+    <label>Rulers <input type="checkbox" id="show_ruler" checked></label>
+    <label>Sew line (inside the seam allowance) <input type="checkbox" id="show_sew_line" checked></label>
+  </fieldset>
+</aside>
+<section class="v">
+  <div id="err"></div>
+  <div class="tabs"><button data-t="sheet" class="on">Pattern</button><button data-t="pages">Print pages</button><button data-t="explain">How it was designed</button><button data-t="instr" id="tab-instr" style="display:none">Knitting instructions</button></div>
+  <div class="panes">
+  <div class="pane on" id="pane-sheet"><div class="row noprint" style="margin-bottom:8px"><button id="dl" class="primary">Download full-size SVG</button><span class="note" id="sheetinfo"></span></div><div id="sheetwrap"></div></div>
+  <div class="pane" id="pane-pages"><div class="row noprint" style="margin-bottom:8px"><button class="primary" id="print">Print all pages</button><span class="note" id="pageinfo"></span></div>
+    <p class="note noprint">Print at 100% (not “fit to page”), margins none/default, then check the 1 in square on the first page. Trim nothing: neighbouring pages overlap by 1/2 in; line up the red crosses and tape.</p><div id="pages"></div></div>
+  <div class="pane" id="pane-explain"><div id="warnings"></div><h3>Self-checks</h3><div id="checks"></div><h3>How the pattern is drawn</h3><ol class="explain" id="explain"></ol></div>
+  <div class="pane" id="pane-instr"><h3>Written instructions</h3><ol class="explain" id="instr"></ol></div>
+  </div>
+</section>
+</div>
+<p class="meta">Inspired by the public work of Cornelius Quiring, Firm&eacute; Atelier, Glory Allan and Bernadette Banner. Method and credits are in the <a href="https://github.com/pink-bourbon-estate/Toolkits/tree/main/patternkit" rel="noopener">source code</a>.</p>
+<svg width="0" height="0" style="position:absolute"><defs><g id="sheetdef"></g></defs></svg>
+<script src="app.js"></script>
+</main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="../about/">About</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

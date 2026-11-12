@@ -1,7 +1,8 @@
 name: Website
 
-# The site is plain hand-written HTML and CSS, so there is nothing to build:
-# this just publishes the files in the repository to GitHub Pages.
+# The site is plain hand-written HTML and CSS. The only thing built here is Pattern Kit's
+# engine: its Rust code (from the Toolkits repository) is compiled to WebAssembly so the tool
+# runs in the visitor's browser, and is published next to the page.
 on:
   push:
     branches: [main]
@@ -24,6 +25,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch the Pattern Kit source (public repository)
+        uses: actions/checkout@v4
+        with:
+          repository: pink-bourbon-estate/Toolkits
+          path: _toolkits
+      - name: Build the Pattern Kit engine as WebAssembly
+        run: |
+          rustup toolchain install stable --profile minimal --target wasm32-unknown-unknown
+          rustup default stable
+          cd _toolkits/patternkit
+          cargo build --release --lib --target wasm32-unknown-unknown
+          cp target/wasm32-unknown-unknown/release/patternkit.wasm "$GITHUB_WORKSPACE/pattern-kit/patternkit.wasm"
+          cp web/app.js "$GITHUB_WORKSPACE/pattern-kit/app.js"
+      - name: Leave the build folders out of the site
+        run: rm -rf _toolkits
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

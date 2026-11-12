@@ -1,0 +1,34 @@
+
+/* Pattern Kit layout, in the estate's colours (the page's own styles, kept small and readable). */
+main { max-width: 1500px; }
+.pk { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+.pk aside { border-top: 1px solid var(--ink); padding-top: 8px; }
+.pk section.v { min-width: 0; }
+.pk fieldset { border: 0; border-top: 1px solid var(--line); margin: 0 0 14px; padding: 8px 0 12px; }
+.pk legend { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); padding: 0 6px 0 0; }
+.pk label { display: grid; grid-template-columns: 1fr 96px; gap: 8px; align-items: center; margin: 5px 0; font-size: 14px; }
+.pk label.wide { grid-template-columns: 1fr; }
+.pk label small { color: var(--mute); display: block; font-size: 12px; }
+.pk input[type=number], .pk select { font: inherit; width: 100%; padding: 4px 0; border: 0; border-bottom: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 0; }
+.pk input[type=range] { width: 100%; accent-color: var(--ink); }
+.pk .sl { margin: 9px 0 3px; } .pk .sl b { font-weight: 500; } .pk .sl .val { float: right; font-variant-numeric: tabular-nums; }
+.pk .row { display: flex; gap: 6px; flex-wrap: wrap; }
+.pk button.primary { background: var(--ink); color: var(--bg); }
+.pk .tabs { margin-top: 0; border-bottom: 1px solid var(--line); }
+.pk .tabs button { border: 0; border-bottom: 1px solid transparent; padding: 6px 0; margin-right: 18px; }
+.pk .tabs button.on { border-bottom-color: var(--ink); }
+.pk .tabs button:hover { background: transparent; color: var(--ink); }
+.pk .pane { display: none; } .pk .pane.on { display: block; }
+.pk #sheetwrap { overflow: auto; background: #fff; border: 1px solid var(--line); padding: 6px; max-height: 80vh; }
+.pk .check { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 14px; } .pk .check i { font-style: normal; width: 18px; }
+.pk .warn { background: var(--soft); padding: 8px 10px; margin: 8px 0; font-size: 14px; }
+.pk ol.explain li { margin: 6px 0; }
+.pk #pages { display: flex; flex-wrap: wrap; gap: 14px; } .pk .pg { background: #fff; border: 1px solid var(--line); } .pk .pg svg { display: block; width: 100%; height: auto; } .pk .pgbox { width: 240px; font-size: 12px; } .pk .pgbox.printing { width: auto; }
+#err { color: var(--accent); font-weight: 600; }
+@media (max-width: 900px) { .pk { grid-template-columns: 1fr; } }
+@media print {
+  .top, .foot, h1, .lede, .note, .meta, .pk aside, .pk .tabs, .pk #sheetwrap, .pk .noprint, .pk .pane:not(#pane-pages) { display: none !important; }
+  .pk { display: block; } .pk #pane-pages { display: block !important; } .pk #pages { display: block; }
+  .pk .pgbox { width: auto !important; break-after: page; } .pk .pgbox .cap { display: none; } .pk .pgbox:last-child { break-after: auto; } .pk .pg { border: 0; }
+  .pk .pg svg { width: var(--pw); height: var(--ph); }
+}

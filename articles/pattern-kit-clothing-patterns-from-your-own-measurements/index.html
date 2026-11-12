@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern Kit: clothing patterns from your own measurements - Pink Bourbon Estate</title>
+<meta name="description" content="Choose a garment, a fit and your measurements and get a print-ready, tiled sewing pattern, drawn on your own device.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/articles/pattern-kit-clothing-patterns-from-your-own-measurements/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Pattern Kit: clothing patterns from your own measurements - Pink Bourbon Estate">
+<meta property="og:description" content="Choose a garment, a fit and your measurements and get a print-ready, tiled sewing pattern, drawn on your own device.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/articles/pattern-kit-clothing-patterns-from-your-own-measurements/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">pink bourbon<span>estate</span></a>
+  <nav aria-label="Main"><a href="../../projects/">Projects</a><a href="../../articles/" aria-current="page">Articles</a><a href="../../about/">About</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<p class="tag"><a href="../">Articles</a> / Project · 12 November 2026 · 6 min read</p>
+<h1>Pattern Kit: clothing patterns from your own measurements</h1>
+<div class="prose">
+<p class="lede">Choose a garment, a fit and your measurements, and get a sewing pattern drawn for your body, tiled to print at home. It is generated from your numbers, not traced from a template.</p>
+<p><a class="btn" href="../../pattern-kit/">Try it in your browser</a> <a class="btn" href="https://github.com/pink-bourbon-estate/Toolkits/tree/main/patternkit" rel="noopener">Read the code</a></p>
+<p class="note">Work in progress: the geometry passes its own checks, but no pattern has been sewn up yet, so make a test garment first. Expect bugs; this tool is not actively maintained.</p>
+
+<h2>The idea</h2>
+<p>Commercial patterns come in a handful of sizes and ask you to adjust them to fit. This tool starts from your own measurements and draws every line from them, so the pattern you print already has your numbers in it. The point is the same as everywhere on this estate: a useful thing that you can understand, with nothing hidden. Every step of how a pattern is drawn is written next to it on the page.</p>
+
+<h2>What it makes</h2>
+<ul>
+<li><strong>T-shirt:</strong> front, back, sleeve (short or long) and neck band.</li>
+<li><strong>Shirt:</strong> the tee block with a button band, collar stand, collar, and cuffs for long sleeves.</li>
+<li><strong>Hoodie:</strong> the tee block with a hood, rib cuffs and waistband, and a kangaroo pocket.</li>
+<li><strong>Trousers:</strong> front, back with a dart, and a waistband, high-waisted or standard.</li>
+<li><strong>Knitted pullover:</strong> a drop-shoulder crew neck, with stitch counts and written instructions worked out from your own gauge.</li>
+</ul>
+<p>Each comes in fitted, regular and baggy. Sliders correct common complaints, such as tightness under the arms, drag lines or shoulder slope, one at a time, so you change one thing at a time as you would on a real test garment.</p>
+
+<h2>How the patterns are designed</h2>
+<p>The tops follow the numbered-points method from Cornelius Quiring's public video on drafting a shirt pattern, and the trousers follow his video on men's trousers. The code is original; the steps and numbers of the videos are the reference, and an automated test checks the code against the video's worked example. The project is also inspired by the public work of Firm&eacute; Atelier, Glory Allan and Bernadette Banner. Fit is a table that opens the block up, so changing what "baggy" means is a change to one table.</p>
+<p>Because the pattern is calculated, it can check itself. Every pattern reports whether the front and back side seams and the shoulder seams are the same length, whether the sleeve cap fits the armhole it sews into, and whether the neck opening matches the neck. The sheet is cut into pages with a half-inch overlap, registration crosses and a one-inch test square on the first page, so you can check your printer is not scaling it.</p>
+
+<h2>Privacy by design</h2>
+<p>The pattern engine is written in Rust and compiled to WebAssembly, a small program that runs inside your browser. That means your measurements are used on your own device to draw the pattern, and are never sent to a server. There is no account, no saved profile and nothing to leak. You can also run the same engine on your own computer, offline.</p>
+
+<h2>Limits</h2>
+<ul>
+<li>No pattern has been sewn up yet. Always make a test garment first.</li>
+<li>Seam allowances are fixed at half an inch, and hems at an inch (an inch and a half on trousers).</li>
+<li>The hood is sized from your neck, because no head measurement is taken. Check it on a test garment.</li>
+<li>Shirts have no pleats, yoke or curved hem, and hoodies have no drawstring channel. Knitting shapes are the simplest that work.</li>
+<li>Joggers, a blazer and women's clothing are not covered yet.</li>
+<li>It is a work in progress and not actively maintained. Bugs are to be expected.</li>
+</ul>
+<p class="meta">Licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a>. See <a href="../../privacy/">privacy and licence</a>.</p>
+</div>
+</main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="../../about/">About</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
