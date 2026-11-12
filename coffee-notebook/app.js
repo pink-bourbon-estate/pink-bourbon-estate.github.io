@@ -6,9 +6,11 @@
      2. Recipes     shot styles and brew methods, scaled to your dose, with a step-by-step clock
      3. Flavour     a simple flavour wheel you can tick off while you taste
      4. Grind log   your own settings and shots, saved in this browser, with CSV download
+     4b. Bags       the coffees you have bought and how much you liked them
+     4c. Stats      charts and simple recommendations worked out from your log and bags
      5. Problems    sour, bitter, weak, channelling: what to change
      6. Beans       species, varieties, processing and place, and what each tends to taste like
-     7. About       why this exists, and every source and reading it leans on
+     9. About       why this exists, and every source and reading it leans on
 
    Privacy: nothing is sent anywhere. Your log lives in this browser (localStorage); clear your site
    data and it is gone. No cookies, no analytics. Download your log as CSV to keep your own copy.
@@ -254,14 +256,16 @@
   }
 
   /* ------------------------------------------------------------------ 4. GRIND LOG */
-  const LOG_COLS = ['date', 'bean', 'roaster', 'grinder', 'setting', 'dose', 'yield', 'time', 'tds', 'taste', 'notes'];
+  const LOG_COLS = ['date', 'bean', 'roaster', 'method', 'grinder', 'setting', 'dose', 'yield', 'time', 'tds', 'rating', 'taste', 'notes', 'example'];
+  const METHODS = ['Espresso', 'Filter / pour-over', 'AeroPress', 'Immersion / French press', 'Cold brew', 'Other'];
+  const BAGS_KEY = 'coffee-notebook-bags-v1';   // coffees you have bought
   function logTab() {
     let log = read(LOG_KEY, []);
     const out = h('div', {});
     const filter = h('select', { id: 'lf', 'aria-label': 'Filter by bean' });
     const field = (id, label, type, value, attrs) => h('label', { class: 'fld' }, label, h('input', { id, type: type || 'text', value: value ?? '', ...attrs }));
     const today = new Date().toISOString().slice(0, 10);
-    const form = h('div', { class: 'form' }, field('l_date', 'Date', 'date', today), field('l_bean', 'Bean'), field('l_roaster', 'Roaster'), field('l_grinder', 'Grinder'), field('l_setting', 'Grind setting'),
+    const form = h('div', { class: 'form' }, field('l_date', 'Date', 'date', today), field('l_bean', 'Bean'), field('l_roaster', 'Roaster'), h('label', { class: 'fld' }, 'Method', h('select', { id: 'l_method' }, METHODS.map((m) => h('option', { value: m }, m)))), field('l_rating', 'Rating (1-5)', 'number', '', { min: 1, max: 5, step: 1 }), field('l_grinder', 'Grinder'), field('l_setting', 'Grind setting'),
       field('l_dose', 'Dose in (g)', 'number', '', { step: 'any' }), field('l_yield', 'Out (g)', 'number', '', { step: 'any' }), field('l_time', 'Time (s)', 'number', '', { step: 'any' }), field('l_tds', 'TDS % (optional)', 'number', '', { step: 'any' }),
       field('l_taste', 'Taste (sour, balanced, bitter...)'), field('l_notes', 'Notes'));
     const csvQ = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
@@ -271,18 +275,18 @@
       filter.replaceChildren(h('option', { value: '' }, 'All beans'), beans.map((b) => h('option', { value: b }, b))); filter.value = beans.includes(cur) ? cur : '';
       const rows = log.map((e, i) => [e, i]).filter(([e]) => !filter.value || e.bean === filter.value);
       out.replaceChildren(rows.length
-        ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Date', 'Bean', 'Grinder', 'Setting', 'In', 'Out', 'Time', 'Ratio', 'Taste', ''].map((t, i) => h('th', { class: i > 3 && i < 8 ? 'n' : '' }, t)))),
-          h('tbody', {}, rows.slice().reverse().map(([e, i]) => h('tr', {}, h('td', {}, e.date), h('td', {}, e.bean, e.roaster ? h('span', { class: 'meta block' }, e.roaster) : null), h('td', {}, e.grinder), h('td', {}, e.setting),
-            h('td', { class: 'n' }, e.dose || ''), h('td', { class: 'n' }, e.yield || ''), h('td', { class: 'n' }, e.time ? e.time + ' s' : ''), h('td', { class: 'n' }, e.dose && e.yield ? '1:' + round1(e.yield / e.dose) : ''),
+        ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Date', 'Bean', 'Grinder', 'Setting', 'In', 'Out', 'Time', 'Ratio', 'Rating', 'Taste', ''].map((t, i) => h('th', { class: i > 3 && i < 9 ? 'n' : '' }, t)))),
+          h('tbody', {}, rows.slice().reverse().map(([e, i]) => h('tr', {}, h('td', {}, e.date), h('td', {}, e.bean, e.example ? h('span', { class: 'meta block' }, '(example)') : null, e.roaster ? h('span', { class: 'meta block' }, e.roaster) : null), h('td', {}, e.grinder), h('td', {}, e.setting),
+            h('td', { class: 'n' }, e.dose || ''), h('td', { class: 'n' }, e.yield || ''), h('td', { class: 'n' }, e.time ? e.time + ' s' : ''), h('td', { class: 'n' }, e.dose && e.yield ? '1:' + round1(e.yield / e.dose) : ''), h('td', { class: 'n' }, e.rating ? e.rating + '/5' : ''),
             h('td', {}, e.taste, e.notes ? h('span', { class: 'meta block' }, e.notes) : null), h('td', {}, h('button', { type: 'button', onclick: () => { log.splice(i, 1); write(LOG_KEY, log); draw(); } }, 'Delete')))))))
         : h('p', { class: 'meta' }, 'Nothing logged yet.'));
     };
     const add = () => {
       const g = (id) => root.querySelector('#l_' + id).value.trim();
       if (!g('bean') && !g('setting')) return;
-      log.push({ date: g('date'), bean: g('bean'), roaster: g('roaster'), grinder: g('grinder'), setting: g('setting'), dose: Number(g('dose')) || 0, yield: Number(g('yield')) || 0, time: Number(g('time')) || 0, tds: Number(g('tds')) || 0, taste: g('taste'), notes: g('notes') });
+      log.push({ date: g('date'), bean: g('bean'), roaster: g('roaster'), method: g('method'), rating: Number(g('rating')) || 0, grinder: g('grinder'), setting: g('setting'), dose: Number(g('dose')) || 0, yield: Number(g('yield')) || 0, time: Number(g('time')) || 0, tds: Number(g('tds')) || 0, taste: g('taste'), notes: g('notes') });
       write(LOG_KEY, log);
-      ['setting', 'time', 'tds', 'taste', 'notes'].forEach((id) => { root.querySelector('#l_' + id).value = ''; });   // keep bean, grinder and dose for the next shot
+      ['setting', 'time', 'tds', 'rating', 'taste', 'notes'].forEach((id) => { root.querySelector('#l_' + id).value = ''; });   // keep bean, grinder and dose for the next shot
       draw();
     };
     filter.addEventListener('change', draw); draw();
@@ -291,6 +295,119 @@
       h('h2', {}, 'Your log'), h('label', { class: 'fld' }, 'Show', filter), out,
       h('p', {}, h('button', { type: 'button', onclick: () => saveFile('coffee-log.csv', LOG_COLS.join(',') + '\n' + log.map((e) => LOG_COLS.map((c) => csvQ(e[c])).join(',')).join('\n') + '\n', 'text/csv') }, 'Download CSV'), ' ',
         h('button', { type: 'button', onclick: () => { if (log.length && confirm('Delete the whole log from this browser?')) { log = []; write(LOG_KEY, log); draw(); } } }, 'Clear the log')));
+  }
+
+
+  /* ------------------------------------------------------------------ BAGS (coffees you have bought) */
+  const BAG_COLS = ['date', 'name', 'roaster', 'origin', 'process', 'variety', 'grams', 'price', 'rating', 'notes', 'example'];
+  function bagsTab() {
+    let bags = read(BAGS_KEY, []);
+    const out = h('div', {});
+    const field = (id, label, type, value, attrs) => h('label', { class: 'fld' }, label, h('input', { id, type: type || 'text', value: value ?? '', ...attrs }));
+    const form = h('div', { class: 'form' }, field('b_date', 'Date bought', 'date', new Date().toISOString().slice(0, 10)), field('b_name', 'Coffee name'), field('b_roaster', 'Roaster'), field('b_origin', 'Country / region'),
+      field('b_process', 'Process (washed, natural...)'), field('b_variety', 'Variety (optional)'), field('b_grams', 'Bag size (g)', 'number', 250), field('b_price', 'Price paid', 'number', '', { step: 'any' }), field('b_rating', 'Rating (1-5)', 'number', '', { min: 1, max: 5 }), field('b_notes', 'Notes'));
+    const draw = () => {
+      out.replaceChildren(bags.length ? h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, ['Date', 'Coffee', 'Origin', 'Process', 'g', 'Price', 'Rating', ''].map((t, i) => h('th', { class: i > 3 && i < 7 ? 'n' : '' }, t)))),
+        h('tbody', {}, bags.map((b, i) => [b, i]).reverse().map(([b, i]) => h('tr', {}, h('td', {}, b.date), h('td', {}, b.name, b.example ? h('span', { class: 'meta block' }, '(example)') : null, b.roaster ? h('span', { class: 'meta block' }, b.roaster) : null), h('td', {}, b.origin), h('td', {}, b.process),
+          h('td', { class: 'n' }, b.grams || ''), h('td', { class: 'n' }, b.price || ''), h('td', { class: 'n' }, b.rating ? b.rating + '/5' : ''), h('td', {}, h('button', { type: 'button', onclick: () => { bags.splice(i, 1); write(BAGS_KEY, bags); draw(); } }, 'Delete')))))))
+        : h('p', { class: 'meta' }, 'No bags yet.'));
+    };
+    const add = () => {
+      const g = (id) => root.querySelector('#b_' + id).value.trim();
+      if (!g('name')) return;
+      bags.push({ date: g('date'), name: g('name'), roaster: g('roaster'), origin: g('origin'), process: g('process'), variety: g('variety'), grams: Number(g('grams')) || 0, price: Number(g('price')) || 0, rating: Number(g('rating')) || 0, notes: g('notes') });
+      write(BAGS_KEY, bags); ['name', 'variety', 'price', 'rating', 'notes'].forEach((id) => { root.querySelector('#b_' + id).value = ''; }); draw();
+    };
+    draw();
+    return h('div', {}, h('p', { class: 'meta' }, 'Keep a list of the coffees you have bought and how much you liked each. The Stats tab uses it to show what you prefer. Saved only in this browser.'),
+      h('h2', {}, 'Add a bag'), form, h('p', {}, h('button', { type: 'button', onclick: add }, 'Add the bag')), h('h2', {}, 'Your bags'), out);
+  }
+
+  /* ------------------------------------------------------------------ STATS */
+  /*
+     Everything here is worked out from your own log and bags, in your browser.
+     The "example data" button adds made-up entries so you can see what the charts look like. They are
+     illustrative only: they are NOT results from any real study or person, and are labelled (example).
+     "Recommendations" are simple averages of the shots you rated 4 or 5, and say so.
+  */
+  const avg = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0);
+  const median = (a) => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  /** Group items by a key, return [[key, items], ...]. */
+  const groupBy = (arr, f) => { const m = new Map(); arr.forEach((x) => { const k = f(x); if (k) (m.get(k) || m.set(k, []).get(k)).push(x); }); return [...m]; };
+
+  /** Made-up sample entries, shaped like ordinary home practice (1:2 espresso, 1:16 filter). Not real data. */
+  function exampleData() {
+    const bags = [['Ethiopia Guji natural', 'Example Roasters', 'Ethiopia', 'Natural', 4], ['Kenya AA washed', 'Example Roasters', 'Kenya', 'Washed', 5], ['Brazil pulped natural', 'Sample Coffee Co', 'Brazil', 'Pulped natural', 3], ['Colombia washed', 'Sample Coffee Co', 'Colombia', 'Washed', 4], ['Italian-style blend', 'Example Roasters', 'Blend', 'Mixed', 2]];
+    const shots = []; let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    bags.forEach(([name, roaster, , , score], bi) => {
+      for (let i = 0; i < 8; i++) {
+        const esp = (i + bi) % 3 !== 0, dose = esp ? 18 : 15, ratio = esp ? 1.8 + rnd() * 0.9 : 15 + rnd() * 3, setting = Math.round((esp ? 14 - i * 0.5 : 24) * 10) / 10 + (bi % 2);
+        const good = i > 3, rating = Math.max(1, Math.min(5, Math.round(score - 1.5 + (good ? 1.5 : 0) + rnd()))); 
+        const d = new Date(Date.UTC(2026, 0, 3 + bi * 21 + i * 2)).toISOString().slice(0, 10);
+        shots.push({ date: d, bean: name, roaster, method: esp ? 'Espresso' : 'Filter / pour-over', grinder: 'Example grinder', setting, dose, yield: Math.round(dose * ratio), time: esp ? Math.round(24 + rnd() * 10) : Math.round(170 + rnd() * 40), tds: esp ? Math.round((8 + rnd() * 3) * 10) / 10 : Math.round((1.2 + rnd() * 0.2) * 100) / 100, rating, taste: rating >= 4 ? 'balanced' : (rnd() > 0.5 ? 'sour' : 'bitter'), notes: '', example: true });
+      }
+    });
+    return { shots, bags: bags.map(([name, roaster, origin, process, rating], i) => ({ date: new Date(Date.UTC(2026, 0, 1 + i * 21)).toISOString().slice(0, 10), name, roaster, origin, process, variety: '', grams: 250, price: 11 + i, rating, notes: '', example: true })) };
+  }
+
+  function statsTab() {
+    const log = read(LOG_KEY, []), bags = read(BAGS_KEY, []);
+    const box = h('div', {});
+    const chart = (title, fn) => { const c = h('div', { class: 'chart' }); box.append(h('h3', {}, title), c); fn(c); };
+    const rated = log.filter((e) => e.rating > 0);
+    const ratio = (e) => (e.dose && e.yield ? e.yield / e.dose : 0);
+
+    const buttons = h('p', {},
+      h('button', { type: 'button', onclick: () => { const ex = exampleData(); write(LOG_KEY, read(LOG_KEY, []).concat(ex.shots)); write(BAGS_KEY, read(BAGS_KEY, []).concat(ex.bags)); show('stats'); } }, 'Load example data'), ' ',
+      h('button', { type: 'button', onclick: () => { write(LOG_KEY, read(LOG_KEY, []).filter((e) => !e.example)); write(BAGS_KEY, read(BAGS_KEY, []).filter((e) => !e.example)); show('stats'); } }, 'Remove example data'), ' ',
+      h('button', { type: 'button', onclick: () => { if (confirm('Delete your whole log, bags and flavour wheel from this browser?')) { write(LOG_KEY, []); write(BAGS_KEY, []); write(WHEEL_KEY, []); show('stats'); } } }, 'Clear all my data'));
+    box.append(h('p', { class: 'meta' }, 'Charts are worked out on your device from the Grind log and Bags tabs. The example data is made up, to show what the charts look like: it is not from any real study or person. Clear it any time.'), buttons);
+    if (!log.length && !bags.length) { box.append(h('p', { class: 'lede' }, 'Nothing to show yet. Log a few shots, or load the example data.')); return box; }
+
+    PBEcharts.stat(box, [['Shots logged', log.length], ['Bags bought', bags.length], ['Average rating', rated.length ? round1(avg(rated.map((e) => e.rating))) + '/5' : '-'],
+      ['Spent', bags.some((b) => b.price) ? round1(bags.reduce((s, b) => s + (b.price || 0), 0)) : '-'], ['Coffee used', round1(log.reduce((s, e) => s + (e.dose || 0), 0)) + ' g']]);
+
+    chart('Shots by brew method', (c) => PBEcharts.bar(c, groupBy(log, (e) => e.method).map(([k, v]) => ({ label: k, value: v.length })).sort((a, b) => b.value - a.value), { unit: 'shots' }));
+    chart('Average rating by coffee (best first)', (c) => PBEcharts.bar(c, groupBy(rated, (e) => e.bean).map(([k, v]) => ({ label: k, value: avg(v.map((e) => e.rating)) })).sort((a, b) => b.value - a.value), { unit: '/5' }));
+    chart('Average rating by brew ratio', (c) => {
+      const bucket = (e) => { const r = ratio(e); return !r ? '' : r < 1.5 ? 'under 1:1.5' : r < 2.2 ? '1:1.5 to 1:2.2' : r < 3 ? '1:2.2 to 1:3' : r < 14 ? '1:3 to 1:14' : r < 16.5 ? '1:14 to 1:16.5' : 'over 1:16.5'; };
+      PBEcharts.bar(c, groupBy(rated, bucket).map(([k, v]) => ({ label: k + ' (' + v.length + ')', value: avg(v.map((e) => e.rating)) })), { unit: '/5' });
+    });
+    chart('Average rating by origin (from your bags)', (c) => PBEcharts.bar(c, groupBy(bags.filter((b) => b.rating), (b) => b.origin).map(([k, v]) => ({ label: k, value: avg(v.map((b) => b.rating)) })).sort((a, b) => b.value - a.value), { unit: '/5' }));
+    chart('Average rating by process (from your bags)', (c) => PBEcharts.bar(c, groupBy(bags.filter((b) => b.rating), (b) => b.process).map(([k, v]) => ({ label: k, value: avg(v.map((b) => b.rating)) })).sort((a, b) => b.value - a.value), { unit: '/5' }));
+
+    // grind and time over the dates for one coffee that you pick
+    const beans = [...new Set(log.map((e) => e.bean).filter(Boolean))];
+    if (beans.length) {
+      const pick = h('select', { id: 'sbean', 'aria-label': 'Coffee' }, beans.map((b) => h('option', { value: b }, b)));
+      const methods = [...new Set(log.map((e) => e.method).filter(Boolean))];
+      const pickM = h('select', { id: 'smethod', 'aria-label': 'Method' }, [h('option', { value: '' }, 'All methods'), ...methods.map((m) => h('option', { value: m }, m))]);
+      const lines = h('div', {});
+      const draw = () => {
+        const mine = log.filter((e) => e.bean === pick.value && (!pickM.value || e.method === pickM.value)).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        lines.replaceChildren(h('h3', {}, 'Grind setting over time'), h('div', { class: 'chart' }), h('h3', {}, 'Shot time over time (seconds)'), h('div', { class: 'chart' }), h('h3', {}, 'TDS over time (%)'), h('div', { class: 'chart' }));
+        const cs = lines.querySelectorAll('.chart');
+        PBEcharts.line(cs[0], mine.filter((e) => Number(e.setting)).map((e) => ({ x: e.date, y: Number(e.setting) })));
+        PBEcharts.line(cs[1], mine.filter((e) => e.time).map((e) => ({ x: e.date, y: e.time })));
+        PBEcharts.line(cs[2], mine.filter((e) => e.tds).map((e) => ({ x: e.date, y: e.tds })), { empty: 'Log TDS readings to see this.' });
+      };
+      pick.addEventListener('change', draw); pickM.addEventListener('change', draw); draw();
+      box.append(h('h2', {}, 'One coffee over time'), h('label', { class: 'fld' }, 'Coffee', pick), h('label', { class: 'fld' }, 'Method (grind and time differ between methods)', pickM), lines);
+    }
+
+    // simple recommendations from shots rated 4 or 5
+    const best = rated.filter((e) => e.rating >= 4);
+    if (best.length >= 3) {
+      const rec = [];
+      const byM = groupBy(best, (e) => e.method);
+      byM.forEach(([m, v]) => { const rs = v.map(ratio).filter(Boolean), ts = v.map((e) => e.time).filter(Boolean); if (rs.length) rec.push('Your best ' + m.toLowerCase() + ' shots (rated 4-5, ' + v.length + ' of them) ran at about 1:' + round1(median(rs)) + (ts.length ? ' in about ' + Math.round(median(ts)) + ' s' : '') + '.'); });
+      const top = groupBy(rated, (e) => e.bean).map(([k, v]) => [k, avg(v.map((e) => e.rating)), v.length]).filter((x) => x[2] >= 3).sort((a, b) => b[1] - a[1])[0];
+      if (top) rec.push('You rate "' + top[0] + '" highest on average (' + round1(top[1]) + '/5 over ' + top[2] + ' shots).');
+      const sour = log.filter((e) => e.taste === 'sour').length, bit = log.filter((e) => e.taste === 'bitter').length;
+      if (sour + bit >= 3) rec.push(sour > bit ? 'You note "sour" more often than "bitter" (' + sour + ' to ' + bit + '): try grinding a touch finer or running a little longer.' : 'You note "bitter" more often than "sour" (' + bit + ' to ' + sour + '): try grinding a touch coarser or stopping earlier.');
+      box.append(h('h2', {}, 'What your data suggests'), h('ul', {}, rec.map((r) => h('li', {}, r))), h('p', { class: 'meta' }, 'These are plain averages of your own entries, not advice from an expert. With only a few shots they will not mean much.'));
+    }
+    return box;
   }
 
   /* ------------------------------------------------------------------ 5. PROBLEMS */
@@ -375,6 +492,7 @@
       h('h3', {}, 'People and channels worth your time'),
       h('ul', {}, li(h('strong', {}, 'James Hoffmann'), ': YouTube, and the books "The World Atlas of Coffee" and "How to Make the Best Coffee at Home". A source for brewing technique, the AeroPress and V60, and for what flavours to expect from origins and processing.'),
         li(h('strong', {}, 'Lance Hedrick'), ': YouTube; detailed espresso dialling-in, puck preparation and workflow.'),
+        li(h('strong', {}, 'Andrew and Serena (andsercoffee)'), ': YouTube; "coffee omakase" style drinks at home, coffee cocktails and experiments: a good place for funkier brews. ', a('https://youtube.com/@andsercoffee', 'Their channel'), '.'),
         li(h('strong', {}, 'Morgan Eckroth'), ': YouTube and the book "Coffee, for Here": café-style and funkier recipes such as espresso tonic.')),
       h('h3', {}, 'Reading these educators often point to (to follow up)'),
       h('ul', {}, li('Scott Rao: "Everything but Espresso", "The Professional Barista\'s Handbook" and "The Coffee Roaster\'s Companion".'),
@@ -393,7 +511,7 @@
   }
 
   /* ---- tabs and start-up ---- */
-  const TABS = [['dial', 'Dial in', dialTab], ['recipes', 'Recipes', recipesTab], ['flavour', 'Flavour', wheelTab], ['log', 'Grind log', logTab], ['problems', 'Problems', problemsTab], ['beans', 'Beans', beansTab], ['about', 'About', aboutTab]];
+  const TABS = [['dial', 'Dial in', dialTab], ['recipes', 'Recipes', recipesTab], ['flavour', 'Flavour', wheelTab], ['log', 'Grind log', logTab], ['bags', 'Bags', bagsTab], ['stats', 'Stats', statsTab], ['problems', 'Problems', problemsTab], ['beans', 'Beans', beansTab], ['about', 'About', aboutTab]];
   function show(t) {
     const body = TABS.find((x) => x[0] === t)[2]();
     root.replaceChildren(

@@ -348,11 +348,16 @@
       h('p', { class: 'meta' }, 'The recipe data, with its comments, is in build_data.py and data.json in the source repository.'));
   }
 
+  /* ---- history: counts and charts of what you have made (see ../charts.js) ---- */
+  function historyTab() {
+    return PBEcharts.history({ storeKey: 'brewing-fermentation-history-v1', noun: 'batch', plural: 'batches', recipes: DATA.recipes.map((r) => ({ key: r.key, name: r.name, group: r.group })) });
+  }
+
   /* ---- tabs and start-up ---- */
-  const TABS = [['plan', 'Plan'], ['weigh', 'Ingredients'], ['timeline', 'Timeline'], ['strength', 'Strength'], ['cultures', 'Cultures'], ['safety', 'Safety'], ['sources', 'Sources']];
+  const TABS = [['plan', 'Plan'], ['weigh', 'Ingredients'], ['timeline', 'Timeline'], ['strength', 'Strength'], ['cultures', 'Cultures'], ['safety', 'Safety'], ['history', 'History'], ['sources', 'Sources']];
   function show(t) {
     tab = t;
-    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, strength: strengthTab, cultures: culturesTab, safety: safetyTab, sources: sourcesTab }[t]();
+    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, strength: strengthTab, cultures: culturesTab, safety: safetyTab, history: historyTab, sources: sourcesTab }[t]();
     root.replaceChildren(
       bannerNote(),
       h('nav', { class: 'tabs', 'aria-label': 'Sections' }, TABS.map(([k, l]) => h('a', { href: '#' + k, 'aria-current': k === t ? 'page' : false, onclick: (e) => { e.preventDefault(); show(k); } }, l))),

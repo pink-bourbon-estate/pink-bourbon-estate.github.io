@@ -483,11 +483,16 @@
       h('p', { class: 'meta' }, 'Each time you bake, the Plan tab can tell you how much dough to cut off after the first mix, before the salt, to be your next starter (150 g by default). That dough already has the levain in it, so it is a ready-made starter: put it in a clean jar and feed it before the next bake.'));
   }
 
+  /* ---- history: counts and charts of what you have made (see ../charts.js) ---- */
+  function historyTab() {
+    return PBEcharts.history({ storeKey: 'sourdough-baking-history-v1', noun: 'bake', recipes: DATA.recipes.map((r) => ({ key: r.key, name: r.name, group: r.family })) });
+  }
+
   /* ---- tabs and start-up ---- */
-  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['starter', 'Starter'], ['sources', 'Sources']];
+  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['starter', 'Starter'], ['history', 'History'], ['sources', 'Sources']];
   function show(t) {
     tab = t;
-    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, starter: starterTab, sources: sourcesTab }[t]();
+    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, starter: starterTab, history: historyTab, sources: sourcesTab }[t]();
     root.replaceChildren(
       bannerNote(),
       h('nav', { class: 'tabs', 'aria-label': 'Sections' }, TABS.map(([k, l]) => h('a', { href: '#' + k, 'aria-current': k === t ? 'page' : false, onclick: (e) => { e.preventDefault(); show(k); } }, l))),

@@ -1,28 +1,46 @@
-/* Projects page filters: a status filter (All / Live / In development / Planned) and a category filter.
-   The two work together, and the category you pick stays selected while you switch between statuses.
-   Without this script every section is simply shown. Nothing is stored or sent. */
+/* Projects page: filter by status and by category ("tape"), and choose how the list is grouped.
+   The filters work together and each one stays on when you change another.
+   Without this script the whole list is simply shown. Nothing is stored or sent. */
 (() => {
-  const statusBar = document.getElementById('filter');
-  const catBar = document.getElementById('catfilter');
-  if (!statusBar || !catBar) return;
-  const sections = [...document.querySelectorAll('section[data-status]')];
-  const cats = [...new Set([...document.querySelectorAll('.cat')].map((c) => c.dataset.cat))];
-  let status = 'all';   // the status chosen
-  let cat = 'all';      // the category chosen: it is kept when the status changes
+  const list = document.getElementById('list');
+  const bars = { status: document.getElementById('filter'), cat: document.getElementById('catfilter'), view: document.getElementById('viewopts') };
+  if (!list || !bars.status) return;
+  const items = [...list.querySelectorAll('.item')];             // the original order, kept so we can rebuild
+  const cats = [...new Set(items.map((i) => i.dataset.cat))].sort((a, b) => a.localeCompare(b));
+  const state = { status: 'live', cat: 'all', byTape: true, az: true };
 
-  const apply = () => {
-    sections.forEach((s) => { s.hidden = status !== 'all' && s.dataset.status !== status; });
-    document.querySelectorAll('.cat').forEach((c) => { c.hidden = cat !== 'all' && c.dataset.cat !== cat; });
-    statusBar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === status)));
-    catBar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === cat)));
-  };
-  const button = (bar, key, label, onPick) => {
+  /** Make a button inside a bar; `pressed` says whether it looks selected. */
+  const button = (bar, label, onClick, pressed, tape) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.dataset.f = key; b.textContent = label;
-    b.addEventListener('click', () => { onPick(key); apply(); });
-    bar.append(b);
+    b.type = 'button'; b.textContent = label; b.setAttribute('aria-pressed', 'false');
+    if (tape) b.style.setProperty('--tape', tape);
+    b.addEventListener('click', () => { onClick(); draw(); });
+    bar.append(b); b.pressedFn = pressed; return b;
   };
-  [['all', 'All'], ['live', 'Live'], ['dev', 'In development'], ['planned', 'Planned']].forEach(([k, l]) => button(statusBar, k, l, (v) => { status = v; }));
-  [['all', 'All categories'], ...cats.map((c) => [c, c])].forEach(([k, l]) => button(catBar, k, l, (v) => { cat = v; }));
-  apply();
+  const all = [];
+  [['all', 'All'], ['live', 'Live'], ['dev', 'In development'], ['planned', 'Planned']].forEach(([k, l]) => all.push(button(bars.status, l, () => { state.status = k; }, () => state.status === k)));
+  all.push(button(bars.cat, 'All tapes', () => { state.cat = 'all'; }, () => state.cat === 'all'));
+  cats.forEach((c) => all.push(button(bars.cat, c, () => { state.cat = c; }, () => state.cat === c, items.find((i) => i.dataset.cat === c).style.getPropertyValue('--tape'))));
+  all.push(button(bars.view, 'Group by tape', () => { state.byTape = !state.byTape; }, () => state.byTape));
+  all.push(button(bars.view, 'A to Z', () => { state.az = !state.az; }, () => state.az));
+
+  function draw() {
+    all.forEach((b) => b.setAttribute('aria-pressed', String(b.pressedFn())));
+    let shown = items.filter((i) => (state.status === 'all' || i.dataset.status === state.status) && (state.cat === 'all' || i.dataset.cat === state.cat));
+    const order = { live: 0, dev: 1, planned: 2 };
+    // A to Z sorts by name; otherwise live comes first, then in development, then planned.
+    shown = shown.slice().sort((a, b) => state.az ? a.dataset.name.localeCompare(b.dataset.name) : order[a.dataset.status] - order[b.dataset.status]);
+    list.replaceChildren();
+    if (state.byTape) {
+      cats.forEach((c) => {
+        const group = shown.filter((i) => i.dataset.cat === c);
+        if (!group.length) return;
+        const h = document.createElement('h2'); h.className = 'grp'; h.textContent = c;
+        h.style.setProperty('--tape', group[0].style.getPropertyValue('--tape'));
+        list.append(h, ...group);
+      });
+    } else list.append(...shown);
+    document.getElementById('empty').hidden = shown.length > 0;
+  }
+  draw();
 })();

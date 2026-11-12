@@ -193,8 +193,23 @@ td.n, th.n { white-space: nowrap; }
 .form > :not(.fld) { grid-column: 1 / -1; margin: 0; }
 .fld { align-content: start; }
 
-/* Projects page: a category inside each status section */
-.cat { margin: 1.5rem 0; }
-.cat > h3 { margin-bottom: .5rem; }
-.cat .empty { opacity: .6; }
-#catfilter { margin-top: .5rem; flex-wrap: wrap; }
+/* Projects page: each item has a strip of "washi tape" in its category colour */
+.item { display: grid; grid-template-columns: 14px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line, rgba(128,128,128,.25)); }
+.item h3 { margin: 2px 0 4px; }
+.item .tag { margin: 0; }
+.tape { display: block; align-self: stretch; min-height: 44px; background: var(--tape); opacity: .85; transform: rotate(-1.5deg);
+  clip-path: polygon(0 3%, 100% 0, 92% 25%, 100% 50%, 92% 75%, 100% 100%, 0 97%, 8% 75%, 0 50%, 8% 25%); }
+.grp { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin: 28px 0 0; padding-left: 28px; position: relative; }
+.grp::before { content: ""; position: absolute; left: 0; top: 2px; width: 18px; height: 11px; background: var(--tape); transform: rotate(-4deg); opacity: .85; }
+#catfilter button::before { content: ""; display: inline-block; width: 12px; height: 8px; margin-right: 6px; background: var(--tape); transform: rotate(-4deg); }
+#catfilter, #viewopts { flex-wrap: wrap; }
+
+#catfilter button[aria-pressed="true"], #viewopts button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+#catfilter { gap: 6px; } #catfilter button { padding: 3px 8px; font-size: 11px; }
+#viewopts { margin-bottom: 16px; }
+.grp { border-top: 0; }
+
+/* Stats pages: big numbers and charts (charts use the text colour, so they follow light and dark mode) */
+.statrow { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 14px 0 22px; }
+.stat .big { font-size: 34px; font-weight: 300; line-height: 1.1; }
+.chart { margin: 8px 0 24px; color: var(--ink); }
