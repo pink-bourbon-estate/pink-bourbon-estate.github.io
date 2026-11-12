@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player - PianoCraft - Pink Bourbon Estate</title>
+<meta name="description" content="Play public-domain piano pieces on a sampled grand piano with tempo, loop and repeat bars, hands separately, transposing, a metronome and a 1 to 7 difficulty slider.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/pianocraft/player/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Player - PianoCraft - Pink Bourbon Estate">
+<meta property="og:description" content="Play public-domain piano pieces on a sampled grand piano with tempo, loop and repeat bars, hands separately, transposing, a metronome and a 1 to 7 difficulty slider.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/pianocraft/player/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<script src="../../theme.js"></script>
+<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../pc.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../../projects/" aria-current="page">Projects</a><a href="../../articles/">Articles</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Player</h1>
+<p class="meta"><a href="../">PianoCraft</a> · <a href="../convert/">PDF to MIDI demo</a> · <a href="../player/">Player</a> · <a href="../score-lab/">Score lab</a></p>
+<p class="lede">Pick a piece and press Play. Click a bar to loop it; click a later bar to stretch the loop. Slide the difficulty down to hear and see an easier version.</p>
+<h2 id="title" style="margin-bottom:0"></h2><p class="meta" id="by"></p>
+<div class="ctl"><label class="row">Piece<select id="piece"></select></label>
+<label class="row">Difficulty <output id="level_o"></output><input id="level" type="range" min="1" max="7" value="7"></label>
+<label class="row">Tempo <output id="tempo_o"></output><input id="tempo" type="range" min="30" max="150" value="100"></label>
+<label class="row">Transpose <output id="trans_o"></output><input id="trans" type="range" min="-12" max="12" value="0"></label></div>
+<div class="transport"><button id="play" type="button">Play</button><button id="stop" type="button">Stop</button><button id="dl" type="button">Download MIDI</button><span id="where" class="meta"></span><span id="count" class="meta"></span></div>
+<input id="pos" class="bigscrub" type="range" min="0" max="100" value="0" aria-label="Position in the piece">
+<div class="ctl"><label class="chk"><input id="hR" type="checkbox" checked> Right hand</label><label class="chk"><input id="hL" type="checkbox" checked> Left hand</label><label class="chk"><input id="metro" type="checkbox"> Metronome</label><label class="chk"><input id="count_in" type="checkbox"> Count-in</label></div>
+<div class="ctl"><label class="chk"><input id="loopon" type="checkbox"> Loop bars</label><label class="row">From bar<input id="la" type="number" min="1" value="1"></label><label class="row">To bar<input id="lb" type="number" min="1" value="1"></label><label class="row">Repeat (0 = until you stop)<input id="times" type="number" min="0" value="0"></label></div>
+<p class="status" id="status" role="status"></p>
+<div class="scorebox" id="score"></div>
+<div class="prose"><p>The score is a simple engraving drawn from the MIDI data: two staves, note shapes, no key signature (sharps and flats are written next to the notes) and no rests, so it is a reading aid rather than a publisher's page. The piano is a set of real recordings stretched to fill in the notes between them, with a little room reverb added.</p></div>
+<h2>Credits and licences</h2>
+<div class="prose">
+<p><strong>Music:</strong> every piece here is in the public domain. The MIDI files come from the Mutopia Project's typesetters, named on each page. <strong>Piano sound:</strong> the Salamander Grand Piano, recorded by Alexander Holm, used under the Creative Commons Attribution 3.0 licence (CC BY 3.0). The recordings are kept in this site's own folder; nothing is loaded from another site. <strong>Code:</strong> the tool's code is open and commented, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/pianocraft" rel="noopener">this folder</a>. The desktop app that does the real PDF reading is in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>.</p>
+<p>Nothing you do here leaves your browser: markup is saved on your device only, and no files are uploaded anywhere.</p>
+</div>
+<script src="../pc.js"></script><script src="../player.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

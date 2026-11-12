@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score lab - PianoCraft - Pink Bourbon Estate</title>
+<meta name="description" content="Mark up a public-domain piano score with pen, highlighter, text and fingering, simplify it with a 1 to 7 slider, and tick off practice steps. Saved only in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/pianocraft/score-lab/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Score lab - PianoCraft - Pink Bourbon Estate">
+<meta property="og:description" content="Mark up a public-domain piano score with pen, highlighter, text and fingering, simplify it with a 1 to 7 slider, and tick off practice steps. Saved only in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/pianocraft/score-lab/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<script src="../../theme.js"></script>
+<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../pc.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../../projects/" aria-current="page">Projects</a><a href="../../articles/">Articles</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Score lab</h1>
+<p class="meta"><a href="../">PianoCraft</a> · <a href="../convert/">PDF to MIDI demo</a> · <a href="../player/">Player</a> · <a href="../score-lab/">Score lab</a></p>
+<p class="lede">Mark up a score the way you would in pencil: circle the tricky bit, write a reminder, add fingering. Make it simpler with the slider. Your markup stays on this device.</p>
+<h2 id="title" style="margin-bottom:0"></h2><p class="meta" id="by"></p>
+<div class="ctl"><label class="row">Piece<select id="piece"></select></label><label class="row">Simplify <output id="level_o"></output><input id="level" type="range" min="1" max="7" value="5"></label></div>
+<div class="penbar" role="group" aria-label="Markup tools"><button type="button" data-tool="pen" aria-pressed="true">Pen</button><button type="button" data-tool="hl" aria-pressed="false">Highlighter</button><button type="button" data-tool="text" aria-pressed="false">Text</button><button type="button" data-tool="fing" aria-pressed="false">Fingering</button>
+<span class="meta">Finger:</span><button type="button" data-f="1" aria-pressed="true">1</button><button type="button" data-f="2" aria-pressed="false">2</button><button type="button" data-f="3" aria-pressed="false">3</button><button type="button" data-f="4" aria-pressed="false">4</button><button type="button" data-f="5" aria-pressed="false">5</button>
+<input id="txt" type="text" placeholder="Text to place, then click the score" aria-label="Text to place" style="max-width:20em"><button id="undo" type="button">Undo</button><button id="clear" type="button">Clear all</button></div>
+<p class="status" id="status" role="status"></p><p class="meta" id="count"></p>
+<div class="scorebox" id="score"></div>
+<div class="transport"><button id="svg" type="button">Download marked-up score (SVG)</button><button id="mid" type="button">Download this version as MIDI</button><button id="print" type="button">Print</button></div>
+<h2>Practice steps</h2><p class="meta">The order the Russian School of Piano Playing approach suggests. If a step is too hard, turn the Simplify slider down and try that step again with less.</p>
+<ol class="steps" id="steps"></ol>
+<h2>Credits and licences</h2>
+<div class="prose">
+<p><strong>Music:</strong> every piece here is in the public domain. The MIDI files come from the Mutopia Project's typesetters, named on each page. <strong>Piano sound:</strong> the Salamander Grand Piano, recorded by Alexander Holm, used under the Creative Commons Attribution 3.0 licence (CC BY 3.0). The recordings are kept in this site's own folder; nothing is loaded from another site. <strong>Code:</strong> the tool's code is open and commented, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/pianocraft" rel="noopener">this folder</a>. The desktop app that does the real PDF reading is in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>.</p>
+<p>Nothing you do here leaves your browser: markup is saved on your device only, and no files are uploaded anywhere.</p>
+</div>
+<script src="../pc.js"></script><script src="../lab.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
