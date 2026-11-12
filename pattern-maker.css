@@ -1,5 +1,5 @@
 
-/* Pattern Kit layout, in the estate's colours (the page's own styles, kept small and readable). */
+/* Sewing and Knitting Pattern Maker layout, in the estate's colours (the page's own styles, kept small and readable). */
 main { max-width: 1500px; }
 .pk { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
 .pk aside { border-top: 1px solid var(--ink); padding-top: 8px; }

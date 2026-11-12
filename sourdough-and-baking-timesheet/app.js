@@ -1,4 +1,4 @@
-/* Proving Ground - a bake planner that runs entirely in your browser.
+/* Sourdough and Baking Timesheet - a bake planner that runs entirely in your browser.
 
    Read this file top to bottom: it is arranged in the same order you use the tool.
 
@@ -24,7 +24,7 @@
   let DATA = null;       // recipes + sources, from data.json
   let bakes = [];        // the plan: one entry per bake
   let tab = 'plan';
-  const STORE = 'proving-ground-plan-v1';
+  const STORE = 'baking-timesheet-plan-v1';
 
   /* ------------------------------------------------------------------ small helpers */
 

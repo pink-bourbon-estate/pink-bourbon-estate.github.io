@@ -36,8 +36,8 @@ jobs:
           rustup default stable
           cd _toolkits/patternkit
           cargo build --release --lib --target wasm32-unknown-unknown
-          cp target/wasm32-unknown-unknown/release/patternkit.wasm "$GITHUB_WORKSPACE/pattern-kit/patternkit.wasm"
-          cp web/app.js "$GITHUB_WORKSPACE/pattern-kit/app.js"
+          cp target/wasm32-unknown-unknown/release/patternkit.wasm "$GITHUB_WORKSPACE/sewing-and-knitting-pattern-maker/patternkit.wasm"
+          cp web/app.js "$GITHUB_WORKSPACE/sewing-and-knitting-pattern-maker/app.js"
       - name: Leave the build folders out of the site
         run: rm -rf _toolkits
       - uses: actions/configure-pages@v5

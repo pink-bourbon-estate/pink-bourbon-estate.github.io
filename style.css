@@ -21,6 +21,10 @@
     --accent: #ff7aa8; --bar: #f1f1ee;
   }
 }
+:root[data-theme="dark"] {
+    --bg: #111111; --ink: #f1f1ee; --mute: #a3a3a0; --line: #2c2c2c; --soft: #1b1b1b;
+    --accent: #ff7aa8; --bar: #f1f1ee;
+}
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--sans); }
@@ -153,3 +157,7 @@ tr.tot td { border-top: 1px solid var(--ink); }
 .ev.clash { border-left: 3px solid var(--accent); padding-left: 10px; }
 @media print { .top, .foot, .tabs, button, .note { display: none; } }
 @media (max-width: 640px) { .ev { grid-template-columns: 1fr; gap: 2px; } }
+
+/* light / dark switch (see theme.js) */
+.themebtn { margin-left: auto; padding: 4px 10px; font-size: 11px; }
+@media print { .themebtn { display: none; } }
