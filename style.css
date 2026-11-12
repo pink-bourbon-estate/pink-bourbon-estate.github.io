@@ -213,3 +213,13 @@ td.n, th.n { white-space: nowrap; }
 .statrow { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 14px 0 22px; }
 .stat .big { font-size: 34px; font-weight: 300; line-height: 1.1; }
 .chart { margin: 8px 0 24px; color: var(--ink); }
+
+/* tick lists (tracker.js) */
+.checklist { list-style: none; padding: 0; margin: 6px 0 18px; }
+.checklist li { padding: 6px 0; display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; border-top: 1px solid rgba(128,128,128,.2); }
+textarea { font: inherit; width: 100%; box-sizing: border-box; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 8px; }
+
+/* category dropdown with a swatch of the tape colour */
+#catfilter { display: flex; align-items: center; gap: 10px; }
+#catfilter select { max-width: 320px; }
+.swatch { display: inline-block; width: 22px; height: 12px; transform: rotate(-4deg); opacity: .85; }

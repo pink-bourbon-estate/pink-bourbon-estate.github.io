@@ -18,20 +18,23 @@
     bar.append(b); b.pressedFn = pressed; return b;
   };
   const all = [];
-  const chips = [];   // category buttons, so their counts can be refreshed
   [['all', 'All'], ['live', 'Live'], ['dev', 'In development'], ['planned', 'Planned']].forEach(([k, l]) => all.push(button(bars.status, l, () => { state.status = k; }, () => state.status === k)));
-  all.push(button(bars.cat, 'All tapes', () => { state.cat = 'all'; }, () => state.cat === 'all'));
-  cats.forEach((c) => { const b = button(bars.cat, c, () => { state.cat = c; }, () => state.cat === c, items.find((i) => i.dataset.cat === c).style.getPropertyValue('--tape')); b.dataset.label = c; chips.push(b); all.push(b); });
+  // category: a dropdown, with a little piece of that tape's colour beside it
+  const swatch = document.createElement('span'); swatch.className = 'swatch';
+  const select = document.createElement('select'); select.setAttribute('aria-label', 'Category');
+  select.addEventListener('change', () => { state.cat = select.value; draw(); });
+  bars.cat.append(swatch, select);
   all.push(button(bars.view, 'Group by tape', () => { state.byTape = !state.byTape; }, () => state.byTape));
   all.push(button(bars.view, 'A to Z', () => { state.az = !state.az; }, () => state.az));
 
   function draw() {
     all.forEach((b) => b.setAttribute('aria-pressed', String(b.pressedFn())));
-    // each category chip shows how many items it has under the chosen status; empty ones are dimmed
-    chips.forEach((b) => {
-      const n = items.filter((i) => i.dataset.cat === b.dataset.label && (state.status === 'all' || i.dataset.status === state.status)).length;
-      b.textContent = b.dataset.label + ' (' + n + ')'; b.style.opacity = n ? '1' : '0.45';
-    });
+    // the dropdown shows how many items each category has under the chosen status
+    const count = (c) => items.filter((i) => (c === 'all' || i.dataset.cat === c) && (state.status === 'all' || i.dataset.status === state.status)).length;
+    select.replaceChildren(...['all', ...cats].map((c) => { const o = document.createElement('option'); o.value = c; o.textContent = (c === 'all' ? 'All categories' : c) + ' (' + count(c) + ')'; return o; }));
+    select.value = state.cat;
+    const first = items.find((i) => i.dataset.cat === state.cat);
+    swatch.style.background = first ? first.style.getPropertyValue('--tape') : 'transparent';
     let shown = items.filter((i) => (state.status === 'all' || i.dataset.status === state.status) && (state.cat === 'all' || i.dataset.cat === state.cat));
     const order = { live: 0, dev: 1, planned: 2 };
     // A to Z sorts by name; otherwise live comes first, then in development, then planned.

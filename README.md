@@ -19,3 +19,12 @@ This repository is the home page, the articles, the about page and the privacy a
 - `sewing-and-knitting-pattern-maker/`: the sewing and knitting pattern tool. Its engine is built from the Toolkits repository on every deploy.
 
 All tools are works in progress: expect bugs, and not every one is actively maintained.
+- `tracker.js`: the shared framework behind the newer tools (logs, routines, dates, tick lists, notes, and Markdown/CSV/backup export).
+- `bullet-journal/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `meditation/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `health-metrics/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `medicine-and-appointments/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `home-routines/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `car-and-travel/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `gym-and-strength/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `books-and-film/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
