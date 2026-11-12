@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building the Radio 6 Music Collection - Pink Bourbon Estate</title>
+<meta name="description" content="How an archive of every track played on BBC Radio 6 Music since 2008 was gathered politely, checked, and turned into a free, searchable website.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/articles/building-the-radio-6-music-collection/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Building the Radio 6 Music Collection - Pink Bourbon Estate">
+<meta property="og:description" content="How an archive of every track played on BBC Radio 6 Music since 2008 was gathered politely, checked, and turned into a free, searchable website.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/articles/building-the-radio-6-music-collection/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">pink bourbon<span>estate</span></a>
+  <nav aria-label="Main"><a href="../../articles/" aria-current="page">Articles</a><a href="../../about/">About</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<p class="tag"><a href="../">Articles</a> / Project · 12 November 2026 · 9 min read</p>
+<h1>Building the Radio 6 Music Collection</h1>
+<div class="prose">
+<p class="lede">Every track BBC Radio 6 Music has played since 2008, gathered into a free, searchable archive: where the idea came from, and how it was put together.</p>
+<p><a class="btn" href="https://pink-bourbon-estate.github.io/BBC-Radio-6-Music-Collection/">Open the website</a> <a class="btn" href="https://github.com/pink-bourbon-estate/BBC-Radio-6-Music-Collection" rel="noopener">Read the code</a></p>
+
+<h2>The itch</h2>
+<p>Radio 6 Music has a devoted audience, and a large part of it keeps lists by hand: what was played on a show, what that song in the middle of the Tuesday programme was, what an artist's most-played track is. The BBC publishes a tracklist for each programme, but only one episode at a time, and it is hard to ask a question across all of them. "What did this show play most last year?" and "what was that song?" are surprisingly awkward to answer. Often it is the second one that matters most: you remember the tune and not the name.</p>
+
+<h2>First, a database</h2>
+<p>The project began as a command-line program, <code>bbc6</code>, written in Rust, with an offline database. For every day it reads the public 6 Music schedule to learn which episodes aired, then reads each episode's public tracklist (the same "segments" feed the BBC's own programme pages use). Each play becomes one row: date, time, show, episode, position, artist, title, album, label and, where the BBC supplies it, a MusicBrainz identifier for the artist.</p>
+<p>The result is about 1.8 million plays from roughly 67,000 episodes, stored as plain CSV files, compressed one year at a time. Plain files were chosen on purpose: you can open them in a spreadsheet, and there is no database server to run or to break.</p>
+
+<h2>Collecting it politely</h2>
+<p>A scraper is only as ethical as its manners. The rules followed here:</p>
+<ul>
+<li><strong>Slow.</strong> A couple of requests per second at most while catching up on years of history; a daily update needs only a few dozen requests.</li>
+<li><strong>Once.</strong> Finished episodes are recorded and skipped, and every response is cached, so nothing is fetched twice.</li>
+<li><strong>Read the rules.</strong> The daily job checks the BBC's robots.txt first and stops if the pages it needs are not allowed.</li>
+<li><strong>Say who is asking.</strong> The program identifies itself with the project name and a link to its code, so the BBC can see who is asking and get in touch.</li>
+<li><strong>Facts only.</strong> Show, time, artist, title, album, label. No audio, no artwork, no programme descriptions, nothing about listeners.</li>
+<li><strong>Say what it is.</strong> The site calls itself unofficial and non-commercial, credits its sources, and gives a route for takedown requests.</li>
+</ul>
+<p>Even then, it is worth being honest that the BBC's terms of use may restrict automated access. That is why the project stays small, polite and non-commercial, and why it will change or remove anything on request.</p>
+
+<h2>Checking the numbers</h2>
+<p>With millions of rows, mistakes hide. The song database is rebuilt from the raw plays on every change and compared byte for byte with the published copy, so a bug cannot slip in silently. Real email addresses occasionally appear inside BBC tracklist text, so they are replaced with a placeholder before anything is published, and every change is scanned for secrets and personal addresses.</p>
+<p>The data has known limits, and the site says so: tracklists begin in mid-2008 and are patchy until about 2010; theme tunes and jingles are logged as tracks; the same song under two spellings counts twice. Genre is the weakest part. It comes from MusicBrainz user tags, and only about a third of plays belong to an artist that has one. So every artist shows its MusicBrainz ID, so anyone can check it, or improve it at the source.</p>
+
+<h2>Why a website, not a download</h2>
+<p>A program is fine for someone who wants to adapt it, but for most people a web page is simply better. So the project became a website: a dashboard of what was played today, this week, this month and this year; most played and least played; every show with every song it has played; artists from A to Z; a page for every year; and a CSV and text download button on every table and chart. The look borrows from quiet, typographic archive sites such as Divisare and Standart: thin rules, small capitals, lots of white space, no decoration that is not doing a job.</p>
+
+<h2>How the site stays fast, and stays up to date</h2>
+<ul>
+<li><strong>Pre-computed.</strong> A browser cannot read a 100 MB CSV, so the Rust program works out small JSON files in a few seconds: the top tracks, each show, each letter of the alphabet. The page fetches only the piece it needs.</li>
+<li><strong>Daily refresh.</strong> A scheduled GitHub Actions job reads the new episodes, adds them as a small file, rebuilds the data and publishes the site. It runs without anyone touching it.</li>
+<li><strong>Plain script.</strong> The interface is plain JavaScript with no framework, no build step and nothing loaded from elsewhere. Tables sort, filter and download in your own browser.</li>
+<li><strong>Findable.</strong> Search engines cannot see what a script draws later, so the builder also writes a real HTML page, with its own title and description, for every show, year, chart and the 5,000 most-played artists, plus a sitemap. The script then makes those pages interactive.</li>
+</ul>
+
+<h2>Finding the song you cannot name</h2>
+<p>A list of names is only half the point. If you do not remember what a song is called, you need to hear it. This site hosts no music and embeds no players, because that would mean trackers. Instead each track has plain links that open a search for it on YouTube, Spotify, SoundCloud or Bandcamp, each episode links back to its page on the BBC, and every show and episode has a playlist file that services such as Tune My Music or Soundiiz can import. Nothing is loaded until you choose to click.</p>
+
+<h2>What was learned</h2>
+<ul>
+<li>Start with the plainest format that works. CSV files outlived every clever idea.</li>
+<li>Politeness is cheap and it compounds: caching and a daily delta turned a heavy job into a light one.</li>
+<li>Say what the data cannot do. People trust a limitation that is stated more than a number that is not.</li>
+<li>Comment everything. The code was written so that a beginner can follow it, which also makes it easier to fix.</li>
+</ul>
+<p>The code is on <a href="https://github.com/pink-bourbon-estate/BBC-Radio-6-Music-Collection" rel="noopener">GitHub</a> and is free to fork and adapt, with credit. See the <a href="../../privacy/">privacy and licence</a> page.</p>
+<p class="meta">Licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a>.</p>
+</div>
+</main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="../../about/">About</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
