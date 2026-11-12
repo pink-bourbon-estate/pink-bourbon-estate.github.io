@@ -81,7 +81,7 @@
     const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* private window: carry on */ } };
     const get = (id, fallback) => (store[id] === undefined ? fallback : store[id]);
     const set = (id, v) => { store[id] = v; save(); };
-    const ctx = { h, get, set, today, addDays, addMonths, daysUntil, round, saveFile, uid, rerender: () => show(current) };
+    const ctx = { weekPlanner: (o) => weekPlanner(o), h, get, set, today, addDays, addMonths, daysUntil, round, saveFile, uid, rerender: () => show(current) };
     let current = '_dash';
 
     /* ---- log tab ---- */
@@ -344,6 +344,41 @@
       if (cfg.whatif) box.append(h('h2', {}, 'Play with it'), cfg.whatif(ctx));
       blocks.forEach((b) => box.append(b));
       return box;
+    }
+
+    /* ---- a week planner: a seven-day calendar you fill with sessions ----
+       o.id        storage name
+       o.sessions  the menu: [{ name, hard, mins }]   (hard = a demanding session; mins = rough length)
+       o.templates optional ready-made weeks: { 'Name': { Mon: ['Session name', ...], Tue: [...], ... } }
+       o.fromPlan  optional function(weekNumber) -> { Mon: [...] } to fill the calendar from a generated plan   */
+    const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    function weekPlanner(o) {
+      const wrap = h('div', {});
+      const lookup = (name) => o.sessions.find((x) => x.name === name) || { name, hard: false, mins: 0 };
+      const draw = () => {
+        const s = get(o.id, { days: {} });
+        const cell = (d) => {
+          const list = s.days[d] || [];
+          const sel = h('select', { 'aria-label': 'Add to ' + d }, [h('option', { value: '' }, 'Add...'), ...o.sessions.map((x) => h('option', { value: x.name }, x.name))]);
+          sel.addEventListener('change', () => { if (!sel.value) return; (s.days[d] = s.days[d] || []).push(sel.value); set(o.id, s); draw(); });
+          return h('td', { style: 'vertical-align:top;min-width:120px' }, list.map((n, i) => { const x = lookup(n); return h('div', { style: 'margin:0 0 6px;padding:4px 6px;border:1px solid var(--ink);' + (x.hard ? 'background:var(--ink);color:var(--bg)' : '') }, n, ' ', h('button', { type: 'button', class: 'xbox', style: 'width:18px;height:18px;font-size:12px;' + (x.hard ? 'color:var(--bg);border-color:var(--bg)' : ''), 'aria-label': 'Remove ' + n, onclick: () => { list.splice(i, 1); set(o.id, s); draw(); } }, '×')); }), sel);
+        };
+        const all = DAYS.flatMap((d) => (s.days[d] || []).map(lookup));
+        const hardDays = DAYS.filter((d) => (s.days[d] || []).some((n) => lookup(n).hard));
+        const restDays = DAYS.filter((d) => !(s.days[d] || []).length);
+        const warn = [];
+        DAYS.forEach((d, i) => { if (hardDays.includes(d) && hardDays.includes(DAYS[(i + 1) % 7]) && i < 6) warn.push('Hard sessions on both ' + d + ' and ' + DAYS[i + 1] + ': leave a day between demanding sessions if you can.'); });
+        if (!restDays.length && all.length) warn.push('No rest day: most plans include at least one day with nothing planned.');
+        if (hardDays.length > 3) warn.push(hardDays.length + ' hard days is a lot; many plans keep it to about 2 or 3 a week.');
+        const tplSel = o.templates ? h('select', { 'aria-label': 'Template' }, [h('option', { value: '' }, 'Start from a template...'), ...Object.keys(o.templates).map((k) => h('option', { value: k }, k))]) : null;
+        if (tplSel) tplSel.addEventListener('change', () => { if (!tplSel.value) return; s.days = JSON.parse(JSON.stringify(o.templates[tplSel.value])); set(o.id, s); draw(); });
+        const planSel = o.fromPlan ? h('input', { type: 'number', min: 1, value: 1, style: 'width:70px', 'aria-label': 'Plan week' }) : null;
+        fill(wrap, h('p', { class: 'meta' }, o.intro || 'Plan a typical week. Dark boxes are hard sessions. Click the x on a session to remove it.'),
+          h('p', {}, tplSel, ' ', planSel ? [' or fill from plan week ', planSel, ' ', h('button', { type: 'button', onclick: () => { const d = o.fromPlan(Number(planSel.value)); if (d) { s.days = d; set(o.id, s); draw(); } } }, 'Fill')] : null, ' ', h('button', { type: 'button', onclick: () => { s.days = {}; set(o.id, s); draw(); } }, 'Clear the week')),
+          h('div', { class: 'tablewrap' }, h('table', {}, h('thead', {}, h('tr', {}, DAYS.map((d) => h('th', {}, d)))), h('tbody', {}, h('tr', {}, DAYS.map(cell))))),
+          h('p', { class: 'lede' }, all.length + ' sessions, about ' + Math.round(all.reduce((a, x) => a + (x.mins || 0), 0) / 6) / 10 + ' hours, ' + hardDays.length + ' hard days, ' + restDays.length + ' rest day' + (restDays.length === 1 ? '' : 's')), warn.length ? h('ul', {}, warn.map((w) => h('li', { class: 'meta' }, w))) : null);
+      };
+      draw(); return wrap;
     }
 
     /* ---- the Your data tab ---- */

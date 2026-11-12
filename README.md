@@ -27,4 +27,5 @@ All tools are works in progress: expect bugs, and not every one is actively main
 - `home-routines/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `car-and-travel/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `gym-and-strength/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
+- `endurance-training/`: running, cycling and swimming plans and calculators, built on `tracker.js`.
 - `books-and-film/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
