@@ -28,5 +28,9 @@ All tools are works in progress: expect bugs, and not every one is actively main
 - `car-and-travel/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `gym-and-strength/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `sightline/`: three small piano pages (PDF-to-MIDI demo, player, score lab) with a shared engine in `pc.js`; public-domain MIDI in `scores/`, Salamander Grand Piano recordings (CC BY 3.0, Alexander Holm) in `samples/`.
+- `mobility-and-physio/`, `skincare-and-care/`, `nutrition-and-macros/`: more small tools built on `tracker.js`.
+- `language-lab/`, `chess-lab/`, `travel-map/`: demos of bigger ideas (see the plan on each page). The map outline in `travel-map/` is Natural Earth data (public domain).
+- `sounds.js` and `databar.js`: shared sounds (bells, bowls, timers) and the sample/download data bar.
+- `.github/scripts/reading.py`: builds the home page's "Now reading" list from independent magazines' public feeds once a day.
 - `endurance-training/`: running, cycling and swimming plans and calculators, built on `tracker.js`.
 - `books-and-film/`: a small tool built on `tracker.js`; the logic is in its `app.js`.

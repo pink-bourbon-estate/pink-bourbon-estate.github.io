@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Language Lab - Pink Bourbon Estate</title>
+<meta name="description" content="Paste text in Japanese, Slovak, Czech, Italian, Spanish, French, Greek, Arabic or Norwegian and see word counts, sentence lengths, common phrases and word endings. A demo, in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/language-lab/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Language Lab - Pink Bourbon Estate">
+<meta property="og:description" content="Paste text in Japanese, Slovak, Czech, Italian, Spanish, French, Greek, Arabic or Norwegian and see word counts, sentence lengths, common phrases and word endings. A demo, in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/language-lab/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Language Lab</h1><p class="lede">Paste any text and see its word list, how long its sentences are, which phrases repeat and which beginnings and endings are common. Mark the words you know. Free, in your browser, nothing sent anywhere.</p><div class="note"><p><strong>A demo of the idea, work in progress.</strong> The analysis below is real and works on any text you paste. The daily collection of new words from good sources is a plan, not built yet (see "The plan"). The sample sentences were written for this demo and should be checked by a native speaker.</p></div>
+<div class="form"><label class="fld">Language<select id="lang"></select></label></div>
+<p><button id="sample" type="button">Load a sample</button> <button id="clearknown" type="button">Forget my known words</button></p>
+<textarea id="text" rows="6" style="width:100%;font:inherit;font-size:18px;padding:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)" aria-label="Text to analyse"></textarea>
+<div id="out"></div>
+<h2>The plan</h2><div class="prose">
+<p><strong>What it would grow into:</strong> a word list for each language built from good, safe, non-political reading: public-domain books, scripts and film writing, openly licensed articles, and the titles of respected magazines. For each language: a dashboard of word counts, common phrases, average sentence length, word types (noun, verb and so on), word building (common beginnings and endings), and sentences grouped by length and by how similar their words are.</p>
+<p><strong>How the daily update would work:</strong> a scheduled GitHub job (like the one that updates "Now reading" on the home page) would fetch a few allowed sources once a day, politely and after checking robots.txt, skip anything about death, war, crime or sexism (unless it is a book or film), count the words, and save only the counts and short example sentences to the site. Only text that is public domain or openly licensed would be kept; for magazines, only titles and links.</p>
+<p><strong>Possible sources</strong> (none connected yet, all to be checked for licence and tone): Project Gutenberg and Wikisource for out-of-copyright books and plays; Wikipedia and Wikivoyage articles on art, geography and nature (openly licensed, attribution required); national libraries' digitised collections; and the independent magazines on the home page for fresh vocabulary (titles only).</p>
+<p><strong>Word types</strong> need an open tagger for each language (for example the Universal Dependencies models), and Japanese and Arabic need extra care because of how they write. That is the biggest piece of work.</p></div>
+<script src="app.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

@@ -2,7 +2,7 @@
    Both are plain and local to this site:
    - Listening to picks a random track from the most played on BBC Radio 6 Music in the last week,
      read from the Radio 6 Collection's own data file (same website, nothing from anywhere else).
-   - Now reading shows the latest Standart magazine article. It is looked up when the site is
+   - Now reading shows a recent article from a short list of independent magazines (see .github/scripts/reading.py). It is looked up when the site is
      built each day (see .github/workflows/pages.yml) and saved to now-reading.json, so your browser
      never contacts Standart. It only links to the article.
    If either can't load, the plain link already on the page stays. */
@@ -20,9 +20,11 @@
   }).catch(() => {});
 
   fetch('now-reading.json').then((r) => r.json()).then((a) => {
-    if (!a || !a.title || !/^https:\/\/standartmag\.com\//.test(a.url)) return;
-    const p = document.getElementById('reading');
-    p.replaceChildren(el('a', { href: a.url, rel: 'noopener' }, a.title));
-    p.append(el('span', { class: 'meta block' }, 'Latest from Standart magazine'));
+    // a.items is a short list of {source, topic, title, url}; pick one at random. Only https links are accepted.
+    const list = (a && a.items && a.items.length ? a.items : (a && a.title ? [{ source: 'Standart magazine', title: a.title, url: a.url }] : [])).filter((x) => /^https:\/\//.test(x.url));
+    if (!list.length) return;
+    const x = list[Math.floor(Math.random() * list.length)], p = document.getElementById('reading');
+    p.replaceChildren(el('a', { href: x.url, rel: 'noopener' }, x.title));
+    p.append(el('span', { class: 'meta block' }, 'From ' + x.source + (x.topic ? ' · ' + x.topic : '') + '. Picked at random from a short list of independent magazines.'));
   }).catch(() => {});
 })();

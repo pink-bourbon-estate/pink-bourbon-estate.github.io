@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chess Lab - Pink Bourbon Estate</title>
+<meta name="description" content="Learn opening lines move by move and drill them from memory. A small demo that stores your drill record in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/chess-lab/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Chess Lab - Pink Bourbon Estate">
+<meta property="og:description" content="Learn opening lines move by move and drill them from memory. A small demo that stores your drill record in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/chess-lab/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Chess Lab</h1><p class="lede">Learn a line one move at a time, then play it from memory. Free, in your browser, nothing sent anywhere.</p><div class="note"><p><strong>A demo of the idea, work in progress.</strong> This board only plays the moves stored in each line: it does not check legality and does not play against you. The four lines were written from general chess knowledge: check them against a book or a trusted site before you rely on them.</p></div>
+<div class="ctl" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"><label class="fld">Line<select id="line"></select></label></div>
+<p><button id="learn" type="button">Learn</button> <button id="drill" type="button">Drill (play from memory)</button> <button id="back" type="button">Back</button> <button id="next" type="button">Next move</button></p>
+<p class="meta" id="step"></p>
+<svg id="board" viewBox="0 0 400 400" role="img" aria-label="Chess board" style="width:100%;max-width:420px;height:auto;display:block;border:1px solid var(--line)"></svg>
+<p class="lede" id="msg" role="status"></p><p id="moves"></p><p class="meta" id="idea"></p><p class="meta" id="rec"></p>
+<h2>The plan</h2><div class="prose"><p>Next: many more openings and endgames in a tree you can browse; spaced repetition so lines you get wrong come back sooner (the same idea as the flashcards in the language tool); import and export of PGN files; puzzles; and, later, play against an engine in the browser (Stockfish is open source under the GPL, which has its own conditions). A chess desktop app already exists in the Toolkits repository: this page is the start of a browser version.</p></div>
+<script src="app.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Travel Map - Pink Bourbon Estate</title>
+<meta name="description" content="Pin the places you have been, draw routes, and add the position from photos on an offline map. A demo; everything stays in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/travel-map/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Travel Map - Pink Bourbon Estate">
+<meta property="og:description" content="Pin the places you have been, draw routes, and add the position from photos on an offline map. A demo; everything stays in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/travel-map/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main">
+<h1>Travel Map</h1><p class="lede">Pin where you have been, import a route (GPX, KML or GeoJSON) and add the place from a photo. The map is a file on this site: nothing is sent anywhere and photos are never uploaded.</p><div class="note"><p><strong>A demo of the idea, work in progress.</strong> Today this is a country-level map. Street-level maps and highlighting the roads you travelled along are planned, not built (see "The plan").</p></div>
+<div class="transport"><button id="zin" type="button">Zoom in</button><button id="zout" type="button">Zoom out</button><button id="home" type="button">World</button><button id="eu" type="button">Europe</button><button id="uk" type="button">UK</button><button id="modepin" type="button" aria-pressed="false">Add a pin by clicking</button></div>
+<div class="form"><label class="fld">Pin name<input id="pinname" type="text" placeholder="e.g. Lisbon"></label><label class="fld">Date<input id="pindate" type="date"></label><label class="fld">Import a route or photos (GPX, KML, GeoJSON, JPEG)<input id="files" type="file" multiple accept=".gpx,.kml,.json,.geojson,.jpg,.jpeg"></label></div>
+<p class="status" id="msg" role="status"></p>
+<svg id="map" viewBox="0 0 1000 1000" role="img" aria-label="World map" style="width:100%;max-width:900px;height:auto;aspect-ratio:1;display:block;border:1px solid var(--line);touch-action:none;cursor:grab"></svg>
+<p class="meta">Drag to move, scroll or use the buttons to zoom. Click a pin to remove it. <span id="count"></span></p>
+<p><button id="loads" type="button">Load sample data</button> <button id="rems" type="button">Remove sample data</button> <button id="dlgeo" type="button">Download my data (GeoJSON)</button> <button id="clear" type="button">Delete all my data</button></p>
+<h2>Timeline</h2><ul id="timeline" style="list-style:none;padding:0"></ul>
+<h2>The plan</h2><div class="prose">
+<p><strong>Roads you have travelled, not just places.</strong> A route from a maps app only gives start, end and a rough line. To highlight the actual roads, the line has to be matched to a road network (map matching), then each road segment is drawn and counted as "travelled". The road network would come from OpenStreetMap (open, free to use with credit) or Ordnance Survey open data (Open Zoomstack and OS Open Roads, free under the Open Government Licence). The matching could run in your browser on a small area, or in a scheduled job. That would show the places you passed through and the roads you have not yet driven.</p>
+<p><strong>Where the data would come from:</strong> GPX, KML and GeoJSON files (working now), the position inside photos (working now), a Google Maps Timeline export from your phone (to be added), and the places on receipts or card statements typed in or imported as CSV (to be added: only what you choose to import).</p>
+<p><strong>Related map ideas:</strong> choosing a map area and downloading it as a vector file, a shape file or a 3D mesh, a bit like CADMapper but free; tree data from open lidar and satellite sources (the UK tree map); run, bike and interrail route planning on the same map; and weather, wind and flight-tracking layers for paramotoring and sailing (open sources such as the Met Office, Open-Meteo and the OpenSky Network are options). I have not yet read the god\'s-eye-view project you mentioned, so that is still to look at.</p>
+<p><strong>Credits:</strong> country outlines from Natural Earth (public domain), packaged by world-atlas (ISC licence); the file is kept on this site.</p></div>
+<script src="app.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
