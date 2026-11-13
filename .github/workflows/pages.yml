@@ -61,28 +61,42 @@ jobs:
         id: roads
         if: steps.roadcache.outputs.cache-hit != 'true'
         continue-on-error: true
+        shell: bash
         run: |
-          set -e
-          pip install pyproj
-          mkdir -p _roads
-          curl -fL --retry 3 -o _roads/openroads.zip "https://api.os.uk/downloads/v1/products/OpenRoads/downloads?area=GB&format=GeoPackage&redirect"
-          unzip -q _roads/openroads.zip -d _roads/openroads
-          python3 .github/scripts/build_roads.py os "$(find _roads/openroads -name '*.gpkg' | head -1)" _roads/out-os
-          mkdir -p travel-map/roads-data && rm -rf travel-map/roads-data/os && mv _roads/out-os travel-map/roads-data/os
-          rm -rf _roads/openroads _roads/openroads.zip
+          mkdir -p _roads travel-map
+          set -o pipefail
+          {
+            set -e
+            pip install pyproj
+            curl -fL --retry 3 -o _roads/openroads.zip "https://api.os.uk/downloads/v1/products/OpenRoads/downloads?area=GB&format=GeoPackage&redirect"
+            unzip -q _roads/openroads.zip -d _roads/openroads
+            python3 .github/scripts/build_roads.py os "$(find _roads/openroads -name '*.gpkg' | head -1)" _roads/out-os
+            mkdir -p travel-map/roads-data && rm -rf travel-map/roads-data/os && mv _roads/out-os travel-map/roads-data/os
+            rm -rf _roads/openroads _roads/openroads.zip
+          } 2>&1 | tee _roads/os.log
+          code=$?
+          tail -n 40 _roads/os.log > travel-map/roads-build-os.log   # a short public log, so a failure can be seen from the site
+          exit $code
       - name: Build the footpath tiles from an OpenStreetMap extract (monthly)
         id: paths
         if: steps.roadcache.outputs.cache-hit != 'true'
         continue-on-error: true
+        shell: bash
         run: |
-          set -e
-          sudo apt-get install -y osmium-tool
-          mkdir -p _roads
-          curl -fL --retry 3 -o _roads/gb.osm.pbf https://download.geofabrik.de/europe/great-britain-latest.osm.pbf
-          osmium tags-filter --overwrite _roads/gb.osm.pbf w/highway=footway,path,track,cycleway,bridleway,steps,pedestrian -o _roads/paths.osm.pbf
-          osmium export --overwrite _roads/paths.osm.pbf -f geojsonseq -o _roads/paths.geojsonseq
-          python3 .github/scripts/build_roads.py paths _roads/paths.geojsonseq _roads/out-paths
-          mkdir -p travel-map/roads-data && rm -rf travel-map/roads-data/paths && mv _roads/out-paths travel-map/roads-data/paths
+          mkdir -p _roads travel-map
+          set -o pipefail
+          {
+            set -e
+            sudo apt-get install -y osmium-tool
+            curl -fL --retry 3 -o _roads/gb.osm.pbf https://download.geofabrik.de/europe/great-britain-latest.osm.pbf
+            osmium tags-filter --overwrite _roads/gb.osm.pbf w/highway=footway,path,track,cycleway,bridleway,steps,pedestrian -o _roads/paths.osm.pbf
+            osmium export --overwrite _roads/paths.osm.pbf -f geojsonseq -o _roads/paths.geojsonseq
+            python3 .github/scripts/build_roads.py paths _roads/paths.geojsonseq _roads/out-paths
+            mkdir -p travel-map/roads-data && rm -rf travel-map/roads-data/paths && mv _roads/out-paths travel-map/roads-data/paths
+          } 2>&1 | tee _roads/paths.log
+          code=$?
+          tail -n 40 _roads/paths.log > travel-map/roads-build-paths.log
+          exit $code
       - name: Check the tiles fit on the site (the Pages limit is about 1 GB in all)
         if: steps.roadcache.outputs.cache-hit != 'true'
         run: |
@@ -96,6 +110,11 @@ jobs:
         with:
           path: travel-map/roads-data
           key: road-tiles-${{ steps.month.outputs.m }}
+      - name: Write a small build report into the site (so the page can say what happened)
+        if: always()
+        run: |
+          mkdir -p travel-map
+          echo "{\"month\":\"${{ steps.month.outputs.m }}\",\"cached\":\"${{ steps.roadcache.outputs.cache-hit }}\",\"roads\":\"${{ steps.roads.outcome }}\",\"paths\":\"${{ steps.paths.outcome }}\"}" > travel-map/roads-status.json
       - name: Leave the build folders out of the site
         run: rm -rf _toolkits _roads
       - uses: actions/configure-pages@v5

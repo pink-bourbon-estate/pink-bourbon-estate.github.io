@@ -30,6 +30,7 @@
 <div class="form"><label class="fld">Step name<input id="pinname" type="text" placeholder="e.g. Lisbon"></label><label class="fld">Date<input id="pindate" type="date"></label><label class="fld">Import routes or photos (GPX, KML, GeoJSON, JPEG)<input id="files" type="file" multiple accept=".gpx,.kml,.json,.geojson,.jpg,.jpeg"></label></div>
 <p class="status" id="msg" role="status"></p>
 <svg id="map" viewBox="0 0 1000 1000" role="img" aria-label="Map of the world with your steps and routes" style="width:100%;max-width:900px;height:auto;aspect-ratio:1;display:block;border:1px solid var(--line);touch-action:none;cursor:grab"></svg>
+<p class="meta" id="tilestatus"></p>
 <p class="meta">Drag to move, scroll or use the buttons to zoom. Visited countries are shaded. <span id="count"></span></p>
 <h2>Roads you have travelled</h2>
 <div class="prose"><p id="tileinfo">Looking for the street-map tiles...</p><p>Zoom in and the roads appear by themselves, read from this site (no other server is contacted). Then press "Highlight roads I travelled" to colour the roads your route follows.</p></div>

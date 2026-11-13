@@ -283,10 +283,17 @@
     remove: () => { data.trips = data.trips.filter((t) => !t.sample); ensure(); save(); reloadTo('Example data removed.'); },
   });
 
+  /** If the tiles are missing, read the small report the monthly build leaves on the site, so the page can say what happened. */
+  async function buildReport() {
+    try {
+      const r = await fetch('roads-status.json'); if (!r.ok) { $('tileinfo').textContent += ' No build report was found either, so the monthly build has probably not run since this feature was added (see the Actions tab on GitHub).'; return; }
+      const j = await r.json(); $('tileinfo').textContent += ' Last build report (' + j.month + '): roads ' + j.roads + ', paths ' + j.paths + (j.cached === 'true' ? ' (tiles came from the cache)' : '') + '. If a step says "failure", its short log is at travel-map/roads-build-os.log or roads-build-paths.log on the site.';
+    } catch (e) { /* no report: nothing to add */ }
+  }
   /* ---------------------------------------------------------------- wiring up the page */
   document.addEventListener('DOMContentLoaded', async () => {
     load(); const svg = $('map'); let drag = null;
-    TMtiles.init().then((i) => { tileInfo = i; $('tileinfo').textContent = i.any ? 'Street map from this site (built ' + i.built + '): ' + i.credits.join('. ') + '. Zoom in to see roads' + (i.hasPaths ? '; footpaths and tracks appear when you zoom in close.' : '. Footpaths and tracks are not built yet.') : 'The street-map tiles have not been built yet (they are made by a monthly job on this site). Until then you can load a roads file, try the practice area, or ask OpenStreetMap directly (under the heading below).'; draw(); });
+    TMtiles.init().then((i) => { tileInfo = i; $('tileinfo').textContent = i.any ? 'Street map from this site (built ' + i.built + '): ' + i.credits.join('. ') + '. Zoom in to see roads' + (i.hasPaths ? '; footpaths and tracks appear when you zoom in close.' : '. Footpaths and tracks are not built yet.') : 'The street-map tiles have not been built yet (they are made by a monthly job on this site). Until then you can load a roads file, try the practice area, or ask OpenStreetMap directly (under the heading below).'; $('tilestatus').textContent = i.any ? '' : 'No street-map tiles on this site yet, so only country outlines show. See Roads below.'; if (!i.any) buildReport(); draw(); });
     window.addEventListener('resize', () => draw());                      // redraw when the Map tab is shown again (pin sizes depend on the map's width on screen)
     svg.addEventListener('wheel', (e) => { e.preventDefault(); const [cx, cy] = at(e); zoom(e.deltaY > 0 ? 1.25 : 0.8, cx, cy); }, { passive: false });
     svg.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false }; svg.setPointerCapture(e.pointerId); });
