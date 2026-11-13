@@ -489,13 +489,17 @@
   }
 
   /* ---- tabs and start-up ---- */
-  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['starter', 'Starter'], ['history', 'History'], ['sources', 'Sources']];
+  const TABS = [['plan', 'Plan'], ['weigh', 'Weigh-out'], ['timeline', 'Timeline'], ['water', 'Water'], ['starter', 'Starter'], ['history', 'History']];
+  PBEshell.claim();                                                                       // this page draws its own tab bar
+  /* the four standard tabs always sit at the end; this tool's Sources tab (built from its data file) fills the standard Sources slot */
+  const STD = PBEshell.standard('sourdough-and-baking-timesheet', PBEshell.current(), { sources: () => sourcesTab() });
+  const ALL = TABS.concat(STD.map((x) => [x.id, x.label]));
   function show(t) {
     tab = t;
-    const body = { plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, starter: starterTab, history: historyTab, sources: sourcesTab }[t]();
+    const body = ({ plan: planTab, weigh: weighTab, timeline: timelineTab, water: waterTab, starter: starterTab, history: historyTab }[t] || (() => STD.find((x) => x.id === t).build()))();
     root.replaceChildren(
       bannerNote(),
-      h('nav', { class: 'tabs', 'aria-label': 'Sections' }, TABS.map(([k, l]) => h('a', { href: '#' + k, 'aria-current': k === t ? 'page' : false, onclick: (e) => { e.preventDefault(); show(k); } }, l))),
+      h('nav', { class: 'tabs', 'aria-label': 'Sections' }, ALL.map(([k, l]) => h('a', { href: '#' + k, 'aria-current': k === t ? 'page' : false, onclick: (e) => { e.preventDefault(); show(k); } }, l))),
       body);
   }
 

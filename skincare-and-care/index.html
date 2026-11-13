@@ -23,6 +23,7 @@
   <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
 </header>
 <main id="main">
+<script src="../shell.js"></script><script src="../info.js"></script>
 <h1>Skincare and Care</h1>
 <p class="lede">Keep up a simple routine, know when products need replacing, and note how your skin feels. Free, in your browser, no account.</p>
 <div id="app"><p class="loading">Loading</p></div>
@@ -32,18 +33,6 @@
 <script src="../charts.js"></script>
 <script src="../tracker.js"></script>
 <script src="app.js"></script>
-<script src="../databar.js"></script>
-<script>PBEdata.bar({ id: 'coffee', keys: ['skincare-and-care-log-v1', 'skincare-and-care-bags-v1'], sample: () => {
-  const d = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
-  return {
-    'skincare-and-care-log-v1': [
-      { date: d(12), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 3, grinder: 'Hand grinder', setting: '14', dose: 18, yield: 52, time: 24, tds: 0, taste: 'sour, thin', notes: 'Too fast: grind finer' },
-      { date: d(11), bean: 'Washed Ethiopian', roaster: 'Example Roasters', method: 'Espresso', rating: 4, grinder: 'Hand grinder', setting: '12', dose: 18, yield: 40, time: 29, tds: 0, taste: 'sweet, lemon', notes: 'Better' },
-      { date: d(5), bean: 'Brazil natural', roaster: 'Example Roasters', method: 'V60', rating: 4, grinder: 'Hand grinder', setting: '22', dose: 15, yield: 250, time: 175, tds: 1.4, taste: 'chocolate, nutty', notes: '' }],
-    'skincare-and-care-bags-v1': [
-      { date: d(14), name: 'Washed Ethiopian', roaster: 'Example Roasters', origin: 'Ethiopia', process: 'Washed', variety: 'Heirloom', grams: 250, price: 9.5, rating: 4, notes: 'Floral' },
-      { date: d(6), name: 'Brazil natural', roaster: 'Example Roasters', origin: 'Brazil', process: 'Natural', variety: 'Yellow Bourbon', grams: 1000, price: 22, rating: 3, notes: 'Everyday coffee' }] };
-} });</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

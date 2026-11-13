@@ -23,6 +23,7 @@
   <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
 </header>
 <main id="main">
+<script src="../shell.js"></script><script src="../info.js"></script>
 <h1>Sourdough and Baking Timesheet</h1>
 <p class="lede">Plan bakes, from sourdough to pasta. Choose a recipe, how many, and when, and get every gram to weigh and a clock-time timeline, with several bakes on one sheet. Free, in your browser, no account.</p>
 <div id="app"><p class="loading">Loading</p></div>
@@ -32,13 +33,12 @@
 <p>Every recipe is the average of published formulas from baking schools and bakeries, worked out with baker's percentages (flour is 100, everything else is a percentage of it). The Sources tab lists every formula with its citation and link. Your plan stays in this browser and nothing is sent anywhere. <a href="../articles/sourdough-and-baking-timesheet-every-gram-and-every-minute/">Read how and why it was made</a>. The code is plain JavaScript with comments, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/sourdough-and-baking-timesheet" rel="noopener">this folder</a>.</p>
 </div>
 <script src="../charts.js"></script>
-<script src="app.js"></script>
-<script src="../databar.js"></script>
-<script src="../sounds.js"></script>
-<script>PBEsound.timers();</script>
-<script>PBEdata.bar({ id: 'baking', keys: ['baking-timesheet-plan-v1'], sample: () => ({ 'baking-timesheet-plan-v1': [
+<script>PBEshell.data({ id: 'sourdough-and-baking-timesheet', title: 'Sourdough and Baking Timesheet', keys: ['sourdough-baking-history-v1', 'baking-timesheet-plan-v1'], sample: () => ({ 'baking-timesheet-plan-v1': [
   { recipe_key: 'sourdough_country', label: 'Country sourdough x2', pieces: 2, piece_weight: 900, hydration: 74.5, yeast_type: 'instant', starter_cut: 20, waste_pct: 2, anchor: Date.now() + 86400000, mode: 'start', room_c: 20, overrides: {} },
   { recipe_key: 'focaccia', label: 'Focaccia x1', pieces: 1, piece_weight: 900, hydration: 80, yeast_type: 'instant', starter_cut: 20, waste_pct: 2, anchor: Date.now() + 86400000 + 3600000 * 24, mode: 'start', room_c: 20, overrides: {} }] }) });</script>
+<script src="app.js"></script>
+<script src="../sounds.js"></script>
+<script>PBEsound.timers();</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

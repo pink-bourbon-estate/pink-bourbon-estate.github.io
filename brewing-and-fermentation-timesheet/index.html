@@ -23,6 +23,7 @@
   <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
 </header>
 <main id="main">
+<script src="../shell.js"></script><script src="../info.js"></script>
 <h1>Brewing and Fermentation Timesheet</h1>
 <p class="lede">Plan brews and ferments, from mead and kombucha to kimchi and jam. Choose a recipe and a batch size, and get every amount to weigh, a dated timeline and the safety notes, with several batches on one sheet. Free, in your browser, no account.</p>
 <div id="app"><p class="loading">Loading</p></div>
@@ -33,13 +34,12 @@
 <p>This is not medical, legal or food-safety advice. Please read the Safety tab. When in doubt, throw it out.</p>
 </div>
 <script src="../charts.js"></script>
-<script src="app.js"></script>
-<script src="../databar.js"></script>
-<script src="../sounds.js"></script>
-<script>PBEsound.timers();</script>
-<script>PBEdata.bar({ id: 'brewing', keys: ['brewing-timesheet-plan-v1'], sample: () => ({ 'brewing-timesheet-plan-v1': [
+<script>PBEshell.data({ id: 'brewing-and-fermentation-timesheet', title: 'Brewing and Fermentation Timesheet', keys: ['brewing-fermentation-history-v1', 'brewing-timesheet-plan-v1'], sample: () => ({ 'brewing-timesheet-plan-v1': [
   { recipe_key: 'kombucha', label: 'Kombucha (3.8 L)', amount: 3.8, vars: [], anchor: Date.now() + 86400000, mode: 'start', room_c: 21 },
   { recipe_key: 'mead', label: 'Mead (4.5 L)', amount: 4.5, vars: [0, 0, 0], anchor: Date.now() + 86400000 + 3600000 * 48, mode: 'start', room_c: 19 }] }) });</script>
+<script src="app.js"></script>
+<script src="../sounds.js"></script>
+<script>PBEsound.timers();</script>
 </main>
 <footer class="foot">
   <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>

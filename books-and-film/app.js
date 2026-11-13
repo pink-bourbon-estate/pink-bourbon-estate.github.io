@@ -1,6 +1,6 @@
 /* Books and Film - a private reading and watching list. Built with the shared tracker.js framework:
    each tab below is described by a small object, and tracker.js draws it. Everything is saved in this
-   browser only. Download it as Markdown or CSV from the "Your data" tab. */
+   browser only. Download it as Markdown or CSV from the "My Data" tab. */
 PBE.tool({
   id: 'books-and-film',
   title: 'Books and Film',

@@ -357,11 +357,8 @@
     const rated = log.filter((e) => e.rating > 0);
     const ratio = (e) => (e.dose && e.yield ? e.yield / e.dose : 0);
 
-    const buttons = h('p', {},
-      h('button', { type: 'button', onclick: () => { const ex = exampleData(); write(LOG_KEY, read(LOG_KEY, []).concat(ex.shots)); write(BAGS_KEY, read(BAGS_KEY, []).concat(ex.bags)); show('stats'); } }, 'Load example data'), ' ',
-      h('button', { type: 'button', onclick: () => { write(LOG_KEY, read(LOG_KEY, []).filter((e) => !e.example)); write(BAGS_KEY, read(BAGS_KEY, []).filter((e) => !e.example)); show('stats'); } }, 'Remove example data'), ' ',
-      h('button', { type: 'button', onclick: () => { if (confirm('Delete your whole log, bags and flavour wheel from this browser?')) { write(LOG_KEY, []); write(BAGS_KEY, []); write(WHEEL_KEY, []); show('stats'); } } }, 'Clear all my data'));
-    box.append(h('p', { class: 'meta' }, 'Charts are worked out on your device from the Grind log and Bags tabs. The example data is made up, to show what the charts look like: it is not from any real study or person. Clear it any time.'), buttons);
+    const buttons = h('p', {}, h('button', { type: 'button', onclick: () => show('_example') }, 'Go to Example Data'));
+    box.append(h('p', { class: 'meta' }, 'Charts are worked out on your device from the Grind log and Bags tabs. The example data is made up, to show what the charts look like: it is not from any real study or person. Load and remove it on the Example Data tab.'), buttons);
     if (!log.length && !bags.length) { box.append(h('p', { class: 'lede' }, 'Nothing to show yet. Log a few shots, or load the example data.')); return box; }
 
     PBEcharts.stat(box, [['Shots logged', log.length], ['Bags bought', bags.length], ['Average rating', rated.length ? round1(avg(rated.map((e) => e.rating))) + '/5' : '-'],
@@ -483,35 +480,14 @@
         h('p', {}, 'The first coffee I really noticed was in London. The Greek and Italian colleagues in the office had a proper coffee culture: an espresso at ten and another at one. One day I was taken to see a friend\'s favourite barista, and the espresso tasted like a rich tomato soup. I have been down the coffee rabbit hole ever since.'),
         h('p', {}, 'More recently I have been enjoying coffees from Taith, and it was while drinking a Pink Bourbon there that I had the idea for this website. Coffee culture is part of Pink Bourbon Estate, so it deserves a tool of its own.'),
         h('p', {}, 'More advanced tools exist. As with everything on this site, this one is for you: your recipes, your data, no tracking. Please enjoy a nice coffee, and thank you for your support.')),
-      h('h2', {}, 'Read, watch and buy'),
-      h('p', { class: 'meta' }, 'This tool leans on the work of many people. The first group below I have read or watched; the second is reading that the educators named often cite, which I list for you to follow up and have not checked line by line. Please support them: buy the books and visit the roasters.'),
-      h('h3', {}, 'Where figures came from'),
-      h('ul', {}, li(a('https://www.seattlecoffeegear.com/blogs/learning-center/achieving-the-gold-cup-standard-your-guide-to-brewing-excellence', 'Achieving the Gold Cup Standard'), ' (Seattle Coffee Gear): 55 g per litre, 1.15-1.35 % TDS, 18-22 % extraction, 195-205 F.'),
-        li(a('https://secure.lamose.com/blogs/recipes/james-hoffmanns-aeropress-recipe-world-champion-method', 'James Hoffmann\'s AeroPress recipe'), ' (Lamose): 11 g, 200 ml at about 96 C, 2-minute steep, gentle press.'),
-        li(a('https://sprudge.com/coffee-for-here-the-new-book-by-morgan-eckroth-is-now-on-pre-order-780003.html', 'Sprudge on Morgan Eckroth\'s "Coffee, for Here"'), ' (Clarkson Potter): a handbook with 40 café-style drink recipes, including espresso tonic.')),
-      h('h3', {}, 'People and channels worth your time'),
-      h('ul', {}, li(h('strong', {}, 'James Hoffmann'), ': YouTube, and the books "The World Atlas of Coffee" and "How to Make the Best Coffee at Home". A source for brewing technique, the AeroPress and V60, and for what flavours to expect from origins and processing.'),
-        li(h('strong', {}, 'Lance Hedrick'), ': YouTube; detailed espresso dialling-in, puck preparation and workflow.'),
-        li(h('strong', {}, 'Andrew and Serena (andsercoffee)'), ': YouTube; "coffee omakase" style drinks at home, coffee cocktails and experiments: a good place for funkier brews. ', a('https://youtube.com/@andsercoffee', 'Their channel'), '.'),
-        li(h('strong', {}, 'Morgan Eckroth'), ': YouTube and the book "Coffee, for Here": café-style and funkier recipes such as espresso tonic.')),
-      h('h3', {}, 'Reading these educators often point to (to follow up)'),
-      h('ul', {}, li('Scott Rao: "Everything but Espresso", "The Professional Barista\'s Handbook" and "The Coffee Roaster\'s Companion".'),
-        li('Christopher Hendon and Maxwell Colonna-Dashwood: "Water for Coffee".'),
-        li('Jonathan Gagné: "The Physics of Filter Coffee".'),
-        li('Barista Hustle (Matt Perger) and its articles and courses.'),
-        li('Illy and Viani, "Espresso Coffee: The Science of Quality".'),
-        li('Specialty Coffee Association: the Coffee Taster\'s Flavor Wheel, the Gold Cup brewing standard and the cupping protocol.'),
-        li('World Coffee Research: the Sensory Lexicon and the Arabica Variety Catalog.')),
-      h('h3', {}, 'Roasters, ateliers and collectives'),
-      h('ul', {}, li(a('https://taithcoffee.com', 'Taith'), ' (Lewes, UK): coffees including Pink Bourbon, the namesake of this site.'),
-        li('April Coffee Roasters (Copenhagen): a lighter-roast, clarity-first style that has influenced many roasters.'),
-        li('Look for your own local roaster, café or collective: tasting something different with a person who cares is the best education.')),
-      h('p', { class: 'meta' }, 'This list is not exhaustive and I may have missed people. Tell me through the GitHub repository and I will add them.'),
       h('h2', {}, 'Please note'), h('p', { class: 'meta' }, 'This is a work in progress and not all tools here are actively maintained. Recipes marked "starting point" are common practice that has not been checked against a published source. Caffeine affects people differently: be careful in pregnancy and with heart conditions, and check with a professional if unsure.'));
   }
 
   /* ---- tabs and start-up ---- */
-  const TABS = [['dial', 'Dial in', dialTab], ['recipes', 'Recipes', recipesTab], ['flavour', 'Flavour', wheelTab], ['log', 'Grind log', logTab], ['bags', 'Bags', bagsTab], ['stats', 'Stats', statsTab], ['problems', 'Problems', problemsTab], ['beans', 'Beans', beansTab], ['about', 'About', aboutTab]];
+  const TABS0 = [['dial', 'Dial in', dialTab], ['recipes', 'Recipes', recipesTab], ['flavour', 'Flavour', wheelTab], ['log', 'Grind log', logTab], ['bags', 'Bags', bagsTab], ['stats', 'Stats', statsTab], ['problems', 'Problems', problemsTab], ['beans', 'Beans', beansTab], ['about', 'About', aboutTab]];
+  PBEshell.claim();                                                                       // this page draws its own tab bar
+  /* the four standard tabs (Sources, My Data, Example Data, FAQ) come from shell.js and always sit at the end */
+  const TABS = TABS0.concat(PBEshell.standard('coffee-notebook', PBEshell.current()).map((x) => [x.id, x.label, x.build]));
   function show(t) {
     const body = TABS.find((x) => x[0] === t)[2]();
     root.replaceChildren(

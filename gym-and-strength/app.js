@@ -186,7 +186,7 @@ PBE.tool({
       const statBox = (pairs) => { const b = h('div', {}); PBEcharts.stat(b, pairs); return b; };
       const rows = (get('lifts', []) || []).filter((x) => x.exercise && x.weight), names = [...new Set(rows.map((x) => x.exercise))].sort();
       const out = h('div', {});
-      if (!names.length) return h('div', {}, h('p', { class: 'meta' }, 'Nothing to chart yet. Log some sets in the Lifts log or the Sets and reps tab, or load sample data in the Your data tab.'));
+      if (!names.length) return h('div', {}, h('p', { class: 'meta' }, 'Nothing to chart yet. Log some sets in the Lifts log or the Sets and reps tab, or load example data in the Example Data tab.'));
       const ex = h('select', { id: 'pg_ex' }, names.map((n) => h('option', { value: n }, n))), metric = h('select', { id: 'pg_m' }, [['orm', 'Estimated one-rep max'], ['weight', 'Heaviest weight'], ['vol', 'Volume (weight x reps x sets)']].map(([v, l]) => h('option', { value: v }, l))), span = h('select', { id: 'pg_s' }, [['28', 'Last 4 weeks'], ['84', 'Last 12 weeks'], ['182', 'Last 6 months'], ['365', 'Last year'], ['0', 'All time']].map(([v, l]) => h('option', { value: v }, l)));
       span.value = '0'; ex.value = names.includes('Back squat') ? 'Back squat' : names[0];
       const draw = () => {

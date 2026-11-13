@@ -22,7 +22,8 @@
   <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
   <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
 </header>
-<main id="main">
+<main id="main" data-tool-tab="Practice">
+<script src="../shell.js"></script><script src="../info.js"></script>
 <h1>Chess Lab</h1><p class="lede">Learn a line one move at a time, then play it from memory. Free, in your browser, nothing sent anywhere.</p><div class="note"><p><strong>A demo of the idea, work in progress.</strong> This board only plays the moves stored in each line: it does not check legality and does not play against you. The four lines were written from general chess knowledge: check them against a book or a trusted site before you rely on them.</p></div>
 <div class="ctl" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"><label class="fld">Line<select id="line"></select></label></div>
 <p><button id="learn" type="button">Learn</button> <button id="drill" type="button">Drill (play from memory)</button> <button id="back" type="button">Back</button> <button id="next" type="button">Next move</button></p>

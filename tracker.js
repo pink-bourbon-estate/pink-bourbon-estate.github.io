@@ -11,8 +11,8 @@
      static  fixed reading material (tables, guidance, sources)
      custom  your own function that builds the page (used for timers, calculators and so on)
 
-   A final "Your data" tab is added to every tool: download everything as Markdown (text) or CSV
-   (opens in any spreadsheet), make or restore a backup file, or clear it all.
+   Four standard tabs are added to the end of every tool by shell.js: Sources, My Data (download as Markdown or CSV, back up,
+   restore, delete, and the data policy), Example Data (load and remove made-up data) and FAQ. Needs shell.js and info.js loaded first.
 
    Privacy: everything stays in this browser (localStorage). Nothing is sent anywhere. No cookies, no tracking.
    Needs charts.js loaded first (for the charts).
@@ -83,6 +83,7 @@
     const set = (id, v) => { store[id] = v; save(); };
     const ctx = { weekPlanner: (o) => weekPlanner(o), h, get, set, today, addDays, addMonths, daysUntil, round, saveFile, uid, rerender: () => show(current) };
     let current = '_dash';
+    PBEshell.claim();                                                    // tell shell.js this page draws its own tabs
 
     /* ---- log tab ---- */
     function logTab(t, opts = {}) {
@@ -302,11 +303,6 @@
       });
       (store._ex || []).forEach((k) => { delete store[k]; }); delete store._ex; save();
     }
-    const exampleButtons = (here) => h('p', {},
-      h('button', { type: 'button', onclick: () => { loadExample(); show(here); } }, 'Load example data'), ' ',
-      h('button', { type: 'button', onclick: () => { removeExample(); show(here); } }, 'Remove example data'), ' ',
-      h('button', { type: 'button', onclick: () => { if (confirm('Delete all the data in this tool from this browser?')) { store = {}; save(); show(here); } } }, 'Clear all my data'));
-
     /* ---- the Dashboard: an overview made automatically from every tab ---- */
     function dashboardTab() {
       const box = h('div', {});
@@ -337,7 +333,7 @@
       const empty = !stats.length && !(cfg.dashboardExtra && cfg.dashboardExtra(ctx));
       fill(box, h('p', { class: 'meta' }, 'An overview worked out on your device from what you have entered. Nothing is sent anywhere.'),
         empty ? h('p', { class: 'lede' }, 'Nothing to show yet. Add some entries, or load example data to see how the dashboard looks.') : null,
-        exampleButtons('_dash'),
+        h('p', {}, h('button', { type: 'button', onclick: () => show('_example') }, 'Go to Example Data')),
         h('p', { class: 'meta' }, 'The example data is made up, to show what the charts look like: it is not from any real person or study. Remove it any time.'));
       if (stats.length) PBEcharts.stat(box, stats.slice(0, 8));
       if (attention.length) box.append(h('h2', {}, 'Needs attention'), h('ul', {}, attention.map((a) => h('li', {}, a))));
@@ -382,7 +378,7 @@
       draw(); return wrap;
     }
 
-    /* ---- the Your data tab ---- */
+    /* ---- building the My Data export (the tab itself comes from shell.js) ---- */
     function dataTab() {
       const toMarkdown = () => {
         let md = '# ' + cfg.title + '\n\nExported ' + today() + '\n';
@@ -399,32 +395,33 @@
         return md;
       };
       const logs = cfg.tabs.filter((t) => t.type === 'log' && (store[t.id] || []).length);
-      const file = h('input', { type: 'file', accept: '.json,application/json' });
-      const msg = h('p', { class: 'meta', role: 'status' });
-      file.addEventListener('change', () => {
-        const f = file.files[0]; if (!f) return;
-        const rd = new FileReader();
-        rd.onload = () => { try { const o = JSON.parse(rd.result); if (o && o.tool === cfg.id && o.data && typeof o.data === 'object') { store = o.data; save(); msg.textContent = 'Restored. Open another tab to see it.'; } else msg.textContent = 'That file is not a backup of this tool.'; } catch (e) { msg.textContent = 'That file could not be read.'; } };
-        rd.readAsText(f);
-      });
-      return h('div', {}, h('p', { class: 'meta' }, 'Your data lives only in this browser. Download a copy now and then: Markdown is plain readable text, CSV opens in any spreadsheet, and the backup file can be restored here later.'),
-        h('p', {}, h('button', { type: 'button', onclick: () => saveFile(cfg.id + '.md', toMarkdown(), 'text/markdown') }, 'Download everything (Markdown)'), ' ',
-          h('button', { type: 'button', onclick: () => saveFile(cfg.id + '-backup.json', JSON.stringify({ tool: cfg.id, saved: today(), data: store }), 'application/json') }, 'Download a backup')),
-        logs.length ? h('div', {}, h('h3', {}, 'Spreadsheet files (CSV)'), h('p', {}, logs.map((t) => [h('button', { type: 'button', onclick: () => saveFile(cfg.id + '-' + t.id + '.csv', t.fields.map((f) => csvCell(f.label)).join(',') + '\n' + store[t.id].map((r) => t.fields.map((f) => csvCell(r[f.key])).join(',')).join('\n') + '\n', 'text/csv') }, t.label), ' ']))) : null,
-        h('h3', {}, 'Restore a backup'), h('p', {}, file), msg,
-        h('h3', {}, 'Example data and clearing'), exampleButtons('_data'));
+      return { toMarkdown, logs };
+    }
+    /** What the My Data and Example Data tabs work with (see shell.js). */
+    function dataSpec() {
+      const { toMarkdown, logs } = dataTab();
+      return {
+        id: cfg.id, md: toMarkdown,
+        csv: () => logs.map((t) => ({ name: cfg.id + '-' + t.id + '.csv', text: t.fields.map((f) => csvCell(f.label)).join(',') + '\n' + store[t.id].map((r) => t.fields.map((f) => csvCell(r[f.key])).join(',')).join('\n') + '\n' })),
+        backup: () => ({ tool: cfg.id, saved: today(), data: store }),
+        restore: (o) => { if (o && o.tool === cfg.id && o.data && typeof o.data === 'object') { store = o.data; save(); show('_mydata'); return true; } return false; },
+        clear: () => { store = {}; save(); show('_mydata'); },
+        summary: () => cfg.tabs.filter((t) => store[t.id] !== undefined).map((t) => [t.label, Array.isArray(store[t.id]) ? store[t.id].length + ' entries' : 'saved']),
+        load: () => { loadExample(); PBEshell.flash('Example data loaded. Open the other tabs to see it.'); show('_example'); },
+        remove: () => { removeExample(); PBEshell.flash('Example data removed.'); show('_example'); },
+      };
     }
 
     /* ---- tabs and start-up ---- */
     const builders = { log: logTab, checks: checksTab, dates: datesTab, list: listTab, notes: notesTab, static: staticTab, custom: (t) => t.render(ctx) };
     function show(id) {
       current = id;
-      const all = [{ id: '_dash', label: 'Dashboard', type: '_dash' }, ...cfg.tabs, { id: '_data', label: 'Your data', type: '_data' }];
+      const std = PBEshell.standard(cfg.id, dataSpec()), all = [{ id: '_dash', label: 'Dashboard', type: '_dash' }, ...cfg.tabs, ...std.map((x) => ({ ...x, type: '_std' }))];
       const t = all.find((x) => x.id === id) || all[0];
       fill(root, 
         h('p', { class: 'note' }, cfg.notice || 'Work in progress: expect bugs. Not all of these tools are actively maintained. Your data stays in this browser.'),
         h('nav', { class: 'tabs', 'aria-label': 'Sections' }, all.map((x) => h('a', { href: '#' + x.id, 'aria-current': x.id === t.id ? 'page' : false, onclick: (e) => { e.preventDefault(); show(x.id); } }, x.label))),
-        t.type === '_data' ? dataTab() : t.type === '_dash' ? dashboardTab() : builders[t.type](t));
+        t.type === '_std' ? t.build() : t.type === '_dash' ? dashboardTab() : builders[t.type](t));
     }
     show(current);
   }

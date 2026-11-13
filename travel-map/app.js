@@ -42,7 +42,8 @@
     const [sx, sy] = t.transform.scale, [tx, ty] = t.transform.translate;
     const arcs = t.arcs.map((a) => { let x = 0, y = 0; return a.map(([dx, dy]) => { x += dx; y += dy; return [x * sx + tx, y * sy + ty]; }); });
     const ring = (idx) => { const pts = []; idx.forEach((i) => { const a = i >= 0 ? arcs[i] : arcs[~i].slice().reverse(); pts.push(...(pts.length ? a.slice(1) : a)); }); return pts; };
-    return t.objects.countries.geometries.map((g) => { const polys = (g.type === 'Polygon' ? [g.arcs] : g.arcs).map((poly) => poly.map(ring)); return { name: g.properties.name, polys, d: polys.map((poly) => poly.map((r) => 'M' + r.map(([lo, la]) => px(lo).toFixed(1) + ' ' + py(la).toFixed(1)).join('L') + 'Z').join('')).join('') }; });
+    /* a jump of more than 180 degrees of longitude means the outline crosses the date line: start a new piece instead of drawing a line across the map */
+    return t.objects.countries.geometries.map((g) => { const polys = (g.type === 'Polygon' ? [g.arcs] : g.arcs).map((poly) => poly.map(ring)); return { name: g.properties.name, polys, d: polys.map((poly) => poly.map((r) => r.map(([lo, la], i) => (!i || Math.abs(lo - r[i - 1][0]) > 180 ? 'M' : 'L') + px(lo).toFixed(1) + ' ' + py(la).toFixed(1)).join('')).join('')).join('') }; });
   }
   /** Is the point inside the ring? (the classic "count the edge crossings" test) */
   function inRing(lon, lat, r) { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { if ((r[i][1] > lat) !== (r[j][1] > lat) && lon < ((r[j][0] - r[i][0]) * (lat - r[i][1])) / (r[j][1] - r[i][1]) + r[i][0]) c = !c; } return c; }
@@ -186,9 +187,26 @@
   }
   const download = (obj, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: 'application/geo+json' })); a.download = name; document.body.append(a); a.click(); a.remove(); };
 
+  /* ---------------------------------------------------------------- the shared My Data and Example Data tabs (see shell.js) */
+  const allGeo = () => ({ type: 'FeatureCollection', features: [].concat(...data.trips.map((t) => [...t.steps.map((p) => ({ type: 'Feature', properties: { trip: t.name, name: p.name, date: p.date, note: p.note }, geometry: { type: 'Point', coordinates: [p.lon, p.lat] } })), ...t.routes.map((r) => ({ type: 'Feature', properties: { trip: t.name, name: r.name, date: r.date }, geometry: { type: 'LineString', coordinates: r.pts } }))])) });
+  const reloadTo = (msg) => { PBEshell.flash(msg); try { history.replaceState(null, '', '#example-data'); } catch (e) { /* ignore */ } location.reload(); };
+  PBEshell.custom({
+    id: 'travel-map', title: 'Travel Map',
+    summary: () => [['Trips', data.trips.length], ['Steps', data.trips.reduce((n, t) => n + t.steps.length, 0)], ['Routes', data.trips.reduce((n, t) => n + t.routes.length, 0)]],
+    md: () => '# Travel Map\n\nExported ' + today() + '\n' + data.trips.map((t) => '\n## ' + t.name + '\n\n| # | Date | Step | Latitude | Longitude | Note |\n| --- | --- | --- | --- | --- | --- |\n' + t.steps.slice().sort((x, y) => ((x.date || '') < (y.date || '') ? -1 : 1)).map((s, i) => '| ' + (i + 1) + ' | ' + (s.date || '') + ' | ' + s.name.replace(/\|/g, '/') + ' | ' + s.lat + ' | ' + s.lon + ' | ' + (s.note || '').replace(/\|/g, '/') + ' |').join('\n') + '\n\nRoutes: ' + t.routes.length + '\n').join(''),
+    csv: () => [{ name: 'travel-map-steps.csv', text: 'trip,date,step,latitude,longitude,note\n' + [].concat(...data.trips.map((t) => t.steps.map((s) => [t.name, s.date, s.name, s.lat, s.lon, s.note].map(PBEshell.csvCell).join(',')))).join('\n') + '\n' }],
+    extra: [{ label: 'Download as GeoJSON (for other map tools)', fn: () => download(allGeo(), 'my-travel-map.geojson') }],
+    backup: () => ({ tool: 'travel-map', saved: today(), data: { trips: data.trips, cur: data.cur } }),
+    restore: (b) => { if (!b || b.tool !== 'travel-map' || !b.data || !b.data.trips) return false; data = { trips: b.data.trips, cur: b.data.cur }; ensure(); save(); reloadTo('Backup restored.'); return true; },
+    clear: () => { data = { trips: [], cur: null }; ensure(); save(); reloadTo('All data was deleted from this browser.'); },
+    load: () => { sample(); save(); reloadTo('Example trip loaded: open the Map and Trips tabs.'); },
+    remove: () => { data.trips = data.trips.filter((t) => !t.sample); ensure(); save(); reloadTo('Example data removed.'); },
+  });
+
   /* ---------------------------------------------------------------- wiring up the page */
   document.addEventListener('DOMContentLoaded', async () => {
     load(); const svg = $('map'); let drag = null;
+    window.addEventListener('resize', () => draw());                      // redraw when the Map tab is shown again (pin sizes depend on the map's width on screen)
     svg.addEventListener('wheel', (e) => { e.preventDefault(); const [cx, cy] = at(e); zoom(e.deltaY > 0 ? 1.25 : 0.8, cx, cy); }, { passive: false });
     svg.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false }; svg.setPointerCapture(e.pointerId); });
     svg.addEventListener('pointermove', (e) => { if (!drag) return; const r = svg.getBoundingClientRect(), dx = ((e.clientX - drag.x) / r.width) * view.w, dy = ((e.clientY - drag.y) / r.height) * view.h; if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 4) drag.moved = true; if (drag.moved) { view.x = Math.max(0, Math.min(SIZE - view.w, drag.vx - dx)); view.y = Math.max(0, Math.min(SIZE - view.h, drag.vy - dy)); svg.setAttribute('viewBox', [view.x, view.y, view.w, view.h].map((n) => +n.toFixed(5)).join(' ')); } });
@@ -209,12 +227,7 @@
     $('fetchroads').addEventListener('click', fetchRoads); $('highlight').addEventListener('click', highlight); $('routeroad').addEventListener('click', routeByRoad);
     $('practice').addEventListener('click', () => { practice(); save(); draw(); say('Practice area loaded: a made-up street grid and route. Press "Highlight roads I travelled".'); });
     $('clearroads').addEventListener('click', () => { ways = []; matched = null; roadLayers = null; $('roadresult').textContent = ''; draw(); });
-    /* export and delete */
-    $('dlgeo').addEventListener('click', () => download({ type: 'FeatureCollection', features: [].concat(...data.trips.map((t) => [...t.steps.map((p) => ({ type: 'Feature', properties: { trip: t.name, name: p.name, date: p.date, note: p.note }, geometry: { type: 'Point', coordinates: [p.lon, p.lat] } })), ...t.routes.map((r) => ({ type: 'Feature', properties: { trip: t.name, name: r.name, date: r.date }, geometry: { type: 'LineString', coordinates: r.pts } }))])) }, 'my-travel-map.geojson'));
     $('dlroads').addEventListener('click', () => { if (!matched) { say('Highlight the roads first.'); return; } download({ type: 'FeatureCollection', features: matched.ways.map((w, wi) => ({ w, wi })).filter(({ w, wi }) => w.pts.some((_, si) => matched.travelled.has(wi + ':' + si))).map(({ w }) => ({ type: 'Feature', properties: { name: w.name, ref: w.ref, highway: w.kind, source: 'Contains data from OpenStreetMap contributors (ODbL) if fetched from OpenStreetMap' }, geometry: { type: 'LineString', coordinates: w.pts } })) }, 'roads-i-travelled.geojson'); });
-    $('loads').addEventListener('click', () => { sample(); save(); draw(); fit([-1, 40, 14, 53]); });
-    $('rems').addEventListener('click', () => { data.trips = data.trips.filter((t) => !t.sample); ways = []; matched = null; roadLayers = null; ensure(); visitedCache = null; save(); draw(); });
-    $('clear').addEventListener('click', () => { if (confirm('Delete every trip from this browser?')) { data = { trips: [], cur: null }; ways = []; matched = null; roadLayers = null; ensure(); visitedCache = null; save(); draw(); } });
     try { countries = topoPaths(await (await fetch('countries-50m.json')).json()); } catch (e) { say('The map outline could not load.'); }
     visitedCache = null; draw();
   });

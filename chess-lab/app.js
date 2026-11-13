@@ -54,4 +54,6 @@
     $('next').addEventListener('click', () => { if (mode === 'learn' && step < mv().length) { step++; draw(); } }); $('back').addEventListener('click', () => { if (mode === 'learn' && step > 0) { step--; draw(); } });
     draw();
   });
+  /* tell the shared tabs (shell.js) where this tool keeps its data, and what example data looks like: two lines marked as drilled a few times */
+  PBEshell.data({ id: 'chess-lab', title: 'Chess Lab', keys: [KEY], sample: () => ({ [KEY]: { [LINES[0].name]: { done: 3 }, [LINES[1].name]: { done: 1 } } }) });
 })();

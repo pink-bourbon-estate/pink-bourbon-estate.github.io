@@ -65,4 +65,6 @@
     $('clearknown').addEventListener('click', () => { if (confirm('Forget all the words you marked as known?')) { known = {}; saveKnown(); analyse(); } });
     $('lang').value = 'it'; $('text').value = SAMPLES.it; analyse();
   });
+  /* tell the shared tabs (shell.js) where this tool keeps its data, and what example data looks like: a few words marked as known (made up, for the sample texts) */
+  PBEshell.data({ id: 'language-lab', title: 'Language Lab', keys: [KEY], sample: () => ({ [KEY]: { es: { 'café': 1, 'estación': 1, 'ventana': 1 }, it: { 'caffè': 1, 'stazione': 1 } } }) });
 })();
