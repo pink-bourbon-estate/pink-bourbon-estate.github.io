@@ -59,11 +59,62 @@
   const bbOf = (w) => { if (!w.bb) { let a = 180, b = 90, c = -180, d = -90; w.pts.forEach(([lo, la]) => { if (lo < a) a = lo; if (lo > c) c = lo; if (la < b) b = la; if (la > d) d = la; }); w.bb = [a, b, c, d]; } return w.bb; };
   /** The visible part of the map as [west, south, east, north] in degrees. */
   const viewBox = () => [unx(view.x), uny(view.y + view.h), unx(view.x + view.w), uny(view.y)];
-  /** One merged path of every road piece that is on screen (cheap to draw even with thousands of pieces). */
-  function roadPath() {
-    const v = viewBox(); let d = '';
-    ways.concat(viewWays).forEach((w) => { const b = bbOf(w); if (b[2] < v[0] || b[0] > v[2] || b[3] < v[1] || b[1] > v[3]) return; d += 'M' + w.pts.map(pt).join('L'); });
+  /** Road pieces on screen, merged into one path per kind of road (cheap to draw even with thousands of pieces).
+      Kinds: 0 motorway, 1 A road, 2 B and other classified roads, 3 minor roads (and roads you loaded yourself), 4 footpaths, tracks and cycleways. */
+  function roadPaths() {
+    const v = viewBox(), d = ['', '', '', '', ''];
+    ways.concat(viewWays).forEach((w) => { const b = bbOf(w); if (b[2] < v[0] || b[0] > v[2] || b[3] < v[1] || b[1] > v[3]) return; const c = w.cls, k = c === 0 ? 0 : c === 1 ? 1 : c === 2 || c === 3 ? 2 : c >= 5 ? 4 : 3; d[k] += 'M' + w.pts.map(pt).join('L'); });
     return d;
+  }
+
+  /* ---------------------------------------------------------------- the map's look (sea, land, water, roads, names) */
+  /** Colours for a normal-looking map, in light or dark mode (follows the site's theme switch, or the device setting). */
+  function palette() {
+    const t = document.documentElement.getAttribute('data-theme'), dark = t === 'dark' || (t !== 'light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+    return dark
+      ? { sea: '#16232c', land: '#2a2a28', visited: '#463c27', border: '#55554f', text: '#d6d4cc', halo: '#2a2a28', seaText: '#7f9fb3', road: ['#a8672b', '#8c7437', '#5a5a55', '#444440', '#8a6a55'], casing: ['#2a1a0c', '#2a2410', '#1c1c1a', '#1c1c1a', null] }
+      : { sea: '#b9d9e8', land: '#f3f0e8', visited: '#ecd9a6', border: '#b3ad9f', text: '#3d3a33', halo: '#f3f0e8', seaText: '#5d86a0', road: ['#f6a05a', '#fbd98b', '#ffffff', '#ffffff', '#a8704f'], casing: ['#c7742a', '#d9b04f', '#cfc9bb', '#d8d3c6', null] };
+  }
+  const basemap = { lakes: '', rivers: '', places: [] };                   // water and place names, read from basemap/ (made by .github/scripts/build_basemap.py)
+  /** The map width on screen in degrees of longitude. Smaller means more zoomed in. */
+  const degWide = () => (view.w / SIZE) * 360;
+  /** A point's position in the map's own units, or null if it is off screen. */
+  const onScreen = (lon, lat, m) => { const x = px(lon), y = py(lat), k = m || 0; return x < view.x - k || x > view.x + view.w + k || y < view.y - k || y > view.y + view.h + k ? null : [x, y]; };
+
+  /** Draw lakes, rivers and the roads, thicker the closer you are. */
+  function drawWaterAndRoads(svg, pal) {
+    const deg = degWide();
+    if (basemap.lakes) el('path', { d: basemap.lakes, fill: pal.sea, stroke: pal.sea, 'stroke-width': 0.5, 'vector-effect': 'non-scaling-stroke' }, svg);
+    if (basemap.rivers && deg < 90) el('path', { d: basemap.rivers, fill: 'none', stroke: pal.sea, 'stroke-width': deg < 8 ? 1.4 : 0.8, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }, svg);
+    if (!haveRoads()) return;
+    const p = roadPaths(), z = deg > 8 ? 0 : deg > 2 ? 1 : deg > 0.5 ? 2 : deg > 0.12 ? 3 : 4;        // closer in = wider roads
+    const wid = [[1.6, 1.2, 0.8, 0.6, 0.6], [2.4, 1.8, 1.2, 0.8, 0.7], [3.4, 2.8, 2, 1.2, 0.9], [4.6, 4, 3, 2, 1.2], [6, 5.4, 4.2, 3, 1.6]][z];
+    [3, 2, 1, 0].forEach((k) => { if (p[k] && pal.casing[k]) el('path', { d: p[k], fill: 'none', stroke: pal.casing[k], 'stroke-width': wid[k] + 1.6, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg); });
+    [3, 2, 1, 0].forEach((k) => { if (p[k]) el('path', { d: p[k], fill: 'none', stroke: pal.road[k], 'stroke-width': wid[k], 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg); });
+    if (p[4] && deg < 0.6) el('path', { d: p[4], fill: 'none', stroke: pal.road[4], 'stroke-width': 1.2, 'stroke-dasharray': '3 2', 'vector-effect': 'non-scaling-stroke' }, svg);
+  }
+
+  /** Country names and place names, with a simple "do not overlap" rule so the map stays readable. */
+  function drawLabels(svg, pal) {
+    const deg = degWide(), k = view.w / (svg.clientWidth || 900), boxes = [];           // k = map units per screen pixel
+    const free = (x, y, w, h) => { for (const b of boxes) if (x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + h > b[1]) return false; boxes.push([x, y, w, h]); return true; };
+    const text = (x, y, s, size, o) => { const t = el('text', Object.assign({ x, y, 'font-size': size, fill: pal.text, stroke: pal.halo, 'stroke-width': size * 0.28, 'paint-order': 'stroke', 'stroke-linejoin': 'round', 'pointer-events': 'none', 'font-family': 'system-ui, sans-serif' }, o || {}), svg); t.textContent = s; return t; };
+    if (deg > 1.5) (countries || []).forEach((c) => {                                  // country names, in the middle of each country's biggest piece
+      if (!c.lab) { let best = null; c.polys.forEach((poly) => { const r = poly[0]; let a = 1e9, b = 1e9, e = -1e9, f = -1e9; r.forEach(([lo, la]) => { if (lo < a) a = lo; if (lo > e) e = lo; if (la < b) b = la; if (la > f) f = la; }); let wrap = 0; if (e - a > 200) { a = 1e9; e = -1e9; r.forEach(([lo]) => { const u = lo < 0 ? lo + 360 : lo; if (u < a) a = u; if (u > e) e = u; }); wrap = 1; }   /* a piece that crosses the date line (Russia, Fiji): measure it on the far side of 180 */ const area = (e - a) * (f - b), mid = (a + e) / 2; if (!best || area > best.area) best = { area, x: px(wrap && mid > 180 ? mid - 360 : mid), y: py((b + f) / 2), w: px(e) - px(a) }; }); c.lab = best || { area: 0, x: 0, y: 0, w: 0 }; }
+      const size = 10 * k, name = c.name.toUpperCase(), width = name.length * size * 0.72;
+      if (c.lab.w < width * 1.15 || !onScreen(unx(c.lab.x), uny(c.lab.y), 0) || !free(c.lab.x - width / 2, c.lab.y - size, width, size * 1.4)) return;
+      text(c.lab.x, c.lab.y, name, size, { 'text-anchor': 'middle', 'letter-spacing': size * 0.12, fill: pal.border, 'font-weight': 600, 'stroke-width': size * 0.2 });
+    });
+    let n = 0;
+    for (const p of basemap.places) {                                                  // places are sorted biggest first, so big ones win any clash
+      if (p[3] < deg || n > 90) continue;
+      const pos = onScreen(p[1], p[2], 0); if (!pos) continue;
+      const size = (p[4] ? 12.5 : 11) * k, width = p[0].length * size * 0.56;
+      if (!free(pos[0] - size * 0.4, pos[1] - size, width + size, size * 1.6)) continue;
+      el('circle', { cx: pos[0], cy: pos[1], r: (p[4] ? 3 : 2.2) * k, fill: pal.text, stroke: pal.halo, 'stroke-width': 0.8 * k }, svg);
+      text(pos[0] + 5 * k, pos[1] + 3.5 * k, p[0], size, p[4] ? { 'font-weight': 600 } : {});
+      n++;
+    }
   }
   /** The travelled roads as one path, drawn on top in the accent colour. */
   function buildHot() { hotPath = ''; if (!matched) return; matched.ways.forEach((w, wi) => w.pts.forEach((p, si) => { if (si && matched.travelled.has(wi + ':' + si)) hotPath += 'M' + pt(w.pts[si - 1]) + 'L' + pt(p); })); }
@@ -80,9 +131,12 @@
   }
   function draw(skipLoad) {
     const svg = $('map'); svg.replaceChildren(); svg.setAttribute('viewBox', [view.x, view.y, view.w, view.h].map((n) => +n.toFixed(5)).join(' '));
-    el('rect', { x: 0, y: 0, width: SIZE, height: SIZE, fill: 'var(--bg)' }, svg);
-    (countries || []).forEach((c) => { const p = el('path', { d: c.d, fill: visited().has(c.name) ? 'var(--soft)' : 'none', stroke: 'var(--mute)', 'stroke-width': 0.6, 'vector-effect': 'non-scaling-stroke' }, svg); const t = el('title', {}, p); t.textContent = c.name + (visited().has(c.name) ? ' (visited)' : ''); });
-    if (haveRoads()) { el('path', { d: roadPath(), fill: 'none', stroke: 'var(--mute)', 'stroke-width': 0.8, 'vector-effect': 'non-scaling-stroke', opacity: 0.8 }, svg); if (hotPath) el('path', { d: hotPath, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round' }, svg); }
+    const pal = palette();
+    el('rect', { x: 0, y: 0, width: SIZE, height: SIZE, fill: pal.sea }, svg);                       // the sea
+    (countries || []).forEach((c) => { const p = el('path', { d: c.d, fill: visited().has(c.name) ? pal.visited : pal.land, stroke: pal.border, 'stroke-width': 0.6, 'vector-effect': 'non-scaling-stroke' }, svg); const t = el('title', {}, p); t.textContent = c.name + (visited().has(c.name) ? ' (visited)' : ''); });
+    drawWaterAndRoads(svg, pal);
+    if (hotPath) el('path', { d: hotPath, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round' }, svg);
+    drawLabels(svg, pal);
     const t = trip(), r = 5 * view.w / (svg.clientWidth || 900);                           // pin radius in screen pixels, whatever the zoom
     t.routes.forEach((rt) => { if (rt.pts.length > 1) el('polyline', { points: rt.pts.map((p) => f5(px(p[0])) + ',' + f5(py(p[1]))).join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': haveRoads() ? 1.2 : 2.5, 'stroke-dasharray': haveRoads() ? '4 3' : '', 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }, svg); });
     sorted().forEach((s, i) => { const g = el('g', {}, svg); el('circle', { cx: f5(px(s.lon)), cy: f5(py(s.lat)), r: r, fill: s.photo ? 'var(--ink)' : 'var(--accent)', stroke: 'var(--bg)', 'stroke-width': r * 0.3 }, g); const tt = el('title', {}, g); tt.textContent = (i + 1) + '. ' + s.name + (s.date ? ' (' + s.date + ')' : '') + (s.note ? ': ' + s.note : ''); });
@@ -257,6 +311,11 @@
     $('clearroads').addEventListener('click', () => { ways = []; viewWays = []; resetMatch(); $('roadresult').textContent = ''; draw(); });
     $('dlroads').addEventListener('click', () => { if (!matched) { say('Highlight the roads first.'); return; } download({ type: 'FeatureCollection', features: matched.ways.map((w, wi) => ({ w, wi })).filter(({ w, wi }) => w.pts.some((_, si) => matched.travelled.has(wi + ':' + si))).map(({ w }) => ({ type: 'Feature', properties: { name: w.name, ref: w.ref, highway: w.kind, source: 'Contains data from OpenStreetMap contributors (ODbL) if fetched from OpenStreetMap' }, geometry: { type: 'LineString', coordinates: w.pts } })) }, 'roads-i-travelled.geojson'); });
     try { countries = topoPaths(await (await fetch('countries-50m.json')).json()); } catch (e) { say('The map outline could not load.'); }
+    /* lakes, rivers and place names (files on this site; the map still works without them) */
+    try { const w = await (await fetch('basemap/water.json')).json(); basemap.lakes = w.lakes.map((r) => 'M' + r.map(pt).join('L') + 'Z').join(''); basemap.rivers = w.rivers.map((l) => 'M' + l.map(pt).join('L')).join(''); } catch (e) { /* not built: plain map */ }
+    try { basemap.places = await (await fetch('basemap/places.json')).json(); } catch (e) { /* not built: no place names */ }
+    if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw(true));
+    new MutationObserver(() => draw(true)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     visitedCache = null; draw();
   });
 })();

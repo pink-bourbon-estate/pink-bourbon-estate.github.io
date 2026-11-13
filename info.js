@@ -107,7 +107,7 @@ window.PBEinfo = {
   },
   'travel-map': {
     keys: ['pbe-travel-map-v2', 'pbe-travel-map-v1'],
-    sources: [{ h: 'Map data', items: [{ t: 'Natural Earth country outlines', u: 'https://www.naturalearthdata.com', n: 'public domain; packaged by world-atlas (ISC licence), kept on this site.' },
+    sources: [{ h: 'Map data', items: [{ t: 'Natural Earth country outlines, lakes, rivers and place names', u: 'https://www.naturalearthdata.com', n: 'public domain; the outlines are packaged by world-atlas (ISC licence). Everything is kept on this site (travel-map/basemap/, made by .github/scripts/build_basemap.py).' },
       { t: 'OS Open Roads (Ordnance Survey)', u: 'https://docs.os.uk/os-downloads/networks/os-open-roads', n: 'every vehicle road in Great Britain, with names and road numbers, rebuilt into small tiles on this site each month. Refreshed by Ordnance Survey in April and October. Free download via the OS Data Hub; the data.gov.uk page points to the Open Government Licence v3.0, with the notice "Contains OS data, Crown copyright and database right". Check the current wording on the OS site; I have not seen the licence page itself.' },
       { t: 'OS Open USRN', u: 'https://docs.os.uk/os-downloads/identifiers/os-open-usrn', n: 'street reference numbers, refreshed monthly. Identifiers only, so not used for the map.' },
       { t: 'OpenStreetMap', u: 'https://www.openstreetmap.org/copyright', n: 'footpaths, tracks, cycleways and bridleways (planned in the monthly build from a Great Britain extract), and the optional direct road lookup. ODbL licence, credit: OpenStreetMap contributors.' },
