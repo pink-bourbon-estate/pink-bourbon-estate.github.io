@@ -14,7 +14,7 @@
   const R = TMroads;
   /* ---------------------------------------------------------------- state */
   let data = { trips: [], cur: null }, view = { x: 0, y: 0, w: SIZE, h: SIZE }, mode = 'pan', countries = null;
-  let ways = [], matched = null, roadLayers = null;                       // road data lives in memory only (it can be large); fetch again after a reload
+  let ways = [], viewWays = [], hotPath = '', matched = null, tileInfo = null, loadTimer = null;   // road data lives in memory only. ways = roads you loaded yourself; viewWays = roads from the site's tiles for the part of the map on screen
   const uid = () => Math.random().toString(36).slice(2, 9), today = () => new Date().toISOString().slice(0, 10);
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* storage blocked: the map still works for this visit */ } };
   /** Load saved trips. If there is a version 1 save ({pins, routes}), move it into one trip called "My trip" so nothing is lost. */
@@ -54,22 +54,40 @@
   }
 
   /* ---------------------------------------------------------------- drawing */
-  /** Build the road layers once per change: one merged path for all roads, one for travelled roads (cheap to draw even with thousands of roads). */
-  function buildRoadLayers() {
-    if (!ways.length) { roadLayers = null; return; }
-    let dim = '', hot = '';
-    ways.forEach((w, wi) => w.pts.forEach((p, si) => { if (!si) return; const seg = 'M' + pt(w.pts[si - 1]) + 'L' + pt(p); if (matched && matched.travelled.has(wi + ':' + si)) hot += seg; else dim += seg; }));
-    roadLayers = { dim, hot };
+  const haveRoads = () => ways.length > 0 || viewWays.length > 0;
+  /** The bounding box [west, south, east, north] of a road piece (worked out once). */
+  const bbOf = (w) => { if (!w.bb) { let a = 180, b = 90, c = -180, d = -90; w.pts.forEach(([lo, la]) => { if (lo < a) a = lo; if (lo > c) c = lo; if (la < b) b = la; if (la > d) d = la; }); w.bb = [a, b, c, d]; } return w.bb; };
+  /** The visible part of the map as [west, south, east, north] in degrees. */
+  const viewBox = () => [unx(view.x), uny(view.y + view.h), unx(view.x + view.w), uny(view.y)];
+  /** One merged path of every road piece that is on screen (cheap to draw even with thousands of pieces). */
+  function roadPath() {
+    const v = viewBox(); let d = '';
+    ways.concat(viewWays).forEach((w) => { const b = bbOf(w); if (b[2] < v[0] || b[0] > v[2] || b[3] < v[1] || b[1] > v[3]) return; d += 'M' + w.pts.map(pt).join('L'); });
+    return d;
   }
-  function draw() {
+  /** The travelled roads as one path, drawn on top in the accent colour. */
+  function buildHot() { hotPath = ''; if (!matched) return; matched.ways.forEach((w, wi) => w.pts.forEach((p, si) => { if (si && matched.travelled.has(wi + ':' + si)) hotPath += 'M' + pt(w.pts[si - 1]) + 'L' + pt(p); })); }
+  const resetMatch = () => { matched = null; hotPath = ''; };
+  /** After the map moves, load the road tiles for what is on screen (from this site, no outside server), a moment after the movement stops. */
+  function scheduleTiles() {
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(async () => {
+      if (!tileInfo || !tileInfo.any) return;
+      const r = await TMtiles.forView(viewBox(), $('withpaths').checked);
+      viewWays = r.ways; draw(true);
+      $('roadnote').textContent = r.level ? (r.capped ? 'Zoom in a little: too many map tiles are in view to show them all.' : '') : 'Zoom in to see roads.';
+    }, 200);
+  }
+  function draw(skipLoad) {
     const svg = $('map'); svg.replaceChildren(); svg.setAttribute('viewBox', [view.x, view.y, view.w, view.h].map((n) => +n.toFixed(5)).join(' '));
     el('rect', { x: 0, y: 0, width: SIZE, height: SIZE, fill: 'var(--bg)' }, svg);
     (countries || []).forEach((c) => { const p = el('path', { d: c.d, fill: visited().has(c.name) ? 'var(--soft)' : 'none', stroke: 'var(--mute)', 'stroke-width': 0.6, 'vector-effect': 'non-scaling-stroke' }, svg); const t = el('title', {}, p); t.textContent = c.name + (visited().has(c.name) ? ' (visited)' : ''); });
-    if (roadLayers) { el('path', { d: roadLayers.dim, fill: 'none', stroke: 'var(--mute)', 'stroke-width': 0.8, 'vector-effect': 'non-scaling-stroke', opacity: 0.7 }, svg); if (roadLayers.hot) el('path', { d: roadLayers.hot, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round' }, svg); }
+    if (haveRoads()) { el('path', { d: roadPath(), fill: 'none', stroke: 'var(--mute)', 'stroke-width': 0.8, 'vector-effect': 'non-scaling-stroke', opacity: 0.8 }, svg); if (hotPath) el('path', { d: hotPath, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round' }, svg); }
     const t = trip(), r = 5 * view.w / (svg.clientWidth || 900);                           // pin radius in screen pixels, whatever the zoom
-    t.routes.forEach((rt) => { if (rt.pts.length > 1) el('polyline', { points: rt.pts.map((p) => f5(px(p[0])) + ',' + f5(py(p[1]))).join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': roadLayers ? 1.2 : 2.5, 'stroke-dasharray': roadLayers ? '4 3' : '', 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }, svg); });
+    t.routes.forEach((rt) => { if (rt.pts.length > 1) el('polyline', { points: rt.pts.map((p) => f5(px(p[0])) + ',' + f5(py(p[1]))).join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': haveRoads() ? 1.2 : 2.5, 'stroke-dasharray': haveRoads() ? '4 3' : '', 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }, svg); });
     sorted().forEach((s, i) => { const g = el('g', {}, svg); el('circle', { cx: f5(px(s.lon)), cy: f5(py(s.lat)), r: r, fill: s.photo ? 'var(--ink)' : 'var(--accent)', stroke: 'var(--bg)', 'stroke-width': r * 0.3 }, g); const tt = el('title', {}, g); tt.textContent = (i + 1) + '. ' + s.name + (s.date ? ' (' + s.date + ')' : '') + (s.note ? ': ' + s.note : ''); });
     lists();
+    if (!skipLoad) scheduleTiles();
   }
   const sorted = () => trip().steps.slice().sort((a, b) => ((a.date || '') < (b.date || '') ? -1 : (a.date || '') > (b.date || '') ? 1 : 0));
   let visitedCache = null;
@@ -92,8 +110,9 @@
     /* trip picker */
     const sel = $('tripsel'); sel.replaceChildren(...data.trips.map((x) => { const o = document.createElement('option'); o.value = x.id; o.textContent = x.name; if (x.id === data.cur) o.selected = true; return o; }));
     /* roads panel */
-    $('roadstats').textContent = ways.length ? ways.length.toLocaleString('en-GB') + ' road pieces loaded' + (matched ? '' : '. Press "Highlight roads I travelled".') : 'No road data loaded yet.';
-    $('count').textContent = view.w < 25 && !roadLayers ? 'You are zoomed in past the country outlines, so there is nothing to see here until you load roads (below) or zoom out.' : '';
+    const n = ways.length + viewWays.length;
+    $('roadstats').textContent = n ? n.toLocaleString('en-GB') + ' road pieces on screen' + (matched ? '' : '. Press "Highlight roads I travelled".') : 'No roads on screen.';
+    $('count').textContent = view.w < 25 && !haveRoads() && !(tileInfo && tileInfo.any) ? 'You are zoomed in past the country outlines, so there is nothing to see here until roads are loaded (see Roads below) or you zoom out.' : (viewWays.length && tileInfo ? tileInfo.credits.join('. ') + '.' : '');
   }
   /** Zoom the map to a box [west, south, east, north]. A square view is used because the map is square. */
   function fit(b) { const x0 = px(b[0]), x1 = px(b[2]), y0 = py(b[3]), y1 = py(b[1]), w = Math.max(0.01, x1 - x0, y1 - y0) * 1.15, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2; view = { x: Math.max(0, Math.min(SIZE - w, cx - w / 2)), y: Math.max(0, Math.min(SIZE - w, cy - w / 2)), w, h: w }; draw(); }
@@ -140,7 +159,7 @@
     const t = { id: uid(), name: 'Practice area (made up)', steps: [], routes: [], sample: true }; data.trips.push(t); data.cur = t.id; visitedCache = null;
     const route = [[0.0, 0.0], [0.008, 0.0], [0.008, 0.012], [0.016, 0.012], [0.016, 0.02], [0.024, 0.02]];
     addStep({ name: 'Start', lon: route[0][0], lat: route[0][1], date: today(), sample: true }); addStep({ name: 'Finish', lon: route[5][0], lat: route[5][1], date: today(), sample: true }); addRoute({ name: 'Practice drive', pts: route, sample: true });
-    matched = null; buildRoadLayers(); fit([-0.002, -0.002, 0.026, 0.026]);
+    resetMatch(); viewWays = []; fit([-0.002, -0.002, 0.026, 0.026]);
   }
 
   /* ---------------------------------------------------------------- roads: consent, fetch, match */
@@ -154,21 +173,28 @@
   const MAXDEG = 0.6;                                                       // biggest box we will ask for (about 65 km), to be kind to the free server
   async function fetchRoads() {
     const b = roadBox(); if (b[2] - b[0] > MAXDEG || b[3] - b[1] > MAXDEG) { say('That area is too big for a free fetch (the limit is about ' + MAXDEG + ' degrees across). Zoom in on part of the trip, or load a roads file instead.'); return; }
-    const q = R.overpassQuery(b, $('withpaths').checked), server = $('overpass').value, host = new URL(server).host;
-    if (!consent('Roads' + ($('withpaths').checked ? ' and paths' : '') + ' inside the box will be returned and kept in this page only.', 'an OpenStreetMap Overpass server (' + host + ')', 'this query only, no names or trip details:\n\n' + q)) return;
+    const q = R.overpassQuery(b, $('opaths').checked), server = $('overpass').value, host = new URL(server).host;
+    if (!consent('Roads' + ($('opaths').checked ? ' and paths' : '') + ' inside the box will be returned and kept in this page only.', 'an OpenStreetMap Overpass server (' + host + ')', 'this query only, no names or trip details:\n\n' + q)) return;
     say('Asking OpenStreetMap for roads... this can take up to a minute.'); $('fetchroads').disabled = true;
     try {
       const res = await fetch(server, { method: 'POST', body: 'data=' + encodeURIComponent(q) });
       if ([429, 502, 503, 504].includes(res.status)) throw new Error('That free server is busy or down right now (error ' + res.status + '). This is common. Wait a minute and try again, or pick the other server in the list. Nothing is wrong with your data.');
       if (!res.ok) throw new Error('The server answered with an error (' + res.status + ').');
-      ways = R.subdivide(R.parseOverpass(await res.json())); matched = null; buildRoadLayers(); say(ways.length ? 'Loaded ' + ways.length + ' road pieces. Road data © OpenStreetMap contributors (ODbL).' : 'No roads found in that box.'); fit([b[1], b[0], b[3], b[2]]);
+      ways = R.subdivide(R.parseOverpass(await res.json())); resetMatch(); say(ways.length ? 'Loaded ' + ways.length + ' road pieces. Road data © OpenStreetMap contributors (ODbL).' : 'No roads found in that box.'); fit([b[1], b[0], b[3], b[2]]);
     } catch (e) { say(e.message || 'Could not reach the server. You can load a roads file instead.'); } finally { $('fetchroads').disabled = false; }
   }
-  function highlight() {
-    if (!ways.length) { say('Load some roads first (fetch, a file, or the practice area).'); return; }
+  async function highlight() {
     const routes = trip().routes.map((r) => r.pts); if (!routes.length) { say('This trip has no route yet. Import a GPX/KML/GeoJSON route, paste a Google Maps link, or draw one by road.'); return; }
-    matched = R.match(routes, ways, { tolerance: Number($('tol').value) || 20 }); buildRoadLayers(); const s = R.stats(matched); draw();
-    $('roadresult').textContent = s.doneKm.toFixed(1) + ' km travelled of ' + s.totalKm.toFixed(1) + ' km of road in this area (' + Math.round(s.share * 100) + '%).' + (s.names.length ? ' Roads: ' + s.names.slice(0, 15).map((n) => n[0] + ' ' + n[1].toFixed(1) + ' km').join(', ') + (s.names.length > 15 ? ' and ' + (s.names.length - 15) + ' more' : '') + '.' : '');
+    let use = ways.slice();
+    if (tileInfo && tileInfo.any) {                                                       // full-detail roads from this site's tiles, only where the route goes
+      say('Loading the roads along your route...');
+      const r = await TMtiles.forRoute([].concat(...routes.map((rt) => R.densify(rt, 500))), $('withpaths').checked, (d, t) => say('Loading roads: ' + d + ' of ' + t + ' map tiles'));
+      if (r.tooBig) { say('This route touches ' + r.tooBig + ' map tiles, which is more than one go can handle. Try a shorter route or one trip leg at a time.'); return; }
+      use = use.concat(r.ways); say('');
+    }
+    if (!use.length) { say('No road data covers this route. Zoom in somewhere in Great Britain once the site\'s road tiles are built, load a roads file, or try the practice area.'); return; }
+    R.subdivide(use, 40); matched = R.match(routes, use, { tolerance: Number($('tol').value) || 20 }); buildHot(); const s = R.stats(matched); draw();
+    $('roadresult').textContent = s.doneKm.toFixed(1) + ' km travelled of ' + s.totalKm.toFixed(1) + ' km of road along your route (' + Math.round(s.share * 100) + '%).' + (s.names.length ? ' Roads: ' + s.names.slice(0, 15).map((n) => n[0] + ' ' + n[1].toFixed(1) + ' km').join(', ') + (s.names.length > 15 ? ' and ' + (s.names.length - 15) + ' more' : '') + '.' : '');
   }
   async function routeByRoad() {
     const st = sorted(); if (st.length < 2) { say('Add at least two steps first.'); return; }
@@ -206,6 +232,7 @@
   /* ---------------------------------------------------------------- wiring up the page */
   document.addEventListener('DOMContentLoaded', async () => {
     load(); const svg = $('map'); let drag = null;
+    TMtiles.init().then((i) => { tileInfo = i; $('tileinfo').textContent = i.any ? 'Street map from this site (built ' + i.built + '): ' + i.credits.join('. ') + '. Zoom in to see roads' + (i.hasPaths ? '; footpaths and tracks appear when you zoom in close.' : '. Footpaths and tracks are not built yet.') : 'The street-map tiles have not been built yet (they are made by a monthly job on this site). Until then you can load a roads file, try the practice area, or ask OpenStreetMap directly (under the heading below).'; draw(); });
     window.addEventListener('resize', () => draw());                      // redraw when the Map tab is shown again (pin sizes depend on the map's width on screen)
     svg.addEventListener('wheel', (e) => { e.preventDefault(); const [cx, cy] = at(e); zoom(e.deltaY > 0 ? 1.25 : 0.8, cx, cy); }, { passive: false });
     svg.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false }; svg.setPointerCapture(e.pointerId); });
@@ -216,17 +243,18 @@
     $('fittrip').addEventListener('click', () => { const t = trip(), pts = t.steps.map((s) => [s.lon, s.lat]).concat(...t.routes.map((r) => r.pts)); if (pts.length) { const b = R.bboxOf(pts, 0.01); fit([b[1], b[0], b[3], b[2]]); } });
     $('modepin').addEventListener('click', () => { mode = mode === 'pin' ? 'pan' : 'pin'; $('modepin').setAttribute('aria-pressed', mode === 'pin'); $('modepin').textContent = mode === 'pin' ? 'Pin mode on: click the map' : 'Add a step by clicking'; });
     /* trips */
-    $('tripsel').addEventListener('change', (e) => { data.cur = e.target.value; visitedCache = null; matched = null; buildRoadLayers(); save(); draw(); });
+    $('tripsel').addEventListener('change', (e) => { data.cur = e.target.value; visitedCache = null; resetMatch(); save(); draw(); });
     $('newtrip').addEventListener('click', () => { const n = $('tripname').value.trim(); if (!n) { say('Type a trip name first.'); return; } const t = { id: uid(), name: n, steps: [], routes: [] }; data.trips.push(t); data.cur = t.id; $('tripname').value = ''; visitedCache = null; save(); draw(); });
     $('renametrip').addEventListener('click', () => { const n = $('tripname').value.trim(); if (!n) { say('Type the new name first.'); return; } trip().name = n; $('tripname').value = ''; save(); draw(); });
     $('deltrip').addEventListener('click', () => { if (!confirm('Delete the trip "' + trip().name + '" from this browser?')) return; data.trips = data.trips.filter((t) => t.id !== data.cur); ensure(); visitedCache = null; save(); draw(); });
     /* import */
     $('files').addEventListener('change', async (e) => { for (const f of e.target.files) { try { if (/\.gpx$/i.test(f.name)) readGPX(await f.text()); else if (/\.kml$/i.test(f.name)) readKML(await f.text()); else if (/\.(geo)?json$/i.test(f.name)) readGeo(await f.text()); else if (/\.jpe?g$/i.test(f.name)) { const r = exif(await f.arrayBuffer()); if (r) addStep({ name: 'Photo', lat: r.lat, lon: r.lon, date: r.date, photo: true }); else say('No GPS position found in ' + f.name + '.'); } } catch (err) { say('Could not read ' + f.name + '.'); } } visitedCache = null; save(); draw(); e.target.value = ''; });
-    $('roadsfile').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; try { ways = R.subdivide(R.parseGeoJSON(JSON.parse(await f.text()))); matched = null; buildRoadLayers(); say(ways.length ? 'Loaded ' + ways.length + ' road pieces from your file (it stays on your device). Check the licence of the data you used.' : 'No lines found in that file. It should be GeoJSON with LineString features.'); draw(); } catch (err) { say('Could not read that roads file.'); } e.target.value = ''; });
+    $('roadsfile').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; try { ways = R.subdivide(R.parseGeoJSON(JSON.parse(await f.text()))); resetMatch(); say(ways.length ? 'Loaded ' + ways.length + ' road pieces from your file (it stays on your device). Check the licence of the data you used.' : 'No lines found in that file. It should be GeoJSON with LineString features.'); draw(); } catch (err) { say('Could not read that roads file.'); } e.target.value = ''; });
     $('glinkgo').addEventListener('click', googleLink);
+    $('withpaths').addEventListener('change', () => { viewWays = []; scheduleTiles(); });
     $('fetchroads').addEventListener('click', fetchRoads); $('highlight').addEventListener('click', highlight); $('routeroad').addEventListener('click', routeByRoad);
     $('practice').addEventListener('click', () => { practice(); save(); draw(); say('Practice area loaded: a made-up street grid and route. Press "Highlight roads I travelled".'); });
-    $('clearroads').addEventListener('click', () => { ways = []; matched = null; roadLayers = null; $('roadresult').textContent = ''; draw(); });
+    $('clearroads').addEventListener('click', () => { ways = []; viewWays = []; resetMatch(); $('roadresult').textContent = ''; draw(); });
     $('dlroads').addEventListener('click', () => { if (!matched) { say('Highlight the roads first.'); return; } download({ type: 'FeatureCollection', features: matched.ways.map((w, wi) => ({ w, wi })).filter(({ w, wi }) => w.pts.some((_, si) => matched.travelled.has(wi + ':' + si))).map(({ w }) => ({ type: 'Feature', properties: { name: w.name, ref: w.ref, highway: w.kind, source: 'Contains data from OpenStreetMap contributors (ODbL) if fetched from OpenStreetMap' }, geometry: { type: 'LineString', coordinates: w.pts } })) }, 'roads-i-travelled.geojson'); });
     try { countries = topoPaths(await (await fetch('countries-50m.json')).json()); } catch (e) { say('The map outline could not load.'); }
     visitedCache = null; draw();

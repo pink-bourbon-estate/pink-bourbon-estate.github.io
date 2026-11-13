@@ -31,7 +31,7 @@ All tools are works in progress: expect bugs, and not every one is actively main
 - `mobility-and-physio/`, `skincare-and-care/`, `nutrition-and-macros/`: more small tools built on `tracker.js`.
 - `language-lab/`, `chess-lab/`: demos of bigger ideas (see the plan on each page).
 - `shell.js` and `info.js`: the four standard tabs every project has (Sources, My Data, Example Data, FAQ). `shell.js` builds them; `info.js` holds each project's sources and FAQ words. To add a project, add an entry to `info.js` and load both files on its page.
-- `travel-map/`: trips and steps, countries visited, and a roads-travelled layer. `roads.js` holds the road maths (readable, no drawing), `app.js` the page. Road data is not in the repo: it comes from a file you load or, after a confirm box, from OpenStreetMap (ODbL, credit required). The country outline is Natural Earth (public domain).
+- `travel-map/`: trips and steps, countries visited, and a roads-travelled layer. `roads.js` holds the road maths (readable, no drawing), `app.js` the page. Road data is not in the repo: `.github/scripts/build_roads.py` rebuilds it into small tiles each month during the site build (OS Open Roads for roads, an OpenStreetMap extract for paths), and `roadtiles.js` reads them. You can also load your own roads file, or, after a confirm box, ask OpenStreetMap directly. The country outline is Natural Earth (public domain).
 - `sounds.js` and `databar.js`: shared sounds (bells, bowls, timers) and the sample/download data bar.
 - `.github/scripts/reading.py`: builds the home page's "Now reading" list from independent magazines' public feeds once a day.
 - `endurance-training/`: running, cycling and swimming plans and calculators, built on `tracker.js`.
