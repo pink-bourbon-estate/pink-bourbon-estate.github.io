@@ -9,6 +9,10 @@
    How honest to be: where a figure or practice is common knowledge that I have not checked against a published source, the entry says so.
    If you spot a mistake or a missing source, please open an issue on GitHub. */
 window.PBEinfo = {
+  '3d-and-blender-tools': {
+    sources: [{ h: 'Where this comes from', items: [{ t: 'Your own entries', n: 'it holds only what you type; nothing is looked up from other sites, and no add-on, shop or author is rated or recommended.' }] }],
+    faq: [{ q: 'Is it connected to Blender or any shop?', a: 'No. It is an independent notebook and is not connected to the Blender Foundation or to any add-on author or shop.' }, { q: 'Where is my list kept?', a: 'Only in this browser. Download a backup from the My Data tab to keep your own copy or to move it to another browser.' }],
+  },
   'books-and-film': {
     sources: [{ h: 'Where this comes from', items: [{ t: 'Your own entries', n: 'a list of what you have read, watched or want to see; nothing is looked up from other sites.' }] }],
     faq: [{ q: 'Does it look up covers or ratings?', a: 'No. It never contacts another site. You type the title, who recommended it and your own rating.' }, { q: 'How do I bring in a list I already have?', a: 'Use the Import tab. It is read in your browser and never uploaded.' }],

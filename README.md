@@ -20,6 +20,7 @@ This repository is the home page, the articles, the about page and the privacy a
 
 All tools are works in progress: expect bugs, and not every one is actively maintained.
 - `tracker.js`: the shared framework behind the newer tools (logs, routines, dates, tick lists, notes, and Markdown/CSV/backup export).
+- `3d-and-blender-tools/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `bullet-journal/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `meditation/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
 - `health-metrics/`: a small tool built on `tracker.js`; the logic is in its `app.js`.
