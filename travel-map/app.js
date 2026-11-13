@@ -93,7 +93,7 @@
     const sel = $('tripsel'); sel.replaceChildren(...data.trips.map((x) => { const o = document.createElement('option'); o.value = x.id; o.textContent = x.name; if (x.id === data.cur) o.selected = true; return o; }));
     /* roads panel */
     $('roadstats').textContent = ways.length ? ways.length.toLocaleString('en-GB') + ' road pieces loaded' + (matched ? '' : '. Press "Highlight roads I travelled".') : 'No road data loaded yet.';
-    $('count').textContent = '';
+    $('count').textContent = view.w < 25 && !roadLayers ? 'You are zoomed in past the country outlines, so there is nothing to see here until you load roads (below) or zoom out.' : '';
   }
   /** Zoom the map to a box [west, south, east, north]. A square view is used because the map is square. */
   function fit(b) { const x0 = px(b[0]), x1 = px(b[2]), y0 = py(b[3]), y1 = py(b[1]), w = Math.max(0.01, x1 - x0, y1 - y0) * 1.15, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2; view = { x: Math.max(0, Math.min(SIZE - w, cx - w / 2)), y: Math.max(0, Math.min(SIZE - w, cy - w / 2)), w, h: w }; draw(); }
@@ -154,12 +154,12 @@
   const MAXDEG = 0.6;                                                       // biggest box we will ask for (about 65 km), to be kind to the free server
   async function fetchRoads() {
     const b = roadBox(); if (b[2] - b[0] > MAXDEG || b[3] - b[1] > MAXDEG) { say('That area is too big for a free fetch (the limit is about ' + MAXDEG + ' degrees across). Zoom in on part of the trip, or load a roads file instead.'); return; }
-    const q = R.overpassQuery(b, $('withpaths').checked);
-    if (!consent('Roads' + ($('withpaths').checked ? ' and paths' : '') + ' inside the box will be returned and kept in this page only.', 'OpenStreetMap\'s Overpass service (overpass-api.de)', 'this query only, no names or trip details:\n\n' + q)) return;
+    const q = R.overpassQuery(b, $('withpaths').checked), server = $('overpass').value, host = new URL(server).host;
+    if (!consent('Roads' + ($('withpaths').checked ? ' and paths' : '') + ' inside the box will be returned and kept in this page only.', 'an OpenStreetMap Overpass server (' + host + ')', 'this query only, no names or trip details:\n\n' + q)) return;
     say('Asking OpenStreetMap for roads... this can take up to a minute.'); $('fetchroads').disabled = true;
     try {
-      const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
-      if (res.status === 429 || res.status === 504) throw new Error('The free server is busy (' + res.status + '). Wait a minute and try again.');
+      const res = await fetch(server, { method: 'POST', body: 'data=' + encodeURIComponent(q) });
+      if ([429, 502, 503, 504].includes(res.status)) throw new Error('That free server is busy or down right now (error ' + res.status + '). This is common. Wait a minute and try again, or pick the other server in the list. Nothing is wrong with your data.');
       if (!res.ok) throw new Error('The server answered with an error (' + res.status + ').');
       ways = R.subdivide(R.parseOverpass(await res.json())); matched = null; buildRoadLayers(); say(ways.length ? 'Loaded ' + ways.length + ' road pieces. Road data © OpenStreetMap contributors (ODbL).' : 'No roads found in that box.'); fit([b[1], b[0], b[3], b[2]]);
     } catch (e) { say(e.message || 'Could not reach the server. You can load a roads file instead.'); } finally { $('fetchroads').disabled = false; }
