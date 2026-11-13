@@ -93,6 +93,13 @@ window.PBEinfo = {
     faq: [{ q: 'Does it work yet?', a: 'It is in development and may show an error in the browser. See the note at the top of the page.' }, { q: 'Do my measurements leave my device?', a: 'No. The pattern is generated in your browser.' }, { q: 'How do I print it at the right size?', a: 'Print at 100 % ("actual size", not "fit to page") and check the test square against a ruler before cutting.' }],
     exampleNote: 'This tool stores nothing, so there is no example data to load or remove.',
   },
+  'video-editing-toolkit': {
+    keys: [],
+    sources: [{ h: 'Tools and documentation', items: [{ t: 'ffmpeg', u: 'https://ffmpeg.org', n: 'does all the real work in the desktop app; a separate project with its own licence, not bundled.' }, { t: 'ffmpeg filters: select', u: 'https://ffmpeg.org/ffmpeg-filters.html', n: 'the frame picker (first frame at or after each interval) is built on it.' }, { t: 'FFmpeg wiki: Encode/H.265', u: 'https://trac.ffmpeg.org/wiki/Encode/H.265', n: 'what the CRF quality number means and why lower is bigger and better.' }],
+      note: 'The claim that "-tag:v hvc1" is needed for QuickTime and iPhone to play H.265 in MP4 is common practice I have not checked against a published Apple page.' }],
+    faq: [{ q: 'Is this page the converter?', a: 'No. It is a demonstration that runs in your browser with its own tools: JPEG frames, WAV audio and a short WebM preview. The desktop app uses ffmpeg and writes H.265 MP4, mp3 and the rest.' }, { q: 'Is my video uploaded?', a: 'No. It is opened inside this tab and nothing is sent or stored.' }, { q: 'Why does the sample take 12 seconds to make?', a: 'The browser records it in real time. Keep the tab in front while it runs.' }, { q: 'Why can my file not be opened here?', a: 'Browsers read fewer formats than ffmpeg. MP4 and WebM usually work. The desktop app reads almost everything.' }],
+    exampleNote: 'There is no stored data here. The demo has a built-in sample clip instead.',
+  },
   'sightline': {
     keys: ['pbe-sightline-lab-v1'],
     sources: [{ h: 'Music', items: [{ t: 'The Mutopia Project', u: 'https://www.mutopiaproject.org', n: 'every piece is public domain; the MIDI files come from its typesetters, named on each page and in scores/LICENSES.txt.' }] },

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo - Video Editing Toolkit - Pink Bourbon Estate</title>
+<meta name="description" content="Try the ideas behind the Video Editing Toolkit in your browser: pull frames out of a video by time, extract the audio, and see what compression does, with the exact ffmpeg commands the desktop app runs.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/video-editing-toolkit/demo/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Demo - Video Editing Toolkit - Pink Bourbon Estate">
+<meta property="og:description" content="Try the ideas behind the Video Editing Toolkit in your browser, with the exact ffmpeg commands the desktop app runs.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/video-editing-toolkit/demo/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<script src="../../theme.js"></script>
+<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../vet.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../../projects/" aria-current="page">Projects</a><a href="../../articles/">Articles</a><a href="../../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main" data-tool-tab="Demo">
+<script src="../../shell.js"></script><script src="../../info.js"></script>
+<h1>Video Editing Toolkit demo</h1>
+<p class="meta"><a href="../">Video Editing Toolkit</a> · <a href="./">Demo</a></p>
+<p class="lede">Choose a video, or make a short sample, then try the three jobs: stills by time, the audio track, and compression.</p>
+<div class="note"><p><strong>This is a demonstration, not the converter.</strong> It runs in your browser with the browser's own tools, so it can only do small versions of the real jobs: frames as JPEG, audio as WAV, and compression as a short WebM preview. The desktop app (in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>) uses ffmpeg, handles any size and format, and writes H.265 MP4, mp3, m4a, aac and opus. Under each demo is the exact ffmpeg command the app would run for your settings. Your video is never uploaded: it stays in this tab.</p></div>
+
+<h2>1. Choose a video</h2>
+<div class="picker" id="picker">
+  <label class="row">Pick a file, or drop one here <input id="file" type="file" accept="video/*"></label>
+  <div class="transport"><button id="sample" type="button">Make a 12 second sample clip</button><span class="status" id="srcstatus" role="status">The sample is made in your browser: four coloured slides and a tone.</span></div>
+</div>
+<div class="srcinfo" id="srcinfo" hidden>
+  <video id="preview" controls playsinline preload="metadata"></video>
+  <dl id="facts"></dl>
+</div>
+
+<h2>2. Try a job</h2>
+<div class="seg" role="group" aria-label="Job">
+  <button type="button" data-job="frames" aria-pressed="true">Extract frames</button>
+  <button type="button" data-job="audio" aria-pressed="false">Extract audio</button>
+  <button type="button" data-job="compress" aria-pressed="false">Compress</button>
+</div>
+
+<section class="panel" id="p-frames">
+  <p class="lede">A still every few seconds, named by the time it was taken, for notes, slides and reference.</p>
+  <div class="ctl">
+    <label class="row">One frame every <output id="o-fint">10 s</output><input id="f-int" type="range" min="1" max="60" value="10"></label>
+    <label class="row">Start at <output id="o-fstart">0 s</output><input id="f-start" type="range" min="0" max="60" value="0"></label>
+    <label class="row">Largest width<select id="f-w"><option value="1920">1920 px</option><option value="1280">1280 px</option><option value="854">854 px</option><option value="480" selected>480 px (demo default)</option></select></label>
+    <label class="row">JPEG quality <output id="o-fq">80</output><input id="f-q" type="range" min="50" max="95" value="80"></label>
+    <label class="chk"><input id="f-dd" type="checkbox"> Skip frames that look the same as the last one (slides, still shots)</label>
+  </div>
+  <div class="transport"><button id="f-run" type="button" disabled>Extract frames</button><button id="f-zip" type="button" disabled>Download all (.zip)</button></div>
+  <p class="status" id="f-status" role="status"></p>
+  <div class="thumbs" id="f-thumbs"></div>
+  <h3>The same job in the app</h3>
+  <pre class="cmd" id="f-cmd"></pre>
+  <p class="meta">The old fps filter returned the frame nearest the middle of each period, so "every 10 s" was really about 5 s, 15 s, 25 s. This takes the first frame at or after each multiple of the interval and names each file from that frame's own timestamp.</p>
+</section>
+
+<section class="panel" id="p-audio" hidden>
+  <p class="lede">The sound of each video as its own file: handy for transcripts and listening.</p>
+  <div class="ctl">
+    <label class="row">App format<select id="a-fmt"><option value="mp3">mp3</option><option value="m4a">m4a</option><option value="aac">aac</option><option value="opus">opus</option><option value="wav">wav</option></select></label>
+    <label class="row">App bitrate <output id="o-akb">96 kbit/s</output><input id="a-kb" type="range" min="32" max="256" step="32" value="96"></label>
+    <label class="chk"><input id="a-mono" type="checkbox"> Mono (half the size, fine for speech)</label>
+  </div>
+  <div class="transport"><button id="a-run" type="button" disabled>Extract audio (WAV)</button><button id="a-dl" type="button" disabled>Download WAV</button></div>
+  <p class="status" id="a-status" role="status"></p>
+  <div id="a-out" hidden><canvas class="wave" id="a-wave" width="1000" height="120" role="img" aria-label="Waveform of the audio"></canvas><audio id="a-audio" controls style="width:100%;margin-top:8px"></audio></div>
+  <div class="facts2" id="a-facts" hidden></div>
+  <h3>The same job in the app</h3>
+  <pre class="cmd" id="a-cmd"></pre>
+  <p class="meta">The browser can only write WAV here. The size shown for the other formats is a calculation from the length and the bitrate, so it is close for a fixed bitrate but not exact.</p>
+</section>
+
+<section class="panel" id="p-compress" hidden>
+  <p class="lede">See what squeezing a video does to its size. Here the browser records the first 20 seconds again at a lower bitrate, in real time.</p>
+  <div class="ctl">
+    <label class="row">Demo video bitrate <output id="o-cbr">800 kbit/s</output><input id="c-br" type="range" min="150" max="4000" step="50" value="800"></label>
+    <label class="row">Largest width<select id="c-w"><option value="0">Keep original</option><option value="1280">1280 px</option><option value="854" selected>854 px</option><option value="640">640 px</option></select></label>
+    <label class="row">App codec<select id="c-codec"><option value="libx265">H.265 (smaller files)</option><option value="libx264">H.264 (plays everywhere)</option></select></label>
+    <label class="row">App quality (CRF) <output id="o-ccrf">28</output><input id="c-crf" type="range" min="18" max="35" value="28"></label>
+    <label class="row">App speed<select id="c-preset"><option>ultrafast</option><option>veryfast</option><option>fast</option><option selected>medium</option><option>slow</option><option>veryslow</option></select></label>
+  </div>
+  <div class="transport"><button id="c-run" type="button" disabled>Compress a preview</button></div>
+  <p class="status" id="c-status" role="status"></p>
+  <div class="pair" id="c-pair" hidden>
+    <div><video id="c-orig" controls playsinline></video><p class="meta" id="c-orig-meta"></p></div>
+    <div><video id="c-new" controls playsinline></video><p class="meta" id="c-new-meta"></p></div>
+  </div>
+  <div id="c-bars" hidden></div>
+  <h3>The same job in the app</h3>
+  <pre class="cmd" id="c-cmd"></pre>
+  <p class="meta">Only the bitrate and width above affect the demo preview. Codec, quality and speed are the app's settings and only change the command. Lower CRF keeps more detail and makes a bigger file. How much a real video shrinks depends heavily on the footage: screen recordings and slides shrink a lot, busy camera footage much less. The "hvc1" tag lets QuickTime and iPhone play H.265 in an MP4. The "replace original" option writes a temporary file, checks it opens, and swaps it in only if it is smaller.</p>
+</section>
+
+<h2>What the app adds</h2>
+<div class="prose"><p>A window you can drop whole folders onto, a command line for scripts, a progress bar and a Cancel button that cleans up half-written files, a check that a video really has audio before it tries, and a clear message from ffmpeg when something fails. It does not bundle ffmpeg: you install that once. Colour, quality and size choices in this demo are examples, not recommendations.</p></div>
+<h2>Credits and licences</h2>
+<div class="prose">
+<p><strong>Code:</strong> this page's code is plain JavaScript with comments, in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/video-editing-toolkit" rel="noopener">this folder</a>, with no libraries. The desktop app is in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a>. <strong>ffmpeg</strong> is a separate project with its own licence; the app runs it but does not include it.</p>
+<p>Nothing you do here leaves your browser: no video, frame or sound is uploaded, and nothing is stored.</p>
+</div>
+<script src="../vet.js"></script></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>

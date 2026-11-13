@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Editing Toolkit - Pink Bourbon Estate</title>
+<meta name="description" content="Compress video, extract the audio and save a still every N seconds: one small desktop program with a window and a command line, plus a demo you can try in your browser.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/video-editing-toolkit/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pink Bourbon Estate">
+<meta property="og:title" content="Video Editing Toolkit - Pink Bourbon Estate">
+<meta property="og:description" content="Compress video, extract the audio and save a still every N seconds: one small desktop program with a window and a command line, plus a demo you can try in your browser.">
+<meta property="og:url" content="https://pink-bourbon-estate.github.io/video-editing-toolkit/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="vet.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/" aria-current="page">Projects</a><a href="../articles/">Articles</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main" data-tool-tab="Overview">
+<script src="../shell.js"></script><script src="../info.js"></script>
+<h1>Video Editing Toolkit</h1>
+<p class="lede">Three small jobs that come up all the time, in one program: shrink a video, pull out its audio, or save a still every few seconds named by the time it was taken. A window you can drop folders onto, and a command line for scripts. Free, no account, and your videos never leave your computer.</p>
+<div class="note"><p><strong>Work in progress, and an honest note:</strong> the desktop app is in the Toolkits repository. It is a careful wrapper around ffmpeg, which you install once (it is not bundled). The engine and command line have been tested against real video; the window and the Windows build are built automatically but have had less hands-on testing. The demo page here is a demonstration in your browser, not the app.</p></div>
+<div class="cards">
+<div class="card"><h3><a href="demo/">1. Try the demo</a></h3><p class="meta">Pick a video or make a sample, pull frames out by time, extract the audio, and see what compression does. Each job shows the exact ffmpeg command the app would run.</p></div>
+<div class="card"><h3><a href="https://github.com/pink-bourbon-estate/Toolkits/tree/main/video-editing-toolkit" rel="noopener">2. Get the app</a></h3><p class="meta">Windows and Linux downloads are on the Toolkits Releases page (<code>video-editing-toolkit-v0.1.N</code>). It installs for you only, with no admin rights, and updates itself with a checksum check.</p></div>
+</div>
+<h2>What it does</h2>
+<div class="prose"><p><strong>Compress:</strong> H.265 or H.264 into an MP4, with a quality setting, a size cap, and an option to replace the original only when the new file is smaller. <strong>Extract audio:</strong> mp3, m4a, aac, opus or wav, optionally mono. <strong>Extract frames:</strong> a still every N seconds as JPEG or PNG, named like <code>lecture_t00m10s.jpg</code>, with an option to skip frames that look the same (slides). All three take files or whole folders.</p></div>
+<h2>Better than the scripts it replaces</h2>
+<div class="prose"><p>It replaces three small Python scripts. Frame times are now correct: the old method returned the frame nearest the middle of each period, so "every 10 seconds" gave frames at about 5, 15 and 25 seconds, with the wrong names. H.265 files are tagged so QuickTime and iPhone play them. Output is always a format every player accepts. Videos with no audio, or with extra data tracks, no longer fail. Replacing an original is verified first. There is a progress bar, a Cancel button, and ffmpeg's own message when something goes wrong.</p></div>
+<h2>Credits and licences</h2>
+<div class="prose">
+<p><strong>Code:</strong> the app is written in Rust and is open, in the <a href="https://github.com/pink-bourbon-estate/Toolkits" rel="noopener">Toolkits repository</a> under the MIT licence. This site's pages are in <a href="https://github.com/pink-bourbon-estate/pink-bourbon-estate.github.io/tree/main/video-editing-toolkit" rel="noopener">this folder</a>. <strong>ffmpeg</strong> is a separate project with its own licence; the app runs it but does not include it.</p>
+<p>Nothing you do on these pages leaves your browser.</p>
+</div></main>
+<footer class="foot">
+  <p>Pink Bourbon Estate is a small place for free, open, readable tools. No cookies, no tracking, no adverts, nothing loaded from other sites.</p>
+  <p>All tools here are works in progress: expect bugs, and not every one is actively maintained.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+</body>
+</html>
