@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://pink-bourbon-estate.github.io/sitemap.xml
+Sitemap: https://pink-bourbon-estate.github.io/BBC-Radio-6-Music-Collection/sitemap.xml
