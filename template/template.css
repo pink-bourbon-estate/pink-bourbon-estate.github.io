@@ -12,7 +12,7 @@
 .tpl-pal, .tpl-insp { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; }
 .tpl-pal h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 14px 0 6px; }
 .tpl-pal button { display: block; width: 100%; text-align: left; margin: 0 0 4px; text-transform: none; letter-spacing: 0; font-size: 13px; padding: 5px 8px; }
-.tpl-canvas { min-height: 400px; border: 1px dashed var(--line); padding: 12px 16px; }
+.tpl-canvas { display: flex; flex-wrap: wrap; gap: 0 12px; align-content: flex-start; min-height: 400px; border: 1px dashed var(--line); padding: 12px 16px; }
 .tpl-canvas.preview { border: 0; padding: 0; }
 .blk { position: relative; padding: 8px; margin: 6px 0; border: 1px solid transparent; }
 .tpl-canvas:not(.preview) .blk:hover { border-color: var(--line); }
@@ -23,3 +23,12 @@
 .tpl-insp .fld { margin: 0 0 12px; } .tpl-insp textarea { min-height: 120px; font: 13px/1.4 var(--mono); }
 .tpl-empty { color: var(--mute); padding: 32px 0; text-align: center; }
 @media (max-width: 1000px) { .tpl-cols { grid-template-columns: 1fr; } .tpl-pal, .tpl-insp { position: static; max-height: none; } .tpl-pal { display: flex; flex-wrap: wrap; gap: 4px; } .tpl-pal button { width: auto; } .tpl-pal h3 { width: 100%; } }
+
+.tpl-canvas .blk { width: calc(var(--w, 100) * 1% - 12px * (1 - var(--w, 100) / 100)); min-width: 0; }
+.tpl-canvas.preview .blk { padding: 0; }
+.tpl-empty { width: 100%; }
+.blk .rs { position: absolute; right: -4px; top: 0; bottom: 0; width: 8px; cursor: ew-resize; display: none; }
+.tpl-canvas:not(.preview) .blk:hover .rs, .tpl-canvas:not(.preview) .blk.sel .rs { display: block; background: linear-gradient(90deg, transparent 3px, var(--ink) 3px, var(--ink) 5px, transparent 5px); }
+.blk .drag { cursor: grab; } .blk.dropl { box-shadow: -4px 0 0 var(--accent); } .blk.dropr { box-shadow: 4px 0 0 var(--accent); }
+.ed { outline: 0; cursor: text; } .ed:hover { background: var(--soft); } .ed:focus { background: var(--soft); outline: 1px dashed var(--mute); }
+@media (max-width: 700px) { .tpl-canvas .blk { width: calc(100% - 12px); } }
