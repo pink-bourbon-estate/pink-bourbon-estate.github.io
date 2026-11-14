@@ -122,8 +122,7 @@
     const p = $('palette'); p.replaceChildren();
     order.forEach((g) => { const h = document.createElement('h3'); h.textContent = g; p.append(h); Object.values(BL).filter((d) => d.group === g || (g === 'Music' && d.group === 'Music')).forEach((d) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = '+ ' + d.name; b.addEventListener('click', () => addBlock(d.t)); p.append(b); }); });
   }
-  function drawInspector() {
-    const w = $('inspector'); w.replaceChildren();
+  function drawForm(w) {
     const b = cur().blocks.find((x) => x.id === S.sel);
     if (!b) { w.innerHTML = '<p class="meta">Click a panel to edit it. Panels can be moved, copied and deleted with the small buttons that appear above them.</p>'; return; }
     const d = BL[b.t], vals = Object.assign({}, d.defaults, b.p);
@@ -143,6 +142,65 @@
       el.dataset.key = key; l.append(el); w.append(l);
     });
     if (!d.fields.length) { const p = document.createElement('p'); p.className = 'meta'; p.textContent = 'This panel has nothing to edit.'; w.append(p); }
+  }
+
+  /* ---------------------------------------------------------------- the right-hand editor: boxes ("Form") or code ("Code") */
+  const pref = (k, d) => get('pbt-' + k) || d, setPref = (k, v) => put('pbt-' + k, v);
+  const pretty = (html) => {          // lay HTML out one tag per line, indented, so it is easy to read
+    const VOID = /^<(br|hr|img|input|meta|link|circle|path|rect|line|polyline)\b/i; let d = 0, out = [];
+    (html.match(/<[^>]+>|[^<]+/g) || []).forEach((t) => {
+      if (/^<\//.test(t)) d = Math.max(0, d - 1);
+      if (!/^\s+$/.test(t)) out.push('  '.repeat(d) + t.trim());
+      if (/^<[a-z]/i.test(t) && !/\/>$/.test(t) && !VOID.test(t) && !/^<\/|<!--/.test(t)) d++;
+    });
+    return out.join('\n');
+  };
+  const squash = (s) => s.replace(/\s+/g, ' ').replace(/ ?(<[^>]+>) ?/g, '$1').trim();
+  const panelHtml = (b) => blockHtml(b).replace(/ data-edit="[a-z]+"/g, '');
+  const pageHtml = () => S.pages.map((p, i) => '<section data-page="' + i + '">\n' + p.blocks.map((x) => '<div data-block="' + x.id + '" style="--w:' + (x.w || 100) + '">\n' + pretty(panelHtml(x)) + '\n</div>').join('\n') + '\n</section>').join('\n');
+
+  function drawCode(w) {
+    const scope = pref('scope', 'panel'), fmt = pref('fmt', 'html'), b = cur().blocks.find((x) => x.id === S.sel);
+    const row = (label, key, opts) => { const l = document.createElement('label'), s = document.createElement('select'); l.className = 'fld'; l.append(label); opts.forEach(([v, t]) => s.append(new Option(t, v))); s.value = pref(key, opts[0][0]); s.addEventListener('change', () => { setPref(key, s.value); drawInspector(); }); l.append(s); w.append(l); };
+    row('Show the code for', 'scope', [['panel', 'This panel only'], ['page', 'The whole project']]);
+    row('As', 'fmt', [['html', 'HTML (what the page is made of)'], ['json', 'Settings (what this builder saves)']]);
+    const ta = document.createElement('textarea'), msg = document.createElement('p'); ta.className = 'codebox'; ta.spellcheck = false; ta.setAttribute('aria-label', 'Code'); msg.className = 'meta'; msg.setAttribute('role', 'status');
+    let text = '';
+    if (scope === 'panel') {
+      if (!b) { w.append(Object.assign(document.createElement('p'), { className: 'meta', textContent: 'Click a panel on the page to see its code. Or choose "The whole project" above.' })); return; }
+      text = fmt === 'json' ? JSON.stringify({ type: b.t, width: b.w || 100, settings: Object.assign({}, BL[b.t].defaults, b.p) }, null, 2) : pretty(panelHtml(b));
+    } else text = fmt === 'json' ? JSON.stringify({ title: S.title, pages: S.pages }, null, 2) : pageHtml();
+    ta.value = text; ta.rows = 18; w.append(ta);
+    const note = scope === 'panel' && fmt === 'html' ? 'Applying turns this panel into a "Custom HTML" panel that you edit as code only. Its behaviour (sliders, ticks, clock) keeps working if you keep its class names.' : scope === 'page' && fmt === 'html' ? 'Applying keeps every panel you did not change as it was (still editable in boxes). A panel whose code you changed becomes a "Custom HTML" panel.' : 'Applying changes the panel exactly, and you can keep using the boxes afterwards.';
+    const hint = document.createElement('p'); hint.className = 'meta'; hint.textContent = note; w.append(hint);
+    const apply = document.createElement('button'), undo = document.createElement('button'); apply.type = undo.type = 'button'; apply.textContent = 'Apply'; undo.textContent = 'Revert'; undo.addEventListener('click', () => { ta.value = text; msg.textContent = ''; });
+    const run = () => {
+      try {
+        if (fmt === 'json') {
+          const j = JSON.parse(ta.value);
+          if (scope === 'panel') { if (!BL[j.type]) throw new Error('Unknown panel type "' + j.type + '".'); b.t = j.type; b.p = Object.assign({}, j.settings || {}); b.w = [25, 33, 50, 66, 75, 100].includes(+j.width) ? +j.width : 100; }
+          else { const n = clean(j); S.title = n.title; S.pages = n.pages; S.cur = Math.min(S.cur, S.pages.length - 1); S.sel = null; $('title').value = S.title; }
+        } else if (scope === 'panel') {
+          const list = cur().blocks, i = list.indexOf(b); list[i] = mk('html', { code: ta.value }, b.w); S.sel = list[i].id;
+        } else {
+          const d = new DOMParser().parseFromString('<body>' + ta.value + '</body>', 'text/html'), secs = [...d.querySelectorAll('section[data-page]')];
+          if (!secs.length) throw new Error('Keep the <section data-page="..."> wrappers: they mark the pages.');
+          const all = new Map(S.pages.flatMap((p) => p.blocks).map((x) => [x.id, x]));
+          const pages = secs.map((sec, i) => ({ name: (S.pages[i] && S.pages[i].name) || 'Page ' + (i + 1), blocks: [...sec.children].filter((c) => c.matches('[data-block]')).map((c) => { const old = all.get(c.dataset.block), w = parseFloat((c.getAttribute('style') || '').replace(/.*--w:\s*(\d+).*/, '$1')) || 100; if (old && squash(panelHtml(old)) === squash(c.innerHTML)) { old.w = [25, 33, 50, 66, 75, 100].includes(w) ? w : old.w; return old; } if (old && old.t === 'html') return Object.assign(old, { p: { code: c.innerHTML }, w }); return mk('html', { code: c.innerHTML }, w); }) }));
+          S.pages = pages; S.cur = Math.min(S.cur, pages.length - 1); S.sel = null;
+        }
+        save(); draw();
+      } catch (e) { msg.textContent = 'Could not apply: ' + e.message; }
+    };
+    apply.addEventListener('click', run); ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); } if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); ta.setRangeText('  ', ta.selectionStart, ta.selectionEnd, 'end'); } });
+    if (fmt === 'json') ta.addEventListener('input', () => { try { JSON.parse(ta.value); msg.textContent = 'Valid'; } catch (e) { msg.textContent = 'Not valid yet: ' + e.message; } });
+    const bar = document.createElement('p'); bar.append(apply, ' ', undo); w.append(bar, msg);
+  }
+  function drawInspector() {
+    const w = $('inspector'), mode = pref('mode', 'form'); w.replaceChildren();
+    const seg = document.createElement('p'); seg.className = 'seg';
+    [['form', 'Boxes'], ['code', 'Code']].forEach(([m, t]) => { const x = document.createElement('button'); x.type = 'button'; x.textContent = t; x.setAttribute('aria-pressed', String(mode === m)); x.addEventListener('click', () => { setPref('mode', m); drawInspector(); }); seg.append(x); });
+    w.append(seg); if (mode === 'code') drawCode(w); else drawForm(w);
   }
   function draw() { drawPages(); drawCanvas(); drawInspector(); }
 

@@ -32,3 +32,7 @@
 .blk .drag { cursor: grab; } .blk.dropl { box-shadow: -4px 0 0 var(--accent); } .blk.dropr { box-shadow: 4px 0 0 var(--accent); }
 .ed { outline: 0; cursor: text; } .ed:hover { background: var(--soft); } .ed:focus { background: var(--soft); outline: 1px dashed var(--mute); }
 @media (max-width: 700px) { .tpl-canvas .blk { width: calc(100% - 12px); } }
+
+.seg { display: flex; margin: 0 0 14px; } .seg button { flex: 1; } .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.tpl-insp .codebox { font: 12px/1.45 var(--mono); white-space: pre; overflow: auto; min-height: 280px; width: 100%; }
+.tpl-cols:has(.codebox) { grid-template-columns: 200px minmax(0, 1fr) 380px; }
