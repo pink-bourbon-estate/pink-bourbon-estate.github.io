@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study notes: Cornell layout with highlights and sources - Pink Bourbon Estate</title>
+<meta name="description" content="Bring in text or transcripts, highlight what matters, and the highlights become your main ideas. Write comments and a summary, keep a bibliography in APA, Harvard, MLA or Chicago style, and download your notes.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/study/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="study.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/">Projects</a><a href="../articles/">Articles</a><a href="../tutorials/">Tutorials</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main" class="study">
+  <p class="tag">Study notes · version 0.1</p>
+  <h1>Learn by highlighting, then say it in your own words.</h1>
+  <p class="lede">Add text or transcripts as sources. Highlight what matters and it becomes a main idea, with a comment you write. Then write your summary. Everything stays in this browser.</p>
+  <noscript><p class="note">This page needs JavaScript. Nothing is sent anywhere either way.</p></noscript>
+
+  <div class="tools"><label class="fld grow">Title<input id="title" type="text" value="My study notes"></label>
+    <button type="button" id="newnote">New</button><button type="button" id="dlmd">Download notes (.md)</button><button type="button" id="dljson">Download project (.json)</button>
+    <label class="btn" for="openjson">Open project</label><input type="file" id="openjson" accept=".json" class="sr"><button type="button" id="print">Print</button><span id="saved" class="meta" role="status"></span></div>
+
+  <details id="srcbox" open><summary><b>1 · Sources and raw input</b> (what you read goes here)</summary>
+    <div class="form">
+      <label class="fld">Source title<input id="s-title" type="text"></label>
+      <label class="fld">Author(s), as Surname, Given; next author<input id="s-author" type="text" placeholder="Smith, Jane; Jones, Ali"></label>
+      <label class="fld">Year<input id="s-year" type="text" size="4"></label>
+      <label class="fld">Publisher, website or journal<input id="s-pub" type="text"></label>
+      <label class="fld">Address (URL)<input id="s-url" type="text"></label>
+      <label class="fld">Type<select id="s-type"><option value="web">Web page or article</option><option value="book">Book</option><option value="video">Video</option><option value="journal">Journal article</option></select></label>
+      <label class="fld">Date you read it<input id="s-acc" type="date"></label>
+    </div>
+    <label class="fld">Paste the text or transcript<textarea id="s-text" rows="6"></textarea></label>
+    <p><button type="button" id="addsrc">Add source</button> <label class="btn" for="s-file">Add from files (.txt, .md)</label><input type="file" id="s-file" accept=".txt,.md,.markdown,text/plain" multiple class="sr"> <span class="meta">URLs and YouTube need the downloader scripts first (a browser page cannot fetch other sites). Add the combined .md they make here.</span></p>
+    <ol id="srclist" class="srclist"></ol>
+  </details>
+
+  <h2>2 · Cornell notes</h2>
+  <p class="meta" id="hint">Select text on the right to highlight it. Highlights appear on the left as main ideas, where you add comments.</p>
+  <div class="cornell" id="cornell">
+    <h3 class="chead" id="ctitle"></h3>
+    <section class="cues" aria-label="Main ideas"><p class="tag">Main ideas and comments</p><div id="ideas"></div></section>
+    <section class="raw" aria-label="Raw input"><p class="tag">Raw input (select to highlight)</p><div id="rawbox"></div></section>
+    <section class="sum"><label class="fld">Summary, in your own words<textarea id="summary" rows="6"></textarea></label></section>
+  </div>
+
+  <h2>3 · Sources and bibliography</h2>
+  <label class="fld" style="max-width:260px">Style<select id="style"><option>APA 7</option><option>Harvard</option><option>MLA 9</option><option>Chicago (author-date)</option></select></label>
+  <p class="meta">Formats are simplified. Check your institution's guide for anything unusual.</p>
+  <ol id="bib" class="bib"></ol>
+
+  <h2>4 · Ask an AI to do a first pass (optional)</h2>
+  <p class="meta">Copy the instructions, paste them into any AI chat, then paste its answer below. Only plain text is kept: tags, links and tracking marks are removed, and each quote must be found in your own text.</p>
+  <p><button type="button" id="cp1">Copy instructions and my raw text</button> <button type="button" id="cp2">Copy instructions only</button></p>
+  <label class="fld">Paste the AI's answer<textarea id="ai" rows="5" placeholder='{"ideas":[{"quote":"...","comment":"..."}],"summary":"..."}'></textarea></label>
+  <p><button type="button" id="aiimp">Import the answer</button> <span id="aimsg" class="meta" role="status"></span></p>
+</main>
+<footer class="foot"><p>No cookies, no tracking, nothing loaded from other sites.</p><p><a href="../privacy/">Privacy and licence</a></p></footer>
+<script src="study.js"></script>
+</body>
+</html>

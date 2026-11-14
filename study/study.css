@@ -1,0 +1,17 @@
+.study { max-width: 1300px; }
+.grow { flex: 1 1 260px; }
+.cornell { display: grid; grid-template-columns: 32% 1fr; grid-template-rows: auto minmax(360px, auto) auto; border: 1px solid var(--ink); }
+.cornell .chead { grid-column: 1 / -1; margin: 0; padding: 10px 14px; border-bottom: 1px solid var(--ink); }
+.cues { border-right: 1px solid var(--ink); padding: 8px 12px; } .raw { padding: 8px 14px; max-height: 70vh; overflow: auto; }
+.sum { grid-column: 1 / -1; border-top: 1px solid var(--ink); padding: 8px 12px; }
+.rawsrc { white-space: pre-wrap; font-size: 15px; line-height: 1.6; margin: 0 0 20px; user-select: text; }
+.rawh { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 16px 0 6px; border-top: 1px solid var(--line); padding-top: 8px; }
+mark { background: color-mix(in srgb, #ffd54a 70%, transparent); color: inherit; cursor: pointer; padding: 0 1px; }
+mark.on { outline: 2px solid var(--ink); }
+.idea { border-top: 1px solid var(--line); padding: 8px 0; font-size: 14px; }
+.idea q { display: block; color: var(--mute); margin-bottom: 4px; quotes: none; cursor: pointer; } .idea textarea { min-height: 54px; font-size: 14px; }
+.idea .x { float: right; padding: 0 6px; font-size: 11px; }
+.srclist li { margin: 4px 0; font-size: 14px; } .srclist button { padding: 1px 6px; font-size: 11px; margin-left: 8px; }
+.bib li { margin: 6px 0; padding-left: 1.5em; text-indent: -1.5em; font-size: 15px; list-style: none; }
+@media (max-width: 800px) { .cornell { grid-template-columns: 1fr; } .cues { border-right: 0; border-bottom: 1px solid var(--ink); } }
+@media print { .top, .foot, .tools, #srcbox, .study > p, .study > h1, .study > h2:not(:first-of-type), #style, .bib ~ *, label[for=style], #hint, .study > label { display: none !important; } .raw { max-height: none; overflow: visible; } .idea .x { display: none; } mark { background: #ffe58a; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
