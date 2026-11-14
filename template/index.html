@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Template: build and edit a page - Pink Bourbon Estate</title>
+<meta name="description" content="A small site builder: start from blank or a template, import a page, add and move panels (charts, sliders, drop-downs, habit boxes, notes paper, piano, tab) and download the result as one HTML file.">
+<link rel="canonical" href="https://pink-bourbon-estate.github.io/template/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="template.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="mark" href="../" aria-label="Pink Bourbon Estate, home">Pink Bourbon <span>Estate</span></a>
+  <nav aria-label="Main"><a href="../projects/">Projects</a><a href="../articles/">Articles</a><a href="../tutorials/">Tutorials</a><a href="../privacy/">Privacy and licence</a><a href="https://github.com/pink-bourbon-estate" rel="noopener">GitHub</a></nav>
+</header>
+<main id="main" class="tpl">
+  <noscript><p class="note">The builder needs JavaScript. Nothing is sent anywhere either way.</p></noscript>
+  <section id="start" hidden>
+    <p class="tag">Template · version 0.1</p>
+    <h1>Build a page, panel by panel.</h1>
+    <p class="lede">Start from blank or from a template, or bring in a page you already have. Add, move and delete tabs and panels, change what is in them, then download the finished page as a single file. Everything stays in this browser.</p>
+    <h2>Start from a template</h2>
+    <div id="templates" class="tpl-cards"></div>
+    <h2>Import</h2>
+    <div class="tools">
+      <label class="fld">A page from this site<select id="sitepages"><option value="">Choose...</option></select></label>
+      <button type="button" id="importsite">Import it</button>
+      <label class="btn" for="importfile">Open a file (.html or .json)</label><input type="file" id="importfile" accept=".html,.htm,.json" class="sr">
+      <button type="button" id="resume" hidden>Continue my last project</button>
+    </div>
+    <p class="meta" id="importnote">Imported pages keep their headings, paragraphs and other content (as editable "Custom HTML" panels). Scripts are removed, so a page's interactive parts will not come across: rebuild those from the panels.</p>
+  </section>
+  <section id="editor" hidden>
+    <div class="tools tpl-bar">
+      <label class="fld grow">Project title<input id="title" type="text"></label>
+      <button type="button" id="new">New or template...</button>
+      <button type="button" id="preview" aria-pressed="false">Preview</button>
+      <button type="button" id="saveproj">Download project (.json)</button>
+      <button type="button" id="export">Download page (.html)</button>
+      <span id="saved" class="meta" role="status"></span>
+    </div>
+    <div class="tpl-pages" id="pages" role="tablist" aria-label="Pages"></div>
+    <div class="tpl-cols">
+      <aside class="tpl-pal" id="palette" aria-label="Add a panel"></aside>
+      <div class="tpl-canvas" id="canvas" aria-label="The page you are building"></div>
+      <aside class="tpl-insp" id="inspector" aria-label="Edit the selected panel"></aside>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <p>No cookies, no tracking, nothing loaded from other sites. Projects are saved in this browser only; download them to keep them.</p>
+  <p><a href="../privacy/">Privacy and licence</a> · <a href="https://github.com/pink-bourbon-estate" rel="noopener">Source code</a></p>
+</footer>
+<script src="blocks.js"></script>
+<script src="builder.js"></script>
+</body>
+</html>

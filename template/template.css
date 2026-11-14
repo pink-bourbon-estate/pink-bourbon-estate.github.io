@@ -1,0 +1,25 @@
+/* Template builder layout: panels to add on the left, the page in the middle, the editor for the chosen panel on the right. */
+.tpl { max-width: 1500px; }
+.tpl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.tpl-cards button { text-align: left; text-transform: none; letter-spacing: 0; font-size: 15px; padding: 14px; }
+.tpl-cards button small { display: block; color: var(--mute); margin-top: 4px; font-size: 13px; }
+.tpl-cards button:hover small { color: inherit; }
+.tpl-bar .grow { flex: 1 1 240px; } .tpl-bar input { min-width: 0; }
+.tpl-pages { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin: 4px 0 14px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.tpl-pages button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tpl-pages .small, .tpl-insp .small, .tpl-pal button { padding: 3px 8px; font-size: 11px; }
+.tpl-cols { display: grid; grid-template-columns: 200px minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+.tpl-pal, .tpl-insp { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; }
+.tpl-pal h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 14px 0 6px; }
+.tpl-pal button { display: block; width: 100%; text-align: left; margin: 0 0 4px; text-transform: none; letter-spacing: 0; font-size: 13px; padding: 5px 8px; }
+.tpl-canvas { min-height: 400px; border: 1px dashed var(--line); padding: 12px 16px; }
+.tpl-canvas.preview { border: 0; padding: 0; }
+.blk { position: relative; padding: 8px; margin: 6px 0; border: 1px solid transparent; }
+.tpl-canvas:not(.preview) .blk:hover { border-color: var(--line); }
+.tpl-canvas:not(.preview) .blk.sel { border-color: var(--ink); }
+.blk .tb { display: none; position: absolute; right: 4px; top: -14px; background: var(--bg); gap: 4px; z-index: 2; }
+.tpl-canvas:not(.preview) .blk:hover .tb, .tpl-canvas:not(.preview) .blk.sel .tb { display: flex; }
+.blk .tb button { padding: 2px 7px; font-size: 11px; }
+.tpl-insp .fld { margin: 0 0 12px; } .tpl-insp textarea { min-height: 120px; font: 13px/1.4 var(--mono); }
+.tpl-empty { color: var(--mute); padding: 32px 0; text-align: center; }
+@media (max-width: 1000px) { .tpl-cols { grid-template-columns: 1fr; } .tpl-pal, .tpl-insp { position: static; max-height: none; } .tpl-pal { display: flex; flex-wrap: wrap; gap: 4px; } .tpl-pal button { width: auto; } .tpl-pal h3 { width: 100%; } }
