@@ -16,7 +16,7 @@
   /* ---------------------------------------------------------------- starting points */
   const TEMPLATES = [
     ['Blank', 'An empty page with a heading.', () => ({ title: 'My page', pages: [page('Home', mk('heading', { text: 'My page', level: '1' }), mk('text'))] })],
-    ['Tracker', 'Habit boxes, a tick list and a chart, plus a notes page.', () => ({ title: 'My tracker', pages: [page('Today', mk('heading', { text: 'Today', level: '1' }), mk('habits'), mk('checklist'), mk('line')), page('Notes', mk('plain', { rows: 20, lined: true }))] })],
+    ['Tracker', 'Habit boxes, a tick list and a chart, plus a notes page.', () => ({ title: 'My tracker', pages: [page('Today', mk('heading', { text: 'Today', level: '1' }), mk('habits'), mk('checklist'), mk('log'), mk('routine'), mk('dates')), page('Notes', mk('notes')), page('Month', mk('month')), page('Notes paper', mk('plain', { rows: 20, lined: true }))] })],
     ['Notebook', 'Cornell notes, grid and plain paper, piano and tab.', () => ({ title: 'My notebook', pages: [page('Cornell', mk('cornell')), page('Grid', mk('grid')), page('Plain', mk('plain', { rows: 24, lined: true })), page('Music', mk('piano'), mk('tab'))] })],
     ['Dashboard', 'Big numbers, charts, a table, a slider and a drop-down.', () => ({ title: 'My dashboard', pages: [page('Overview', mk('heading', { text: 'Overview', level: '1' }), mk('stats'), mk('bar'), mk('line'), mk('table')), page('Tools', mk('slider'), mk('dropdown'), mk('toggle'), mk('timer'), mk('random'))] })],
     ['Landing page', 'A big opening, a washi-tape list with filter, and questions.', () => ({ title: 'My site', pages: [page('Home', mk('hero'), mk('tape'), mk('faq'))] })]

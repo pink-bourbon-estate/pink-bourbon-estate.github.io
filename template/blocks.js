@@ -84,6 +84,18 @@
   add('piano', 'Piano keyboard', 'Music', { title: '', octaves: 2, labels: true }, [['title', 'text', 'Title'], ['octaves', 'num', 'Octaves (1 to 4)'], ['labels', 'check', 'Show note names']], piano);
   add('tab', 'Guitar / bass tab', 'Music', { title: '', strings: '6', length: 32 }, [['title', 'text', 'Title'], ['strings', 'select', 'Strings', ['6', '4']], ['length', 'num', 'Length (dashes)']], tab);
 
+
+  /* ---- trackers: the log, routine, dates and notes tabs of the tracker tools (tracker.js), and the meditation and kitchen timers ---- */
+  const cfg = (o) => ' data-cfg="' + esc(JSON.stringify(o)) + '"';
+  add('log', 'Log (form, table, chart)', 'Trackers', { title: 'Weight log', fields: 'Weight|number\nNote|text', chart: 'Weight', unit: ' kg' }, [['title', 'text', 'Title'], ['fields', 'area', 'One field per line: name|number, text or date'], ['chart', 'text', 'Draw a line chart of this number field (its name)'], ['unit', 'text', 'Unit']], (p) => head(p) + '<div class="pb-log"' + cfg({ fields: lines(p.fields).map((l) => l.split('|')), chart: p.chart, unit: p.unit }) + '></div>');
+  add('routine', 'Routine checks (due / overdue)', 'Trackers', { title: 'Home routines', data: 'Water the plants|weekly\nClean the kettle|monthly\nWipe the counters|daily' }, [['title', 'text', 'Title'], ['data', 'area', 'One per line: job|daily, weekly, monthly or yearly']], (p) => head(p) + '<div class="pb-routine"' + cfg({ rows: lines(p.data).map((l) => l.split('|')) }) + '></div>');
+  add('dates', 'Dates with countdown', 'Trackers', { title: 'Coming up', data: 'Insurance renews|2027-03-01\nPassport check|2027-06-15' }, [['title', 'text', 'Title'], ['data', 'area', 'One per line: name|YYYY-MM-DD']], (p) => head(p) + '<div class="pb-dates"' + cfg({ rows: lines(p.data).map((l) => l.split('|')) }) + '></div>');
+  add('notes', 'Notes list', 'Trackers', { title: 'Notes' }, [['title', 'text', 'Title']], (p) => head(p) + '<div class="pb-notes"></div>');
+  add('month', 'Month of x boxes', 'Trackers', { title: 'Did it today?' }, [['title', 'text', 'Habit name']], (p) => head(p) + '<div class="pb-month"></div>');
+  add('progress', 'Progress bar', 'Trackers', { label: 'Sourdough starter fed', value: 3, max: 7, unit: ' days' }, [['label', 'text', 'Label'], ['value', 'num', 'Value'], ['max', 'num', 'Out of'], ['unit', 'text', 'Unit']], (p) => '<p class="fld">' + esc(p.label) + ' <b>' + esc(p.value) + ' / ' + esc(p.max) + esc(p.unit) + '</b></p><div class="pb-meter" role="img" aria-label="' + esc(p.label) + '"><span style="width:' + Math.min(100, Math.max(0, (+p.value / (+p.max || 1)) * 100)) + '%"></span></div>');
+  add('breathe', 'Breathing pacer', 'Time and random', { inh: 4, hold: 4, out: 6, rest: 2 }, [['inh', 'num', 'Breathe in (seconds)'], ['hold', 'num', 'Hold (seconds)'], ['out', 'num', 'Breathe out (seconds)'], ['rest', 'num', 'Rest (seconds)']], (p) => '<div class="pb-breathe"' + cfg({ s: [+p.inh || 0, +p.hold || 0, +p.out || 0, +p.rest || 0] }) + '><div class="orb"></div><p><b class="big">Ready</b> <button type="button">Start</button></p></div>');
+  add('sound', 'Bell and bowl sounds', 'Time and random', { sound: 'bowl', every: 0 }, [['sound', 'select', 'Sound', ['bell', 'bowl', 'chime', 'gong', 'wood']], ['every', 'num', 'Repeat every N minutes (0 = only when you press Play)']], (p) => '<p class="pb-sound"' + cfg({ sound: p.sound, every: +p.every || 0 }) + '><button type="button" data-play>Play ' + esc(p.sound) + '</button> ' + (+p.every ? '<button type="button" data-repeat aria-pressed="false">Repeat every ' + (+p.every) + ' min</button>' : '') + '</p>');
+
   /* ---- what makes the panels work. Plain JavaScript, copied into every exported page ---- */
   function runtime(root, key) {
     const $$ = (s) => [...root.querySelectorAll(s)];
@@ -108,6 +120,59 @@
     $$('[data-clock]').forEach((c) => { const t = () => { c.textContent = new Date().toLocaleTimeString(); }; t(); setInterval(t, 1000); });
     $$('.pb-timer').forEach((w) => { const out = w.querySelector('b'), total = +out.dataset.left; let left = total, id = 0; const show = () => { out.textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0'); }; w.querySelector('[data-go]').addEventListener('click', () => { clearInterval(id); id = setInterval(() => { left = Math.max(0, left - 1); show(); if (!left) clearInterval(id); }, 1000); }); w.querySelector('[data-reset]').addEventListener('click', () => { clearInterval(id); left = total; show(); }); });
     $$('.pb-random').forEach((r) => { const list = JSON.parse(r.dataset.pick), out = r.querySelector('b'); const go = () => { out.textContent = list.length ? list[Math.floor(Math.random() * list.length)] : ''; }; r.querySelector('button').addEventListener('click', go); go(); });
+
+    // ---- trackers ----
+    const E = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const mkEl = (tag, text, attrs) => { const e = document.createElement(tag); if (text != null) e.textContent = text; for (const a in (attrs || {})) e.setAttribute(a, attrs[a]); return e; };
+    const iso = (d) => d.toISOString().slice(0, 10), todayIso = () => iso(new Date());
+    const daysFrom = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
+    const store = (w, name) => { const k = w.closest('[data-block]').dataset.block + name; return { read: (d) => { try { return JSON.parse(get(k) || 'null') || d; } catch (e) { return d; } }, write: (v) => put(k, JSON.stringify(v)) }; };
+    const lineSvg = (pts, unit) => { if (pts.length < 2) return '<p class="meta">Add two or more entries to see the chart.</p>'; const W = 600, H = 200, ys = pts.map((q) => q[1]), lo = Math.min(...ys), hi = Math.max(...ys) || 1, rng = hi - lo || 1, x = (i) => 20 + (W - 40) * i / (pts.length - 1), y = (v) => H - 14 - (v - lo) / rng * (H - 34); return '<svg class="pb-chart" viewBox="0 0 ' + W + ' ' + (H + 24) + '" role="img" aria-label="Line chart"><line x1="0" y1="' + H + '" x2="' + W + '" y2="' + H + '"/><polyline fill="none" stroke="currentColor" stroke-width="2" points="' + pts.map((q, i) => x(i) + ',' + y(q[1])).join(' ') + '"/>' + pts.map((q, i) => '<circle class="bar" cx="' + x(i) + '" cy="' + y(q[1]) + '" r="3.5"><title>' + E(q[0]) + ': ' + q[1] + E(unit) + '</title></circle>').join('') + '<text x="20" y="' + (H + 16) + '">' + E(pts[0][0]) + '</text><text x="' + (W - 20) + '" y="' + (H + 16) + '" text-anchor="end">' + E(pts[pts.length - 1][0]) + '</text></svg>'; };
+    // log: a form, a table and a chart of one number field
+    $$('.pb-log').forEach((w) => {
+      const c = JSON.parse(w.dataset.cfg), st = store(w, 'log'); let rows = st.read([]);
+      const form = mkEl('div', null, { class: 'form' }), inputs = c.fields.map(([name, type]) => { const l = mkEl('label', name, { class: 'fld' }), i = mkEl('input', null, { type: type === 'number' || type === 'date' ? type : 'text', step: 'any' }); if (type === 'date') i.value = todayIso(); l.append(i); form.append(l); return i; });
+      const add = mkEl('button', 'Add entry', { type: 'button' }), box = mkEl('div'), chart = mkEl('div');
+      add.addEventListener('click', () => { const r = {}; c.fields.forEach(([n], i) => { r[n] = inputs[i].value; }); if (!Object.values(r).some((v) => v)) return; r._d = todayIso(); rows.push(r); st.write(rows); draw(); inputs.forEach((i, n) => { if (c.fields[n][1] !== 'date') i.value = ''; }); });
+      const draw = () => {
+        box.replaceChildren(); const t = mkEl('table'), hr = mkEl('tr'); t.append(mkEl('thead')); c.fields.forEach(([n]) => hr.append(mkEl('th', n))); hr.append(mkEl('th', '')); t.firstChild.append(hr); const tb = mkEl('tbody'); t.append(tb);
+        rows.forEach((r, i) => { const tr = mkEl('tr'); c.fields.forEach(([n]) => tr.append(mkEl('td', r[n]))); const d = mkEl('button', 'Delete', { type: 'button' }); d.addEventListener('click', () => { rows.splice(i, 1); st.write(rows); draw(); }); const td = mkEl('td'); td.append(d); tr.append(td); tb.append(tr); });
+        box.append(mkEl('div', null, { class: 'tablewrap' })); box.firstChild.append(t);
+        chart.innerHTML = c.chart ? lineSvg(rows.filter((r) => r[c.chart] !== '' && !isNaN(parseFloat(r[c.chart]))).map((r) => [r._d, parseFloat(r[c.chart])]), c.unit) : '';
+      };
+      w.append(form, mkEl('p'), box, chart); w.children[1].append(add); draw();
+    });
+    // routine: when each job was last done, and whether it is due
+    $$('.pb-routine').forEach((w) => {
+      const c = JSON.parse(w.dataset.cfg), st = store(w, 'routine'), every = { daily: 1, weekly: 7, monthly: 30, yearly: 365 };
+      const draw = () => { const done = st.read({}); w.replaceChildren(); const t = mkEl('table'), tb = mkEl('tbody'); t.append(tb); c.rows.forEach(([n, f]) => { const gap = every[(f || '').trim().toLowerCase()] || 7, last = done[n], since = last ? daysFrom(last, todayIso()) : null; const state = since == null ? 'Not done yet' : since >= gap ? 'Overdue by ' + (since - gap + 1) + ' day(s)' : 'Next in ' + (gap - since) + ' day(s)'; const b = mkEl('button', 'Done today', { type: 'button' }); b.addEventListener('click', () => { done[n] = todayIso(); st.write(done); draw(); }); const tr = mkEl('tr'); tr.append(mkEl('td', n), mkEl('td', f), mkEl('td', state)); const td = mkEl('td'); td.append(b); tr.append(td); tb.append(tr); }); const wrap = mkEl('div', null, { class: 'tablewrap' }); wrap.append(t); w.append(wrap); };
+      draw();
+    });
+    // dates: a countdown to each date; you can change a date
+    $$('.pb-dates').forEach((w) => {
+      const c = JSON.parse(w.dataset.cfg), st = store(w, 'dates'); const draw = () => { const ov = st.read({}); w.replaceChildren(); const t = mkEl('table'), tb = mkEl('tbody'); t.append(tb); c.rows.forEach(([n, d]) => { const v = ov[n] || d, left = daysFrom(todayIso(), v); const i = mkEl('input', null, { type: 'date', value: v, 'aria-label': n }); i.addEventListener('change', () => { ov[n] = i.value; st.write(ov); draw(); }); const tr = mkEl('tr'), td = mkEl('td'); td.append(i); tr.append(mkEl('td', n), td, mkEl('td', isNaN(left) ? '' : left < 0 ? Math.abs(left) + ' day(s) ago' : left === 0 ? 'Today' : left + ' day(s) to go')); tb.append(tr); }); const wrap = mkEl('div', null, { class: 'tablewrap' }); wrap.append(t); w.append(wrap); };
+      draw();
+    });
+    // notes: write a note, newest first
+    $$('.pb-notes').forEach((w) => {
+      const st = store(w, 'notes'); let list = st.read([]); const ta = mkEl('textarea', null, { rows: '4', 'aria-label': 'New note' }), b = mkEl('button', 'Add note', { type: 'button' }), out = mkEl('div');
+      const draw = () => { out.replaceChildren(); list.map((n, i) => [n, i]).reverse().forEach(([n, i]) => { const d = mkEl('div', null, { class: 'ev' }), x = mkEl('button', 'Delete', { type: 'button' }); x.addEventListener('click', () => { list.splice(i, 1); st.write(list); draw(); }); d.append(mkEl('p', n.d, { class: 'tag' }), mkEl('p', n.t), x); out.append(d); }); };
+      b.addEventListener('click', () => { if (!ta.value.trim()) return; list.push({ d: todayIso(), t: ta.value.trim() }); st.write(list); ta.value = ''; draw(); }); w.append(ta, mkEl('p'), out); w.children[1].append(b); draw();
+    });
+    // month of x boxes
+    $$('.pb-month').forEach((w) => {
+      const st = store(w, 'month'); let ym = todayIso().slice(0, 7);
+      const draw = () => { const done = st.read({}), first = new Date(ym + '-01T12:00:00'), days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate(), off = (first.getDay() + 6) % 7; w.replaceChildren();
+        const nav = mkEl('p'), prev = mkEl('button', 'Previous', { type: 'button' }), next = mkEl('button', 'Next', { type: 'button' }); prev.addEventListener('click', () => { const d = new Date(first); d.setMonth(d.getMonth() - 1); ym = iso(d).slice(0, 7); draw(); }); next.addEventListener('click', () => { const d = new Date(first); d.setMonth(d.getMonth() + 1); ym = iso(d).slice(0, 7); draw(); }); nav.append(prev, ' ', mkEl('b', first.toLocaleString(undefined, { month: 'long', year: 'numeric' })), ' ', next); w.append(nav);
+        const g = mkEl('div', null, { class: 'pb-days' }); ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach((x) => g.append(mkEl('span', x, { class: 'tag' }))); for (let i = 0; i < off; i++) g.append(mkEl('span'));
+        for (let d = 1; d <= days; d++) { const key = ym + '-' + String(d).padStart(2, '0'), b = mkEl('button', String(d), { type: 'button', class: 'xbox', 'aria-pressed': String(!!done[key]), 'aria-label': key }); b.addEventListener('click', () => { done[key] = !done[key]; st.write(done); b.setAttribute('aria-pressed', String(!!done[key])); }); g.append(b); } w.append(g); };
+      draw();
+    });
+    // breathing pacer and sounds (each sound is a handful of sine waves that fade out)
+    $$('.pb-breathe').forEach((w) => { const s = JSON.parse(w.dataset.cfg).s, labels = ['Breathe in', 'Hold', 'Breathe out', 'Rest'], total = s.reduce((a, b) => a + b, 0) || 1, orb = w.querySelector('.orb'), txt = w.querySelector('b'), btn = w.querySelector('button'); let id = 0, t = 0; const tick = () => { let x = t % total, i = 0; while (x >= s[i]) { x -= s[i]; i++; } txt.textContent = labels[i]; orb.style.transitionDuration = s[i] + 's'; orb.style.transform = i === 0 || i === 1 ? 'scale(1)' : 'scale(.45)'; t++; }; btn.addEventListener('click', () => { if (id) { clearInterval(id); id = 0; btn.textContent = 'Start'; txt.textContent = 'Ready'; orb.style.transform = ''; } else { t = 0; tick(); id = setInterval(tick, 1000); btn.textContent = 'Stop'; } }); });
+    let ac; const parts = { bell: [[1, 1], [2.76, .5], [5.4, .25]], bowl: [[1, 1], [1.006, 1], [2.7, .4]], chime: [[1, 1], [3, .4], [5, .2]], gong: [[.5, 1], [1.5, .6], [2.3, .4]], wood: [[1, 1], [2.3, .3]] }, life = { bell: 3, bowl: 6, chime: 2.5, gong: 7, wood: .3 };
+    const strike = (n) => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const T = ac.currentTime, f = n === 'gong' ? 130 : 440; parts[n].forEach(([m, a]) => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = f * m; g.gain.setValueAtTime(0.18 * a, T); g.gain.exponentialRampToValueAtTime(0.0005, T + life[n] / (1 + m / 3)); o.connect(g).connect(ac.destination); o.start(T); o.stop(T + life[n]); }); } catch (e) { /* no audio */ } };
+    $$('.pb-sound').forEach((w) => { const c = JSON.parse(w.dataset.cfg); w.querySelector('[data-play]').addEventListener('click', () => strike(c.sound)); const r = w.querySelector('[data-repeat]'); if (r) { let id = 0, n = 0; r.addEventListener('click', () => { if (id) { clearInterval(id); id = 0; r.setAttribute('aria-pressed', 'false'); } else { n = 0; r.setAttribute('aria-pressed', 'true'); id = setInterval(() => { if (++n >= c.every * 60) { n = 0; strike(c.sound); } }, 1000); } }); } });
     // piano: a short soft tone for each key
     let ctx; $$('.pb-piano rect').forEach((k) => k.addEventListener('pointerdown', () => { try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 261.63 * Math.pow(2, +k.dataset.semi / 12); g.gain.setValueAtTime(0.2, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2); o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 1.2); } catch (e) { /* no audio */ } k.classList.add('on'); setTimeout(() => k.classList.remove('on'), 160); }));
   }
@@ -120,6 +185,6 @@
     '.pb-piano{display:block;max-width:760px}.pb-piano .wk{fill:#fff;stroke:#111;cursor:pointer}.pb-piano .bk{fill:#111;cursor:pointer}.pb-piano .on{fill:var(--accent)}.pb-piano text{fill:#555;font:11px var(--sans);pointer-events:none}.pb-tab{font:14px/1.3 var(--mono);white-space:pre;overflow-x:auto}' +
     '.pb-slider{max-width:420px}.pb-out{min-height:1.5em}.pb-clock,.pb-timer .big,.pb-random .big{font-size:30px;font-weight:300}.pb-toggle button[aria-pressed=true]{background:var(--ink);color:var(--bg)}.xbox[aria-pressed=true]{background:transparent}' +
     '.pb-tabs{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 20px;border-bottom:1px solid var(--line)}.pb-tabs button{border:0;border-bottom:2px solid transparent;padding:8px 0}.pb-tabs button[aria-pressed=true]{background:transparent;color:var(--ink);border-bottom-color:var(--ink)}.pb-tabs button:hover{background:transparent;color:var(--accent)}' +
-    '.item,.tape{}@media print{.pb-tabs,.top nav{display:none}.pb-paper{border-color:#999}}';
-  window.PB = { blocks: B, esc, runtime, css: CSS, order: ['Text', 'Charts and tables', 'Controls', 'Time and random', 'Paper', 'Music'] };
+    '.pb-meter{height:8px;background:var(--line)}.pb-meter span{display:block;height:100%;background:var(--ink)}.pb-days{display:grid;grid-template-columns:repeat(7,34px);gap:4px;margin:8px 0}.pb-days .xbox{width:34px;height:34px;font-size:12px}.pb-days .xbox[aria-pressed=true]{background:var(--ink);color:var(--bg)}.pb-breathe .orb{width:160px;height:160px;border:2px solid var(--ink);border-radius:50%;margin:12px 0;transition:transform 4s ease-in-out}.pb-sound button[aria-pressed=true]{background:var(--ink);color:var(--bg)}.pb-log .tablewrap{margin:12px 0}@media print{.pb-tabs,.top nav{display:none}.pb-paper{border-color:#999}}';
+  window.PB = { blocks: B, esc, runtime, css: CSS, order: ['Text', 'Charts and tables', 'Controls', 'Trackers', 'Time and random', 'Paper', 'Music'] };
 })();
