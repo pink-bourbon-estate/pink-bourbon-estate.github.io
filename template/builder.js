@@ -50,12 +50,24 @@
       mk('log', { title: 'Decisions', fields: 'Decision|text\nOwner|text', chart: '', unit: '' }),
       mk('log', { title: 'Action items', fields: 'Action|text\nOwner|text\nDue|date\nStatus|text', chart: '', unit: '' }),
       mk('fields', { title: 'Next meeting', data: 'Date\nTime\nLocation', cols: '3' }))] })],
-    ['Landing page', 'A big opening, a washi-tape list with filter, and questions.', () => ({ title: 'My site', pages: [page('Home', mk('hero'), mk('tape'), mk('faq'))] })]
+    ['Landing page', 'A big opening, a washi-tape list with filter, and questions.', () => ({ title: 'My site', pages: [page('Home', mk('hero'), mk('tape'), mk('faq'))] })],
+    ['Website: like this site', 'A whole site in this site\'s layout: header with menu, a home page, Projects, Articles, About and Privacy. Downloads as a folder of pages you can put on GitHub Pages.', () => ({ kind: 'website', title: 'My website', pages: [
+      page('Home', mk('hero', { title: 'Tools, ideas and the code behind them.', text: 'A small place for things I made: free, open, with no tracking.', button: 'Projects', link: 'projects/' }), mk('heading', { text: 'Recently', level: '2' }), mk('tape', { data: 'My first project|Tools|1\nMy second project|Notes|2', filter: true })),
+      page('Projects', mk('heading', { text: 'Projects', level: '1' }), mk('text', { text: 'Everything I have made, with a filter.' }), mk('tape', { data: 'My first project|Tools|1\nMy second project|Notes|2\nMy third project|Tools|3', filter: true })),
+      page('Articles', mk('heading', { text: 'Articles', level: '1' }), mk('text', { text: 'Write your first article here. A blank line starts a new paragraph.' })),
+      page('About', mk('heading', { text: 'About', level: '1' }), mk('text', { text: 'Who made this and why.' }), mk('faq')),
+      page('Privacy', mk('heading', { text: 'Privacy and licence', level: '1' }), mk('note', { text: 'This site sets no cookies and has no tracking. Anything you type stays in your browser.' }))] })],
+    ['Tool planning', 'Plan a new tool before you build it: idea, data, screens, the four standard tabs, a build checklist and a release checklist.', () => ({ title: 'New tool plan', pages: [
+      page('Idea', mk('heading', { text: 'What is it?', level: '1' }), mk('fields', { data: 'Name of the tool\nWho it is for\nThe one problem it solves\nWhat it will not do', cols: '2' }), mk('plain', { rows: 10, lined: true })),
+      page('Data', mk('heading', { text: 'What it stores', level: '2' }), mk('table', { data: 'Field, Type, Example, Kept where\nDate, date, 2026-01-01, this browser\nAmount, number, 350, this browser' }), mk('note', { text: 'Store as little as possible, keep it in the browser, and say so on the My Data tab.' })),
+      page('Screens', mk('heading', { text: 'Sketch the screens', level: '2' }), mk('grid', { rows: 24, size: 24 })),
+      page('The four tabs', mk('heading', { text: 'Every tool has these four tabs', level: '2' }), mk('checklist', { title: 'Standard tabs', data: 'Sources: what the tool refers to\nMy Data: what is stored, export, back up, delete\nExample Data: made-up data to try it\nFAQ: common questions' })),
+      page('Build and release', mk('checklist', { title: 'Build', data: 'First working version\nWorks with the keyboard\nWorks on a phone\nLight and dark mode\nNothing sent to any server' }), mk('checklist', { title: 'Release', data: 'Sources written down\nFAQ written\nTried with example data\nDownloaded the folder and uploaded it to GitHub\nChecked the live page' }))] })]
   ];
 
   const clean = (j) => {               // accept a project from a file only if it has the right shape
     if (!j || !Array.isArray(j.pages) || !j.pages.length || j.pages.length > 30) throw new Error('This file is not a Template project.');
-    return { title: String(j.title || 'Imported').slice(0, 120), pages: j.pages.map((pg) => ({ name: String(pg.name || 'Page').slice(0, 60), blocks: (pg.blocks || []).filter((b) => BL[b.t]).slice(0, 300).map((b) => mk(b.t, b.p, b.w)) })) };
+    return { kind: j.kind === 'website' ? 'website' : 'project', title: String(j.title || 'Imported').slice(0, 120), pages: j.pages.map((pg) => ({ name: String(pg.name || 'Page').slice(0, 60), blocks: (pg.blocks || []).filter((b) => BL[b.t]).slice(0, 300).map((b) => mk(b.t, b.p, b.w)) })) };
   };
 
   /** Turn a web page into panels: headings and paragraphs become their own panels, everything else a Custom HTML panel. */
@@ -76,7 +88,7 @@
 
   /* ---------------------------------------------------------------- saving */
   let saveTimer;
-  const save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => { const ok = put(KEY, JSON.stringify({ title: S.title, pages: S.pages })); $('saved').textContent = ok ? 'Saved in this browser' : 'Not saved (storage blocked): download to keep it'; }, 300); };
+  const save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => { const ok = put(KEY, JSON.stringify({ kind: S.kind, title: S.title, pages: S.pages })); $('saved').textContent = ok ? 'Saved in this browser' : 'Not saved (storage blocked): download to keep it'; }, 300); };
   const download = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: (type || 'text/plain') + ';charset=utf-8' })); a.download = name; document.body.append(a); a.click(); a.remove(); };
   const slug = () => (S.title || 'page').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'page';
 
@@ -244,28 +256,77 @@
 
   /* ---------------------------------------------------------------- the finished page */
   const FALLBACK_CSS = ':root{--bg:#fff;--ink:#111;--mute:#5f5f5f;--line:#e2e2e2;--soft:#f5f5f3;--accent:#b0124f;--sans:Helvetica,Arial,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}@media(prefers-color-scheme:dark){:root{--bg:#111;--ink:#f1f1ee;--mute:#a3a3a0;--line:#2c2c2c;--soft:#1b1b1b;--accent:#ff7aa8}}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans)}main{max-width:1100px;margin:0 auto;padding:24px}button,.btn{font:inherit;font-size:12px;text-transform:uppercase;letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--ink);padding:6px 12px;cursor:pointer}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}.note{background:var(--soft);padding:12px 16px}.item{display:grid;grid-template-columns:14px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}.tape{background:var(--tape);align-self:stretch;transform:rotate(-1.5deg)}';
+  const slugOf = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'page';
+  const grab = async (url, fb) => { try { const r = await fetch(url); if (r.ok) return await r.text(); } catch (e) { /* offline */ } return fb; };
+  const inScript = (t) => t.replace(/<\/script/gi, '<\\/script');
+  const clip = (b) => '<div data-block="' + b.id + '" style="--w:' + (b.w || 100) + '">' + blockHtml(b).replace(/ data-edit="[a-z]+"/g, '') + '</div>';
+  const runtimeTag = (k) => '<script>\n(' + runtime.toString() + ')(document, ' + JSON.stringify(k) + ');\n<\/script>';
+  const FOOT = '<footer class="foot"><p>Made with Template from Pink Bourbon Estate. No cookies, no tracking.</p></footer>';
+  /* the words for the Sources, My Data and FAQ tabs of a project made here (shell.js reads this; edit it in the downloaded info.js) */
+  const infoJs = (id) => 'window.PBEinfo = window.PBEinfo || {};\nwindow.PBEinfo[' + JSON.stringify(id) + '] = {\n  /* the browser-storage keys of this project, so the My Data tab can export, back up and delete them */\n  get keys() { try { return Object.keys(localStorage).filter(function (k) { return k.indexOf(' + JSON.stringify('pb-' + id + ':') + ') === 0; }); } catch (e) { return []; } },\n  sources: [{ h: \'Where this comes from\', items: [{ t: \'Your own entries\', n: \'everything shown here is what you typed; nothing is looked up from other sites. Add the books, pages and data sets you used.\' }] }],\n  faq: [{ q: \'Where is my data kept?\', a: \'Only in this browser. Nothing is sent anywhere. Use the My Data tab to download a backup.\' }, { q: \'Does it track me?\', a: \'No cookies, no analytics, no accounts.\' }]\n};\n';
+  const initTag = (id) => '<script>document.addEventListener("DOMContentLoaded",function(){if(typeof PBEshell!=="undefined"&&!document.querySelector("nav.tabs"))PBEshell.page(' + JSON.stringify(id) + ');});<\/script>';
+  const head = (title, css, extra) => '<!doctype html>\n<html lang="en-GB">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>' + esc(title) + '</title>\n' + extra + '\n' + css + '\n</head>\n';
+  /* a project (one tool): the pages become tabs, then Sources | My Data | Example Data | FAQ follow, exactly like every other project on this site */
+  function projectDoc(id, mode, css, shellJs, themeJs) {
+    const first = S.pages[0].name, body = S.pages.map((p) => '<section class="pb-row" data-pbe-tab="' + esc(p.name) + '">' + p.blocks.map(clip).join('\n') + '</section>').join('\n');
+    const lib = mode === 'zip' ? '<script src="theme.js"></script>\n<link rel="stylesheet" href="style.css">' : '<style>\n' + css + '\n</style>';
+    const scripts = mode === 'zip' ? '<script src="info.js"></script>\n<script src="shell.js"></script>' : '<script>\n' + inScript(infoJs(id)) + '\n<\/script>\n<script>\n' + inScript(shellJs) + '\n<\/script>';
+    return head(S.title, '', lib) + '<body>\n<a class="skip" href="#main">Skip to the content</a>\n<header class="top"><a class="mark" href="./">' + esc(S.title) + '</a></header>\n<main id="main" data-tool-tab="' + esc(first) + '">\n<h1>' + esc(S.title) + '</h1>\n<p class="lede">A tool made with Template.</p>\n' + body + '\n</main>\n' + FOOT + '\n' + scripts + '\n' + runtimeTag('pb-' + id + ':') + '\n' + initTag(id) + '\n</body>\n</html>\n';
+  }
+  /* a website: one folder per page, the same header, menu and footer on each */
+  function siteDocs(id, css) {
+    const slugs = []; S.pages.forEach((p, i) => { let s = i ? slugOf(p.name) : '', n = 2; while (i && (slugs.includes(s) || s === 'style')) s = slugOf(p.name) + '-' + n++; slugs.push(s); });
+    return S.pages.map((p, i) => {
+      const up = i ? '../' : './', nav = S.pages.map((q, j) => '<a href="' + (i ? '../' : '') + (j ? slugs[j] + '/' : (i ? '' : './')) + '"' + (i === j ? ' aria-current="page"' : '') + '>' + esc(q.name) + '</a>').join('');
+      const html = head(S.title + (i ? ' - ' + p.name : ''), '', '<script src="' + (i ? '../' : '') + 'theme.js"></script>\n<link rel="stylesheet" href="' + (i ? '../' : '') + 'style.css">') + '<body>\n<a class="skip" href="#main">Skip to the content</a>\n<header class="top"><a class="mark" href="' + up + '">' + esc(S.title) + '</a><nav aria-label="Main">' + nav + '</nav></header>\n<main id="main">\n<section class="pb-row">' + p.blocks.map(clip).join('\n') + '</section>\n</main>\n' + FOOT + '\n' + runtimeTag('pb-' + id + '-' + (slugs[i] || 'home') + ':') + '\n</body>\n</html>\n';
+      return { name: (i ? slugs[i] + '/' : '') + 'index.html', text: html };
+    });
+  }
   async function buildPage() {
-    let base = FALLBACK_CSS;
-    try { const r = await fetch('../style.css'); if (r.ok) base = await r.text(); } catch (e) { /* offline: use the short built-in style */ }
-    const k = 'pb-' + slug() + ':', multi = S.pages.length > 1;
-    const body = S.pages.map((p, i) => '<section class="pb-row" data-page="' + i + '"' + (i ? ' hidden' : '') + '>' + p.blocks.map((b) => '<div data-block="' + b.id + '" style="--w:' + (b.w || 100) + '">' + blockHtml(b).replace(/ data-edit="[a-z]+"/g, '') + '</div>').join('\n') + '</section>').join('\n');
-    const tabs = multi ? '<div class="pb-tabs" role="group" aria-label="Pages">' + S.pages.map((p, i) => '<button type="button" data-tabbtn="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(p.name) + '</button>').join('') + '</div>' : '';
-    return '<!doctype html>\n<html lang="en-GB">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>' + esc(S.title) + '</title>\n<style>\n' + base + '\n' + BLOCK_CSS + '\n</style>\n</head>\n<body>\n<header class="top"><span class="mark">' + esc(S.title) + '</span></header>\n<main id="main">\n' + tabs + '\n' + body + '\n</main>\n<footer class="foot"><p>Made with Template from Pink Bourbon Estate. No cookies, no tracking.</p></footer>\n<script>\n(' + runtime.toString() + ')(document, ' + JSON.stringify(k) + ');\n<\/script>\n</body>\n</html>\n';
+    const id = slugOf(S.title), css = (await grab('../style.css', FALLBACK_CSS)) + '\n' + BLOCK_CSS, shellJs = await grab('../shell.js', '');
+    return projectDoc(id, 'page', css, shellJs);
+  }
+  /* a zip with no compression (plain "stored" entries): small enough to write by hand, opens everywhere */
+  const CRC = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = (u) => { let c = -1; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; };
+  function zip(files) {
+    const enc = new TextEncoder(), parts = [], cen = []; let off = 0, cl = 0;
+    files.forEach((f) => {
+      const n = enc.encode(f.name), d = enc.encode(f.text), c = crc32(d), lh = new DataView(new ArrayBuffer(30)), ch = new DataView(new ArrayBuffer(46));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(12, 0x21, true); lh.setUint32(14, c, true); lh.setUint32(18, d.length, true); lh.setUint32(22, d.length, true); lh.setUint16(26, n.length, true);
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(14, 0x21, true); ch.setUint32(16, c, true); ch.setUint32(20, d.length, true); ch.setUint32(24, d.length, true); ch.setUint16(28, n.length, true); ch.setUint32(42, off, true);
+      parts.push(lh, n, d); cen.push(ch, n); off += 30 + n.length + d.length; cl += 46 + n.length;
+    });
+    const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cl, true); end.setUint32(16, off, true);
+    return new Blob([...parts, ...cen, end], { type: 'application/zip' });
+  }
+  const README = (title, site) => '# ' + title + '\n\nMade with Template from Pink Bourbon Estate. Plain HTML, CSS and JavaScript: no build step, no tracking.\n\n## Put it on GitHub Pages\n\n1. On github.com choose New repository. Name it, keep it public, create it.\n2. Choose "uploading an existing file", then drag in everything from inside this folder (not the folder itself). Commit.\n3. Settings > Pages > Source: "Deploy from a branch", branch main, folder / (root). Save.\n4. After a minute the site is at https://YOUR-NAME.github.io/REPOSITORY/\n\n## Change it later\n\nOpen the project file (.json) in Template to carry on editing, then download the folder again and upload the files over the old ones.\n' + (site ? '\nEach page is a folder with an index.html; the menu is repeated in each file.\n' : '\nThe tabs after your own pages (Sources, My Data, Example Data, FAQ) are built by shell.js. Edit their words in info.js.\n');
+  async function buildZip() {
+    const id = slugOf(S.title), base = await grab('../style.css', FALLBACK_CSS), css = base + '\n' + BLOCK_CSS, site = S.kind === 'website', theme = await grab('../theme.js', ''), root = id + '/';
+    const files = [{ name: root + 'style.css', text: css }, { name: root + 'theme.js', text: theme }, { name: root + 'README.md', text: README(S.title, site) }];
+    if (site) siteDocs(id, css).forEach((f) => files.push({ name: root + f.name, text: f.text }));
+    else files.push({ name: root + 'index.html', text: projectDoc(id, 'zip', css) }, { name: root + 'shell.js', text: await grab('../shell.js', '') }, { name: root + 'info.js', text: infoJs(id) });
+    return zip(files);
   }
 
   /* ---------------------------------------------------------------- start screen and buttons */
   function open(proj) {
-    S = { title: proj.title, pages: proj.pages, cur: 0, sel: null };
+    S = { kind: proj.kind || 'project', title: proj.title, pages: proj.pages, cur: 0, sel: null };
     $('title').value = S.title; $('start').hidden = true; $('editor').hidden = false; $('preview').setAttribute('aria-pressed', 'false');
     drawPalette(); save(); draw();
   }
-  TEMPLATES.forEach(([name, text, make]) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<b></b><small></small>'; b.firstChild.textContent = name; b.lastChild.textContent = text; b.addEventListener('click', () => open(make())); $('templates').append(b); });
+  const GROUP = { 'Blank': 'Page', 'Tracker': 'Page', 'Notebook': 'Page', 'Dashboard': 'Page', 'Landing page': 'Page', 'CRISP-DM project': 'Document', 'Architectural plan set': 'Document', 'Meeting minutes': 'Document', 'Website: like this site': 'Website', 'Tool planning': 'Tool planning' };
+  ['Page', 'Document', 'Website', 'Tool planning'].forEach((g) => {
+    const h = document.createElement('h3'); h.textContent = g; const box = document.createElement('div'); box.className = 'tpl-cards'; $('templates').append(h, box);
+    TEMPLATES.filter((t) => GROUP[t[0]] === g).forEach(([name, text, make]) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<b></b><small></small>'; b.firstChild.textContent = name; b.lastChild.textContent = text; b.addEventListener('click', () => open(make())); box.append(b); });
+  });
   const saved = get(KEY); if (saved) { $('resume').hidden = false; $('resume').addEventListener('click', () => { try { open(clean(JSON.parse(saved))); } catch (e) { alert('That project could not be read.'); } }); }
   $('title').addEventListener('input', () => { S.title = $('title').value; save(); });
   $('new').addEventListener('click', () => { if (confirm('Go back to the start screen? Your current project stays saved in this browser.')) { $('editor').hidden = true; $('start').hidden = false; location.reload(); } });
   $('preview').addEventListener('click', () => { const on = $('preview').getAttribute('aria-pressed') !== 'true'; $('preview').setAttribute('aria-pressed', String(on)); document.querySelector('.tpl-cols').style.gridTemplateColumns = on ? '1fr' : ''; $('palette').hidden = $('inspector').hidden = on; drawCanvas(); });
-  $('saveproj').addEventListener('click', () => download(slug() + '.project.json', JSON.stringify({ format: 'pbe-template', v: 1, title: S.title, pages: S.pages }, null, 2), 'application/json'));
+  $('saveproj').addEventListener('click', () => download(slug() + '.project.json', JSON.stringify({ format: 'pbe-template', v: 1, kind: S.kind, title: S.title, pages: S.pages }, null, 2), 'application/json'));
   $('export').addEventListener('click', async () => download(slug() + '.html', await buildPage(), 'text/html'));
+  $('exportzip').addEventListener('click', async () => download(slug() + '.zip', await buildZip(), 'application/zip'));
 
   const fromText = (name, text) => /\.json$/i.test(name) ? clean(JSON.parse(text)) : fromHtml(text);
   $('importfile').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; if (f.size > 2e6) return alert('That file is too large (2 MB limit).'); try { open(fromText(f.name, await f.text())); } catch (err) { alert(err.message); } });

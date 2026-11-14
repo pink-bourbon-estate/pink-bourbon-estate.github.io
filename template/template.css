@@ -1,5 +1,6 @@
 /* Template builder layout: panels to add on the left, the page in the middle, the editor for the chosen panel on the right. */
 .tpl { max-width: 1500px; }
+#templates h3 { margin: 22px 0 10px; }
 .tpl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .tpl-cards button { text-align: left; text-transform: none; letter-spacing: 0; font-size: 15px; padding: 14px; }
 .tpl-cards button small { display: block; color: var(--mute); margin-top: 4px; font-size: 13px; }
